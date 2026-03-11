@@ -6,7 +6,9 @@
 
 `1º Semestre/2026`
 
-Escreva um ou dois parágrafos resumindo o objetivo do seu projeto.
+O objetivo do projeto FoodLoop é desenvolver uma plataforma digital que conecte estabelecimentos que possuem excedente de alimentos, como restaurantes, padarias e supermercados, com consumidores interessados em comprar esses produtos por preços reduzidos. Dessa forma, o sistema permite que alimentos que seriam descartados possam ser aproveitados, criando uma solução prática para diminuir o desperdício e ao mesmo tempo gerar benefícios econômicos tanto para as empresas quanto para os usuários.
+
+Além disso, o projeto busca incentivar práticas de consumo mais conscientes e sustentáveis na sociedade. Ao facilitar o reaproveitamento de alimentos que ainda estão próprios para consumo, o FoodLoop contribui para a redução do lixo gerado e promove maior conscientização sobre o impacto do desperdício de comida no meio ambiente, ajudando a construir um ciclo mais sustentável entre empresas e consumidores.
 
 ## Integrantes
 
