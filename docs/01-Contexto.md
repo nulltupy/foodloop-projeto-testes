@@ -1,6 +1,10 @@
 # Introdução
 
-Texto descritivo com a visão geral do projeto abordado. Inclui o contexto, o problema, os objetivos, a justificativa e o público-alvo do projeto. Visando contextualizar melhor o projeto e destacar sua importância para a disciplina, que é **extensionista**, acrescente todas as informações relevantes que julgar necessárias.
+O desperdício de alimentos é um problema global que afeta aspectos sociais, econômicos e ambientais. Enquanto grandes quantidades de alimentos são descartadas todos os anos, muitas pessoas ainda enfrentam dificuldades para ter acesso a uma alimentação adequada. Diante desse cenário, torna-se importante buscar soluções que ajudem a reduzir o desperdício e melhorar a distribuição dos alimentos.
+
+Com base nisso, o projeto propõe o desenvolvimento de um aplicativo que conecta estabelecimentos com excedentes de alimentos, como restaurantes, padarias e supermercados, a consumidores interessados em adquirir esses produtos por preços reduzidos. Dessa forma, alimentos que seriam descartados podem ser reaproveitados, beneficiando tanto os estabelecimentos quanto a população.
+
+Além de contribuir para a diminuição do desperdício, a proposta também se relaciona com iniciativas voltadas à segurança alimentar e à sustentabilidade, promovendo o uso mais consciente dos recursos e ampliando o acesso a alimentos a preços mais acessíveis. Assim, o projeto busca unir tecnologia e impacto social para gerar benefícios para a comunidade.
 
 ## Cliente 
 Nesta seção, devem ser apresentadas informações essenciais sobre o cliente (parceiro) para garantir um entendimento mais preciso do projeto como uma iniciativa extensionista.  
