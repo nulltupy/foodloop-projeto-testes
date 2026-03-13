@@ -14,17 +14,11 @@ De modo geral, essas organizações buscam oferecer alimentos de qualidade e um 
 Nesse contexto, o aplicativo proposto surge como uma solução tecnológica que pode auxiliar esses parceiros a reduzir perdas financeiras causadas pelo desperdício de alimentos, além de contribuir para um impacto social positivo e para práticas mais alinhadas com a sustentabilidade.
 
 ## Problema
-Aqui, a equipe deve fornecer uma descrição detalhada do problema a ser resolvido. Não é o momento adequado para abordar questões técnicas relacionadas ao desenvolvimento da aplicação. O objetivo é compreender e comunicar de maneira precisa qual é o desafio ou necessidade que motiva a criação da aplicação.
+O desperdício de alimentos é um problema significativo na sociedade atual, especialmente em estabelecimentos como restaurantes, padarias e supermercados. Nesses locais, uma grande quantidade de alimentos acaba sendo descartada diariamente devido à proximidade da data de validade ou à impossibilidade de venda no mesmo dia, mesmo estando ainda próprios para consumo.
 
-Descreva também o contexto em que essa aplicação será usada, se  houver: empresa, tecnologias, etc. Novamente, descreva apenas o que de fato existir, pois ainda não é a hora de apresentar requisitos detalhados ou projetos.
+Ao mesmo tempo, muitas pessoas enfrentam dificuldades financeiras para adquirir alimentos a preços convencionais. Esse cenário demonstra uma falha na conexão entre oferta e demanda: enquanto alguns estabelecimentos possuem alimentos excedentes, muitos consumidores poderiam se beneficiar desses produtos por valores mais acessíveis.
 
-O grupo pode optar por fazer uso de ferramentas como Design Thinking, que permite uma visão completa do problema.
-
-> **Links úteis**:
-> - [Objetivos, problema de pesquisa e justificativa](https://medium.com/@versioparole/objetivos-problema-de-pesquisa-e-justificativa-c98c8233b9c3)
-> - [Matriz certezas, suposições e dúvidas](https://medium.com/educa%C3%A7%C3%A3o-fora-da-caixa/matriz-certezas-suposi%C3%A7%C3%B5es-e-d%C3%BAvidas-fa2263633655)
-> - [Brainstorming](https://www.euax.com.br/2018/09/brainstorming/)
-
+Diante desse contexto, surge a necessidade de uma solução que facilite a ligação entre esses dois lados. Assim, a proposta do projeto é pensar em uma aplicação que ajude a aproximar estabelecimentos com excedentes de alimentos e consumidores interessados, contribuindo para a redução do desperdício e para o melhor aproveitamento dos recursos disponíveis.
 ## Objetivos
 
 Aqui, você deve descrever os objetivos do trabalho, indicando que o objetivo geral é desenvolver um software para solucionar o problema apresentado acima.
