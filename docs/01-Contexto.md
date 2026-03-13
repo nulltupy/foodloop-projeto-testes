@@ -7,9 +7,11 @@ Com base nisso, o projeto propõe o desenvolvimento de um aplicativo que conecta
 Além de contribuir para a diminuição do desperdício, a proposta também se relaciona com iniciativas voltadas à segurança alimentar e à sustentabilidade, promovendo o uso mais consciente dos recursos e ampliando o acesso a alimentos a preços mais acessíveis. Assim, o projeto busca unir tecnologia e impacto social para gerar benefícios para a comunidade.
 
 ## Cliente 
-Nesta seção, devem ser apresentadas informações essenciais sobre o cliente (parceiro) para garantir um entendimento mais preciso do projeto como uma iniciativa extensionista.  
+O projeto tem como público parceiro estabelecimentos do setor alimentício, como restaurantes, padarias, mercados e supermercados, que frequentemente lidam com excedentes de alimentos ao longo do dia. Esses estabelecimentos atuam no comércio e na produção de alimentos, um setor marcado pela alta rotatividade de produtos perecíveis, o que gera desafios relacionados à gestão de estoque e ao desperdício.
 
-Recomenda-se incluir dados como missão, visão e valores da organização, além de seu ramo de atuação, porte, nicho de mercado e principais desafios enfrentados. Também é relevante fornecer informações sobre sua localização, histórico, impacto social e possíveis demandas específicas. Quanto mais detalhadas forem essas informações, mais embasada será a análise do contexto, permitindo uma abordagem estratégica e alinhada às necessidades do cliente.
+De modo geral, essas organizações buscam oferecer alimentos de qualidade e um bom atendimento à população, tendo como missão atender bem seus clientes e como visão crescer de forma sustentável e fortalecer a relação com a comunidade. Entre seus valores, destacam-se a responsabilidade social, a qualidade dos produtos e a adoção de práticas mais sustentáveis.
+
+Nesse contexto, o aplicativo proposto surge como uma solução tecnológica que pode auxiliar esses parceiros a reduzir perdas financeiras causadas pelo desperdício de alimentos, além de contribuir para um impacto social positivo e para práticas mais alinhadas com a sustentabilidade.
 
 ## Problema
 Aqui, a equipe deve fornecer uma descrição detalhada do problema a ser resolvido. Não é o momento adequado para abordar questões técnicas relacionadas ao desenvolvimento da aplicação. O objetivo é compreender e comunicar de maneira precisa qual é o desafio ou necessidade que motiva a criação da aplicação.
