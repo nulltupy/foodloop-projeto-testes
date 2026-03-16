@@ -73,17 +73,23 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 
 ### Requisitos funcionais
 
-|ID    | Descrição do Requisito  | Prioridade |
-|------|-----------------------------------------|----|
-|RF-001| Permitir que o usuário cadastre tarefas | ALTA | 
-|RF-002| Emitir um relatório de tarefas no mês   | MÉDIA |
+| ID | Descrição do Requisito | Prioridade |
+| :--- | :--- | :--- |
+| RF-001 | O sistema deve permitir o cadastro de usuários (consumidores e parceiros). | ALTA |
+| RF-002 | O sistema deve permitir que parceiros gerenciem (CRUD) suas ofertas de alimentos. | ALTA |
+| RF-003 | O sistema deve listar ofertas disponíveis em um raio de distância via GPS. | MÉDIA |
+| RF-004 | O sistema deve permitir a reserva e o pagamento de uma oferta. | ALTA |
+| RF-005 | O sistema deve enviar confirmações de pedido via e-mail ou notificação push. | BAIXA |
+| RF-006 | O sistema deve permitir que o usuário visualize o histórico de pedidos. | MÉDIA |
 
 ### Requisitos não funcionais
 
-|ID     | Descrição do Requisito  |Prioridade |
-|-------|-------------------------|----|
-|RNF-001| O sistema deve ser responsivo para rodar em dispositivos móveis | MÉDIA | 
-|RNF-002| Deve processar as requisições do usuário em no máximo 3 segundos |  BAIXA | 
+| ID | Descrição do Requisito | Prioridade |
+| :--- | :--- | :--- |
+| RNF-001 | O sistema deve ser responsivo para rodar em dispositivos móveis e desktop. | ALTA |
+| RNF-002 | As senhas e dados de pagamento devem ser protegidos por criptografia (HTTPS/SSL). | ALTA |
+| RNF-003 | O sistema deve processar buscas por geolocalização em menos de 2 segundos. | MÉDIA |
+| RNF-004 | O back-end deve ser desenvolvido utilizando C# com .NET para garantir escalabilidade. | ALTA |
 
 Com base nas histórias de usuários, enumere os requisitos da sua solução. Classifique esses requisitos em dois grupos:
 
