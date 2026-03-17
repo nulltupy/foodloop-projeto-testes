@@ -69,7 +69,7 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 | RNF-001 | O sistema deve ser responsivo para rodar em dispositivos móveis e desktop. | ALTA |
 | RNF-002 | As senhas e dados de pagamento devem ser protegidos por criptografia (HTTPS/SSL). | ALTA |
 | RNF-003 | O sistema deve processar buscas por geolocalização em menos de 2 segundos. | MÉDIA |
-| RNF-004 | O back-end deve ser desenvolvido utilizando C# com .NET para garantir escalabilidade. | ALTA |
+
 
 Com base nas histórias de usuários, enumere os requisitos da sua solução. Classifique esses requisitos em dois grupos:
 
