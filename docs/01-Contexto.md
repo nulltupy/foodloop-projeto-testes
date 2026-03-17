@@ -21,11 +21,10 @@ Ao mesmo tempo, muitas pessoas enfrentam dificuldades financeiras para adquirir 
 Diante desse contexto, surge a necessidade de uma solução que facilite a ligação entre esses dois lados. Assim, a proposta do projeto é pensar em uma aplicação que ajude a aproximar estabelecimentos com excedentes de alimentos e consumidores interessados, contribuindo para a redução do desperdício e para o melhor aproveitamento dos recursos disponíveis.
 ## Objetivos
 
-Objetivo Geral 
-> **Links úteis**:
+### Objetivo Geral 
 Desenvolver um aplicativo que conecte estabelecimentos com excedentes de alimentos a consumidores interessados em adquiri-los por preços reduzidos, contribuindo para a diminuição do desperdício e promovendo práticas alinhadas aos objetivos de desenvolvimento sustentável. 
 
-Objetivos Específicos 
+### Objetivos Específicos 
 
 Criar uma plataforma digital que permita aos estabelecimentos cadastrarem alimentos excedentes disponíveis para venda. 
 Permitir que consumidores visualizem e adquiram esses produtos de forma rápida e acessível. 
@@ -35,22 +34,20 @@ Promover benefícios econômicos tanto para empresas quanto para consumidores.
 
 ## Justificativa
 
-Descreva a importância ou a motivação para trabalhar com esta aplicação que você escolheu. Indique as razões pelas quais você escolheu seus objetivos específicos ou as razões para aprofundar em certos aspectos do software.
-
-O grupo de trabalho pode fazer uso de questionários, entrevistas e dados estatísticos, que podem ser apresentados, com o objetivo de esclarecer detalhes do problema que será abordado pelo grupo.
-
-> **Links úteis**:
-> - [Como montar a justificativa](https://guiadamonografia.com.br/como-montar-justificativa-do-tcc/)
+A escolha deste projeto está relacionada à crescente preocupação global com o desperdício de alimentos e com a insegurança alimentar. Segundo diversas pesquisas e relatórios internacionais, uma grande quantidade de alimentos produzidos no mundo é descartada diariamente, enquanto milhões de pessoas enfrentam dificuldades para ter acesso a uma alimentação adequada. 
+  
+Nesse contexto, soluções tecnológicas podem desempenhar um papel fundamental na criação de sistemas mais eficientes de distribuição de alimentos. O desenvolvimento de um aplicativo que conecte estabelecimentos com excedentes de alimentos a consumidores representa uma forma prática de reduzir o desperdício e promover o consumo consciente. 
+  
+Além disso, o projeto contribui diretamente para os Objetivos de Desenvolvimento Sustentável, especialmente o ODS 02 – Fome Zero, que busca garantir o acesso a alimentos seguros, nutritivos e suficientes para todas as pessoas. 
+ 
+Assim, este trabalho se justifica pela possibilidade de aplicar conhecimentos tecnológicos na criação de uma solução que gere impacto social positivo, promovendo sustentabilidade, redução de desperdício e maior acesso à alimentação
 
 ## Público-alvo
 
-Descreva quem serão as pessoas que usarão a sua aplicação indicando os diferentes perfis. O objetivo aqui não é definir quem serão os clientes ou quais serão os papéis dos usuários na aplicação. A ideia é, dentro do possível, conhecer um pouco mais sobre o perfil dos usuários: conhecimentos prévios, relação com a tecnologia, relações
-hierárquicas, etc.
+O público-alvo da aplicação é composto por diferentes perfis de usuários que podem se beneficiar diretamente da solução proposta. 
 
-Adicione informações sobre o público-alvo por meio de uma descrição textual, diagramas de personas e mapa de stakeholders.
+O primeiro grupo é formado por estabelecimentos comerciais do setor alimentício, como restaurantes, padarias, lanchonetes e supermercados. Esses usuários utilizarão a plataforma para cadastrar alimentos excedentes que ainda estão próprios para consumo, mas que não foram vendidos dentro do período esperado. 
+O segundo grupo é composto por consumidores interessados em adquirir alimentos por preços mais acessíveis. Esse público pode incluir estudantes, trabalhadores, famílias com orçamento limitado ou pessoas que buscam alternativas de consumo mais sustentáveis. 
+Em relação ao perfil tecnológico, espera-se que os usuários possuam conhecimentos básicos de uso de smartphones e aplicativos, já que a aplicação será projetada para ter uma interface simples e intuitiva. 
 
-> **Links úteis**:
-> - [Público-alvo](https://blog.hotmart.com/pt-br/publico-alvo/)
-> - [Como definir o público-alvo](https://exame.com/pme/5-dicas-essenciais-para-definir-o-publico-alvo-do-seu-negocio/)
-> - [Público-alvo: o que é, tipos, como definir seu público e exemplos](https://klickpages.com.br/blog/publico-alvo-o-que-e/)
-> - [Qual a diferença entre público-alvo e persona?](https://rockcontent.com/blog/diferenca-publico-alvo-e-persona/)
+Além disso, o projeto envolve stakeholders como os próprios estabelecimentos parceiros, consumidores finais e a comunidade local, que se beneficia da redução do desperdício de alimentos e do incentivo a práticas mais sustentáveis. 
