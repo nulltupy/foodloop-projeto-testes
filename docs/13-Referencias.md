@@ -14,6 +14,14 @@ Exemplo:
 
 - SUTHERLAND, Jeffrey Victor; SUTHERLAND, J. J. **Scrum:** a arte de fazer o dobro do trabalho na metade do tempo. Rio de Janeiro, RJ: Sextante, 2019. 254 p.
 
+- VERTICE. **Como escrever boas user stories (histórias de usuários)**. Medium. Disponível em: https://medium.com/vertice/como-escrever-boas-users-stories-hist%C3%B3rias-de-usu%C3%A1rios-b29c75043fac. Acesso em: 17 mar. 2026.
+
+- LUIZ TOOLS. **User Stories: descrição de requisitos que humanos entendem**. Disponível em: https://www.luiztools.com.br/post/user-stories-descricao-de-requisitos-que-humanos-entendem/. Acesso em: 17 mar. 2026.
+
+- REQVIEW. **User Stories Example**. Disponível em: https://www.reqview.com/doc/user-stories-example/. Acesso em: 17 mar. 2026.
+
+- AIRFOCUS. **9 Common User Story Mistakes**. Disponível em: https://airfocus.com/blog/user-story-mistakes/. Acesso em: 17 mar. 2026.
+
 > **Links úteis**:
 > - [Padrão PUC Minas de normalização ABNT](https://www.pucminas.br/biblioteca/DocumentoBiblioteca/ABNT-GUIA-COMPLETO-Elaborar-formatar-trabalho-cientifico.pdf)
 > - [Formato ABNT](https://www.normastecnicas.com/abnt/)
