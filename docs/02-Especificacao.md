@@ -49,26 +49,31 @@ Apresente aqui as histórias de usuários que são relevantes para o projeto da 
 
 ## Requisitos
 
-As tabelas a seguir apresentam os requisitos funcionais e não funcionais que detalham o escopo do projeto. Para determinar a prioridade dos requisitos, aplique uma técnica de priorização e detalhe como essa técnica foi aplicada.
+As tabelas a seguir apresentam os requisitos funcionais e não funcionais que detalham o escopo do projeto, alinhados com as diretrizes mapeadas no Business Model Canvas (BMC). Para determinar a prioridade dos requisitos, aplicou-se a técnica de valor de negócio e urgência.
 
 ### Requisitos funcionais
 
 | ID | Descrição do Requisito | Prioridade |
 | :--- | :--- | :--- |
-| RF-001 | O sistema deve permitir o cadastro de usuários (consumidores e parceiros). | ALTA |
-| RF-002 | O sistema deve permitir que parceiros gerenciem (CRUD) suas ofertas de alimentos. | ALTA |
-| RF-003 | O sistema deve listar ofertas disponíveis em um raio de distância via GPS. | MÉDIA |
-| RF-004 | O sistema deve permitir a reserva e o pagamento de uma oferta. | ALTA |
-| RF-005 | O sistema deve enviar confirmações de pedido via e-mail ou notificação push. | BAIXA |
-| RF-006 | O sistema deve permitir que o usuário visualize o histórico de pedidos. | MÉDIA |
+| **RF-001** | O sistema deve permitir o cadastro e login de usuários (Consumidores e Estabelecimentos Parceiros). | ALTA |
+| **RF-002** | O estabelecimento deve poder publicar e gerenciar (CRUD) suas ofertas de excedentes do fim do expediente. | ALTA |
+| **RF-003** | O sistema deve listar as ofertas disponíveis para o consumidor, filtradas por geolocalização (GPS). | ALTA |
+| **RF-004** | O sistema deve processar reservas e pagamentos, calculando automaticamente a comissão retida pela plataforma FoodLoop. | ALTA |
+| **RF-005** | O sistema deve permitir a aplicação de cupons de desconto e oferecer benefícios para usuários frequentes. | MÉDIA |
+| **RF-006** | O sistema deve permitir que os consumidores avaliem os estabelecimentos parceiros após a retirada do pedido. | MÉDIA |
+| **RF-007** | O sistema deve oferecer suporte à adesão de planos de assinatura para estabelecimentos que desejam maior destaque e espaço promocional no app. | BAIXA |
+| **RF-008** | O sistema deve enviar notificações push sobre o status do pedido e promoções próximas. | MÉDIA |
 
 ### Requisitos não funcionais
 
 | ID | Descrição do Requisito | Prioridade |
 | :--- | :--- | :--- |
-| RNF-001 | O sistema deve ser responsivo para rodar em dispositivos móveis e desktop. | ALTA |
-| RNF-002 | As senhas e dados de pagamento devem ser protegidos por criptografia (HTTPS/SSL). | ALTA |
-| RNF-003 | O sistema deve processar buscas por geolocalização em menos de 2 segundos. | MÉDIA |
+| **RNF-001** | O aplicativo deve ser desenvolvido no framework **React Native**, garantindo compatibilidade com dispositivos móveis (Android e iOS). | ALTA |
+| **RNF-002** | A persistência de dados e a autenticação de usuários devem ser implementadas utilizando a plataforma **Firebase** (Auth, Firestore). | ALTA |
+| **RNF-003** | A integração com os provedores de meios de pagamento deve seguir protocolos de segurança avançados e criptografia ponta a ponta. | ALTA |
+| **RNF-004** | O tempo de carregamento da listagem de ofertas no mapa não deve ultrapassar 3 segundos. | MÉDIA |
+
+
 
 
 Com base nas histórias de usuários, enumere os requisitos da sua solução. Classifique esses requisitos em dois grupos:
@@ -91,15 +96,14 @@ Lembre-se de que cada requisito deve corresponder a uma e somente uma caracterí
 
 ## Restrições
 
-Enumere as restrições à sua solução. Lembre-se de que as restrições geralmente limitam a solução candidata.
+O projeto está restrito aos itens apresentados na tabela a seguir, que delimitam o escopo de execução, as escolhas tecnológicas e os recursos disponíveis.
 
-O projeto está restrito aos itens apresentados na tabela a seguir.
-
-|ID| Restrição                                             |
-|--|-------------------------------------------------------|
-|001| O projeto deverá ser entregue até o final do semestre |
-|002| O custo total do projeto não deve exceder o orçamento definido       |
-
+| ID | Restrição |
+| :--- | :--- |
+| **001** | O projeto e a apresentação deverão ser entregues obrigatoriamente dentro do prazo estipulado pelo cronograma acadêmico. |
+| **002** | O desenvolvimento do software deve ser realizado exclusivamente pelos integrantes do grupo, sendo proibida a contratação de terceiros. |
+| **003** | A arquitetura de software está restrita ao uso de React Native (Front-end) e Firebase (Back-end/BaaS), conforme validação técnica da equipe. |
+| **004** | O custo total do projeto deve ser contido no orçamento zero, utilizando apenas os planos gratuitos (*Free Tier*) de plataformas de hospedagem e APIs. |
 ## Diagrama de casos de uso
 
 O diagrama de casos de uso é o próximo passo após a elicitação de requisitos. Ele utiliza um modelo gráfico e uma tabela com as descrições sucintas dos casos de uso e dos atores. O diagrama contempla a fronteira do sistema e o detalhamento dos requisitos funcionais, com a indicação dos atores, casos de uso e seus relacionamentos.
