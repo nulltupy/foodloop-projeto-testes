@@ -16,17 +16,17 @@ A seguir, apresenta-se o modelo de negócio desenvolvido para o projeto.
 
 ## Personas
 
-![Persona 01](images/Persona_1)
+![Persona 01](images/Persona_1.png)
 
-![Persona 02](images/Persona_2)
+![Persona 02](images/Persona_2.png)
 
-![Persona 03](images/Persona_3)
+![Persona 03](images/Persona_3.png)
 
-![Persona 04](images/Persona_4)
+![Persona 04](images/Persona_4.png)
 
-![Persona 05](images/Persona_5)
+![Persona 05](images/Persona_5.png)
 
-![Persona 06](images/Persona_6)
+![Persona 06](images/Persona_6.png)
 
 > **Links úteis**:
 > - [Rock content](https://rockcontent.com/blog/personas/)
