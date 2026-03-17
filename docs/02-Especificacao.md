@@ -16,9 +16,17 @@ A seguir, apresenta-se o modelo de negócio desenvolvido para o projeto.
 
 ## Personas
 
-Deve-se relacionar as personas identificadas no projeto. Enumere e detalhe as personas da sua solução. Lembre-se que você deve ser enumerar e descrever precisamente e personalizada todos os clientes ideais que sua solução almeja.
+![Persona 01](images/Persona_1)
 
-![Exemplo de persona](images/exemplo-persona.png)
+![Persona 02](images/Persona_2)
+
+![Persona 03](images/Persona_3)
+
+![Persona 04](images/Persona_4)
+
+![Persona 05](images/Persona_5)
+
+![Persona 06](images/Persona_6)
 
 > **Links úteis**:
 > - [Rock content](https://rockcontent.com/blog/personas/)
