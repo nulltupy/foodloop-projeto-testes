@@ -79,14 +79,16 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 
 | ID | Descrição do Requisito | Prioridade |
 | :--- | :--- | :--- |
-| **RF-001** | O sistema deve permitir o cadastro e login de usuários (Consumidores e Estabelecimentos Parceiros). | ALTA |
-| **RF-002** | O estabelecimento deve poder publicar e gerenciar (CRUD) suas ofertas de excedentes do fim do expediente. | ALTA |
-| **RF-003** | O sistema deve listar as ofertas disponíveis para o consumidor, filtradas por geolocalização (GPS). | ALTA |
-| **RF-004** | O sistema deve processar reservas e pagamentos, calculando automaticamente a comissão retida pela plataforma FoodLoop. | ALTA |
-| **RF-005** | O sistema deve permitir a aplicação de cupons de desconto e oferecer benefícios para usuários frequentes. | MÉDIA |
-| **RF-006** | O sistema deve permitir que os consumidores avaliem os estabelecimentos parceiros após a retirada do pedido. | MÉDIA |
-| **RF-007** | O sistema deve oferecer suporte à adesão de planos de assinatura para estabelecimentos que desejam maior destaque e espaço promocional no app. | BAIXA |
-| **RF-008** | O sistema deve enviar notificações push sobre o status do pedido e promoções próximas. | MÉDIA |
+| **RF-001** | O sistema deve permitir o cadastro, login e gerenciamento de perfis para Consumidores e Estabelecimentos. | ALTA |
+| **RF-002** | O estabelecimento deve poder publicar e gerenciar (CRUD) suas ofertas, definindo descrição, preço, e **quantidade em estoque** em tempo real. | ALTA |
+| **RF-003** | O sistema deve listar as ofertas disponíveis, permitindo filtros por **geolocalização (distância) e faixa de preço**. | ALTA |
+| **RF-004** | O sistema deve processar a reserva e o pagamento online diretamente no aplicativo. | ALTA |
+| **RF-005** | O sistema deve permitir o **cancelamento de reservas** tanto pelo consumidor quanto pelo estabelecimento, com atualização de estoque. | ALTA |
+| **RF-006** | O sistema deve disponibilizar um **histórico de pedidos** para o consumidor e um **dashboard de desempenho de vendas** para o parceiro comercial. | MÉDIA |
+| **RF-007** | O sistema deve permitir a aplicação de cupons de desconto e oferecer benefícios de fidelidade para usuários recorrentes. | MÉDIA |
+| **RF-008** | O sistema deve permitir que os consumidores avaliem os estabelecimentos parceiros após a retirada do pedido. | MÉDIA |
+| **RF-009** | O sistema deve enviar **notificações push e alertas** sobre status de reservas, confirmações e promoções próximas. | MÉDIA |
+| **RF-010** | O sistema deve oferecer suporte à adesão de planos de assinatura para parceiros que desejam maior destaque (visibilidade) no aplicativo. | BAIXA |
 
 ### Requisitos não funcionais
 
