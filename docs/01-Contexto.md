@@ -21,12 +21,17 @@ Ao mesmo tempo, muitas pessoas enfrentam dificuldades financeiras para adquirir 
 Diante desse contexto, surge a necessidade de uma solução que facilite a ligação entre esses dois lados. Assim, a proposta do projeto é pensar em uma aplicação que ajude a aproximar estabelecimentos com excedentes de alimentos e consumidores interessados, contribuindo para a redução do desperdício e para o melhor aproveitamento dos recursos disponíveis.
 ## Objetivos
 
-Aqui, você deve descrever os objetivos do trabalho, indicando que o objetivo geral é desenvolver um software para solucionar o problema apresentado acima.
-
-Além disso, apresente alguns (pelo menos 3) objetivos específicos, dependendo de onde você pretende concentrar sua prática investigativa ou como deseja aprofundar seu trabalho.
- 
+Objetivo Geral 
 > **Links úteis**:
-> - [Objetivo geral e objetivo específico: como fazer e quais verbos utilizar](https://blog.mettzer.com/diferenca-entre-objetivo-geral-e-objetivo-especifico/)
+Desenvolver um aplicativo que conecte estabelecimentos com excedentes de alimentos a consumidores interessados em adquiri-los por preços reduzidos, contribuindo para a diminuição do desperdício e promovendo práticas alinhadas aos objetivos de desenvolvimento sustentável. 
+
+Objetivos Específicos 
+
+Criar uma plataforma digital que permita aos estabelecimentos cadastrarem alimentos excedentes disponíveis para venda. 
+Permitir que consumidores visualizem e adquiram esses produtos de forma rápida e acessível. 
+Reduzir o desperdício de alimentos por meio da comercialização de produtos que seriam descartados. 
+Incentivar práticas sustentáveis alinhadas ao ODS 02 – Fome Zero. 
+Promover benefícios econômicos tanto para empresas quanto para consumidores. 
 
 ## Justificativa
 
