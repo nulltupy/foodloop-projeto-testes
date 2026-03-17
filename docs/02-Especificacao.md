@@ -43,10 +43,26 @@ Com base na análise das personas, foram identificadas as seguintes histórias d
 
 |EU COMO... `PERSONA`| QUERO/PRECISO ... `FUNCIONALIDADE` |PARA ... `MOTIVO/VALOR`                 |
 |--------------------|------------------------------------|----------------------------------------|
-|Usuário do sistema  | Registrar minhas tarefas           | Não esquecer de fazê-las               |
-|Administrador       | Alterar permissões                 | Permitir que possam administrar contas |
-
-Apresente aqui as histórias de usuários que são relevantes para o projeto da sua solução. As histórias de usuários consistem em uma ferramenta poderosa para a compreensão e elicitação dos requisitos funcionais e não funcionais da sua aplicação. Se possível, agrupe as histórias de usuários por contexto, para facilitar consultas recorrentes a esta parte do documento.
+| Rafael Souza, estudante universitário com orçamento limitado | ver uma lista de restaurantes próximos com refeições com desconto | economizar na alimentação sem precisar pesquisar em vários aplicativos |
+| Rafael Souza, estudante universitário sem tempo para cozinhar | filtrar as ofertas disponíveis por distância e preço | encontrar rapidamente a opção mais acessível perto da universidade |
+| Carla Mendes, gerente de supermercado com produtos próximos ao vencimento | cadastrar produtos próximos da data de validade com desconto | reduzir o desperdício e evitar prejuízo financeiro com o descarte |
+| Carla Mendes, gerente de supermercado | visualizar o desempenho das ofertas cadastradas | avaliar quais promoções funcionam melhor e otimizar a gestão de estoque |
+| Lucas Ferreira, designer gráfico que pede comida fora com frequência | reservar refeições com desconto pelo aplicativo antes de sair do trabalho | garantir a oferta e evitar os altos gastos com delivery no fim do dia |
+| Lucas Ferreira, designer gráfico preocupado com sustentabilidade | avaliar os estabelecimentos parceiros após retirar o pedido | ajudar outros usuários a escolher melhor e incentivar a qualidade dos parceiros |
+| Mariana Lopes, proprietária de restaurante com sobras no fim do expediente | publicar refeições excedentes do fim do dia com desconto | recuperar parte do custo de produção e evitar o descarte de comida própria para consumo |
+| Mariana Lopes, proprietária de restaurante | editar ou encerrar ofertas publicadas em tempo real | manter as informações atualizadas e evitar reservas de itens já esgotados |
+| Ana Nogueira, proprietária de padaria com grande volume de sobras diárias | anunciar os produtos que sobram no final do expediente de forma simples e rápida | vendê-los antes do encerramento e reduzir o prejuízo com alimentos descartados |
+| Ana Nogueira, proprietária de padaria | ser notificada quando uma reserva for confirmada por um consumidor | organizar o pedido com antecedência e garantir uma boa experiência de retirada |
+| Pedro Santos, professor com rotina agitada e pouco tempo para cozinhar | receber notificações de promoções em restaurantes próximos a mim | aproveitar ofertas acessíveis sem precisar buscar ativamente, economizando tempo e dinheiro |
+| Pedro Santos, professor preocupado com sustentabilidade | acessar o histórico de pedidos realizados na plataforma | reaproveitar estabelecimentos já aprovados e acompanhar minha contribuição à redução do desperdício |
+| Rafael Souza, estudante universitário que acessou o app pela primeira vez | criar uma conta na plataforma como consumidor | ter acesso às ofertas disponíveis e conseguir fazer reservas nos estabelecimentos parceiros |
+| Mariana Lopes, proprietária de restaurante que quer começar a usar o app | cadastrar meu estabelecimento e fazer login na plataforma | começar a publicar ofertas e alcançar novos consumidores próximos |
+| Lucas Ferreira, designer gráfico que usa o app com frequência | acumular benefícios por ser um usuário recorrente e aplicar cupons de desconto | economizar ainda mais nas refeições e ser recompensado pela fidelidade à plataforma |
+| Ana Nogueira, proprietária de padaria que busca mais visibilidade no app | aderir a um plano de destaque para o meu estabelecimento | aparecer em posições privilegiadas na listagem e atrair um volume maior de consumidores próximos |
+| Rafael Souza, estudante universitário que fez uma reserva no app | pagar pela reserva diretamente no aplicativo, sem precisar levar dinheiro | concluir a compra de forma prática e segura antes de ir buscar o pedido |
+| Lucas Ferreira, designer gráfico que não conseguirá retirar um pedido reservado | cancelar uma reserva que fiz | evitar que o estabelecimento separe o produto inutilmente e preservar minha reputação na plataforma |
+| Mariana Lopes, proprietária de restaurante quando um item reservado deixar de estar disponível | cancelar a reserva de um consumidor pelo aplicativo | avisá-lo a tempo e evitar que ele se desloque até o restaurante sem necessidade |
+| Ana Nogueira, proprietária de padaria ao criar uma oferta | definir a quantidade disponível de cada produto anunciado | controlar o estoque com precisão e evitar reservas além do que tenho disponível |
 
 > **Links úteis**:
 > - [Histórias de usuários com exemplos e template](https://www.atlassian.com/br/agile/project-management/user-stories)
