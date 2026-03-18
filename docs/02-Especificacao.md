@@ -89,6 +89,8 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 | **RF-008** | O sistema deve permitir que os consumidores avaliem os estabelecimentos parceiros após a retirada do pedido. | MÉDIA |
 | **RF-009** | O sistema deve enviar **notificações push e alertas** sobre status de reservas, confirmações e promoções próximas. | MÉDIA |
 | **RF-010** | O sistema deve oferecer suporte à adesão de planos de assinatura para parceiros que desejam maior destaque (visibilidade) no aplicativo. | BAIXA |
+| **RF-011** | O sistema deve calcular e reter automaticamente a comissão da plataforma FoodLoop sobre cada transação processada. | ALTA |
+| **RF-012** | O sistema deve disponibilizar ao Administrador um painel de indicadores de uso, volume de transações e impacto de redução de desperdício. | BAIXA |
 
 ### Requisitos não funcionais
 
@@ -98,27 +100,7 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 | **RNF-002** | A persistência de dados e a autenticação de usuários devem ser implementadas utilizando a plataforma **Firebase** (Auth, Firestore). | ALTA |
 | **RNF-003** | A integração com os provedores de meios de pagamento deve seguir protocolos de segurança avançados e criptografia ponta a ponta. | ALTA |
 | **RNF-004** | O tempo de carregamento da listagem de ofertas no mapa não deve ultrapassar 3 segundos. | MÉDIA |
-
-
-
-
-Com base nas histórias de usuários, enumere os requisitos da sua solução. Classifique esses requisitos em dois grupos:
-
-- [Requisitos funcionais
- (RF)](https://pt.wikipedia.org/wiki/Requisito_funcional):
- correspondem a uma funcionalidade que deve estar presente na
-  plataforma (ex: cadastro de usuário).
-- [Requisitos não funcionais
-  (RNF)](https://pt.wikipedia.org/wiki/Requisito_n%C3%A3o_funcional):
-  correspondem a uma característica técnica, seja de usabilidade,
-  desempenho, confiabilidade, segurança ou outro (ex: suporte a
-  dispositivos iOS e Android).
-
-Lembre-se de que cada requisito deve corresponder a uma e somente uma característica-alvo da sua solução. Além disso, certifique-se de que todos os aspectos capturados nas histórias de usuários foram cobertos.
-
-> **Links úteis**:
-> - [O que são requisitos funcionais e requisitos não funcionais?](https://codificar.com.br/requisitos-funcionais-nao-funcionais/)
-> - [Entenda o que são requisitos de software, a diferença entre requisito funcional e não funcional, e como identificar e documentar cada um deles](https://analisederequisitos.com.br/requisitos-funcionais-e-requisitos-nao-funcionais-o-que-sao/)
+| **RNF-005** | O aplicativo deve estar disponível para uso em pelo menos 99% do tempo durante o horário de pico (18h–22h), minimizando interrupções no período de maior demanda. | ALTA |
 
 ## Restrições
 
