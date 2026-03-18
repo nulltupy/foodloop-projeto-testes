@@ -10,21 +10,21 @@ Descreva aqui a metodologia de trabalho do grupo para abordar o problema. Inclua
 
 A ferramenta de controle de versão adotada no projeto foi o [Git](https://git-scm.com/), sendo que o [GitHub](https://github.com) foi utilizado para hospedagem do repositório.
 
-O projeto segue a seguinte convenção para o nome de branches:
+O projeto adota as seguintes convenções para branches:
 
-- `main`: versão estável já testada do software
-- `unstable`: versão já testada do software, porém instável
-- `testing`: versão em testes do software
-- `dev`: versão de desenvolvimento do software
+- `feat/` — nova funcionalidade
+- `docs/` — documentação
+- `fix/` — correção de bug
+- `chore/` — manutenção (configurações, dependências, etc.)
 
-Quanto à gerência de issues, o projeto adota a seguinte convenção para etiquetas:
+Para commits, adota-se o mesmo prefixo seguido de uma descrição curta:
 
-- `documentation`: melhorias ou acréscimos à documentação
-- `bug`: uma funcionalidade encontra-se com problemas
-- `enhancement`: uma funcionalidade precisa ser melhorada
-- `feature`: uma nova funcionalidade precisa ser introduzida
+- `feat: descrição` — nova funcionalidade
+- `docs: descrição` — documentação
+- `fix: descrição` — correção de bug
+- `chore: descrição` — manutenção
 
-Discuta como a configuração do projeto foi feita na ferramenta de versionamento escolhida. Exponha como a gestão de tags, merges, commits e branches é realizada. Discuta também como a gestão de issues foi feita.
+Merges são realizados sempre via Pull Request, nunca diretamente na `main`. As issues são gerenciadas pelo GitHub Projects e vinculadas aos PRs com `Closes #<número>`, permitindo o fechamento automático ao merge.
 
 > **Links úteis**:
 > - [Tutorial GitHub](https://guides.github.com/activities/hello-world/)
@@ -40,10 +40,11 @@ Discuta como a configuração do projeto foi feita na ferramenta de versionament
 > Apresente a divisão de papéis entre os membros do grupo em cada Sprint. O desejável é que, em cada Sprint, o aluno assuma papéis diferentes na equipe. Siga o modelo do exemplo abaixo:
 
 #### Sprint 1
-- _Scrum master_: AlunaX
-- Protótipos: AlunoY
-- Testes: AlunoK
-- Documentação: AlunaZ
+- _Scrum master_: Gabriel Santos Arpini
+- Documentação (Personas): Gabriel Xavier de Souza
+- Documentação (BMC): Diogo Lamera dos Santos
+- Documentação (Requisitos e Restrições): Rafael Lucas Mota Oliveira
+- Documentação (Histórias de usuário): Gabriel Santos Arpini
 
 #### Sprint 2
 - _Scrum master_: AlunaY
@@ -57,14 +58,16 @@ Discuta como a configuração do projeto foi feita na ferramenta de versionament
 
 #### Sprint 1
 
-Atualizado em: 21/04/2024
+Atualizado em: 17/03/2026
 
 | Responsável   | Tarefa/Requisito | Iniciado em    | Prazo      | Status | Terminado em    |
 | :----         |    :----         |      :----:    | :----:     | :----: | :----:          |
-| AlunaX        | Introdução | 01/02/2024     | 07/02/2024 | ✔️    | 05/02/2024      |
-| AlunaZ        | Objetivos    | 03/02/2024     | 10/02/2024 | 📝    |                 |
-| AlunoY        | Histórias de usuário  | 01/01/2024     | 07/01/2025 | ⌛     |                 |
-| AlunoK        | Personas 1  |    01/01/2024        | 12/02/2025 | ❌    |       |
+| Gabriel Santos Arpini      | Histórias de usuário      | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
+| Gabriel Xavier de Souza    | Personas                  | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
+| Diogo Lamera dos Santos    | Business Model Canvas     | 11/03/2026 | 17/03/2026 | ✔️ | 16/03/2026 |
+| Rafael Lucas Mota Oliveira | Requisitos funcionais     | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
+| Rafael Lucas Mota Oliveira | Requisitos não funcionais | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
+| Rafael Lucas Mota Oliveira | Restrições                | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
 
 #### Sprint 2
 
@@ -92,8 +95,10 @@ Legenda:
 
 ### Processo
 
-Coloque informações sobre detalhes da implementação do Scrum seguido pelo grupo. O grupo deverá fazer uso do recurso de gerenciamento de projeto oferecido pelo GitHub, que permite acompanhar o andamento do projeto, a execução das tarefas e o status de desenvolvimento da solução.
- 
+O grupo adotou uma abordagem baseada em Scrum, com entregas organizadas em Sprints. O gerenciamento das tarefas foi realizado por meio do GitHub Projects, utilizando um quadro Kanban onde cada tarefa foi cadastrada como um card e distribuída entre os membros da equipe. Os integrantes selecionavam as tarefas disponíveis no quadro e atualizavam o status conforme o andamento, permitindo acompanhar o progresso da Sprint de forma colaborativa e transparente.
+
+O quadro do projeto pode ser acessado em: https://github.com/orgs/ICEI-PUC-Minas-PBE-SI-TI/projects/6/views/1
+
 > **Links úteis**:
 > - [Planejamento e gestão ágil de projetos](https://pucminas.instructure.com/courses/87878/pages/unidade-2-tema-2-utilizacao-de-ferramentas-para-controle-de-versoes-de-software)
 > - [Sobre quadros de projeto](https://docs.github.com/pt/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards)
@@ -105,13 +110,14 @@ Coloque informações sobre detalhes da implementação do Scrum seguido pelo gr
 
 Os artefatos do projeto são desenvolvidos a partir de diversas plataformas. A relação dos ambientes com seus respectivos propósitos deverá ser apresentada em uma tabela que especifique e detalhe Ambiente, Plataforma e Link de Acesso. Sempre que possível, inclua também frameworks, bibliotecas e demais tecnologias utilizadas, indicando seu uso em contextos específicos, como aplicações móveis, web ou outros.
 
-Exemplo: os artefatos do projeto são desenvolvidos a partir de diversas plataformas e a relação dos ambientes com seu respectivo propósito é apresentada na tabela que se segue.
+Os artefatos do projeto são desenvolvidos a partir de diversas plataformas e a relação dos ambientes com seus respectivos propósitos é apresentada na tabela a seguir.
 
 | Ambiente                            | Plataforma                         | Link de acesso                         |
 |-------------------------------------|------------------------------------|----------------------------------------|
-| Repositório de código fonte         | GitHub                             | http://....                            |
-| Documentos do projeto               | GitHub                             | http://....                            |
-| Projeto de interface                | Figma                              | http://....                            |
-| Gerenciamento do projeto            | GitHub Projects                    | http://....                            |
-| Hospedagem                          | Vercel                             | http://....                            |
+| Repositório de código fonte         | GitHub                             | https://github.com/ICEI-PUC-Minas-PBE-SI-TI/2026-1-p5-tias-foodloop |
+| Documentos do projeto               | GitHub                             | https://github.com/ICEI-PUC-Minas-PBE-SI-TI/2026-1-p5-tias-foodloop/tree/main/docs |
+| Gerenciamento do projeto            | GitHub Projects                    | https://github.com/orgs/ICEI-PUC-Minas-PBE-SI-TI/projects/6/views/1 |
+| Comunicação da equipe               | WhatsApp                           | —                                      |
+| Desenvolvimento mobile              | React Native                       | https://reactnative.dev/               |
+| Banco de dados e autenticação       | Firebase                           | https://firebase.google.com/           |
  
