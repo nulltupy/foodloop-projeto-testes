@@ -75,11 +75,15 @@ Atualizado em: 21/04/2024
 
 | Responsável   | Tarefa/Requisito | Iniciado em    | Prazo      | Status | Terminado em    |
 | :----         |    :----         |      :----:    | :----:     | :----: | :----:          |
-| AlunaX        | Página inicial   | 01/02/2024     | 07/03/2024 | ✔️    | 05/02/2024      |
-| AlunaZ        | CSS unificado    | 03/02/2024     | 10/03/2024 | 📝    |                 |
-| AlunoY        | Página de login  | 01/02/2024     | 07/03/2024 | ⌛     |                 |
-| AlunoK        | Script de login  |  01/01/2024    | 12/03/2024 | ❌    |       |
-
+| Diogo Lamera dos Santos    | Update das ferramentas              | 08/04/2026   | 22/04/2026 | ✔️ | 16/02/2024 |
+| Cristiano Tupynamba Reis   | Preencher carta do estabelecimento  | 08/04/2026   | 22/04/2026 | 📝 |  |
+| Rafael Lucas Mota Oliveira | Preencher quadro de tarefas         | 08/04/2026   | 22/04/2026 | 📝 |  |
+| Rafael Lucas Mota Oliveira | Criar os slides                     | 08/04/2026   | 22/04/2026 | 📝 |  |
+| Diogo Lamera dos Santos    | Descrição geral da proposta         | 08/04/2026   | 22/04/2026 | 📝 |  |
+| Gabriel Santos Arpini      | Indicadores de desempenho           | 08/04/2026   | 22/04/2026 | 📝 |  |
+| Gabriel Xavier de Souza    | Processo 1 - TO BE                  | 08/04/2026   | 22/04/2026 | 📝 |  |
+| Cristiano Tupynamba Reis   | Processo 1 - AS IS                  | 08/04/2026   | 22/04/2026 | 📝 |  |
+| Guilherme Setragni Freitas | Modelagem da situação atual         | 08/04/2026   | 22/04/2026 | 📝 |  |
 
 Legenda:
 - ✔️: terminado
