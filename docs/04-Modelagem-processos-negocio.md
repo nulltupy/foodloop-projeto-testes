@@ -15,35 +15,51 @@ Processo de avaliação do estabelecimento pelo cliente — como a reputação �
 
 ## Descrição geral da proposta (Modelagem TO BE)
 
-A partir dos gargalos identificados nos modelos AS IS, a proposta do FoodLoop consiste em introduzir uma plataforma mobile que permite à Couto Lanches cadastrar seus produtos excedentes ao final do expediente com desconto e tornar essas ofertas visíveis, em tempo real, a consumidores próximos por meio de busca geolocalizada. A transição da operação exclusivamente manual e presencial para uma camada digital de anúncio e reserva rompe com o modelo atual em que todo alimento não vendido durante o dia é integralmente descartado, convertendo parte dessa perda em receita recuperada.
+## Descrição geral da proposta (Modelagem TO BE)
+
+A partir dos gargalos identificados nos modelos AS-IS — a dependência exclusiva do canal presencial para venda, a inexistência de mecanismo de escoamento para os produtos excedentes no fim do expediente e a ausência de vínculo entre a experiência de compra e a avaliação do estabelecimento — a proposta do FoodLoop consiste em uma plataforma mobile que digitaliza e integra essas três dimensões.
+
+A solução estabelece três frentes principais. A primeira consiste em um **canal digital de descoberta e compra**, que substitui a busca passiva e presencial por uma experiência geolocalizada, na qual o cliente visualiza, via aplicativo, os estabelecimentos próximos e seus produtos disponíveis, podendo realizar o pedido e o pagamento dentro do próprio aplicativo e efetuar a retirada no balcão. A segunda consiste em um **mecanismo de escoamento de excedentes**, que confere ao comerciante a capacidade de, a qualquer momento, publicar anúncios com desconto sobre produtos em excesso, convertendo em receita o que hoje é integralmente descartado ao final do expediente. A terceira consiste em um **ciclo de reputação integrado**, que substitui a dependência de plataformas externas por um sistema interno de avaliação acoplado ao pedido, no qual cada cliente é convidado a avaliar sua experiência imediatamente após a retirada.
 
 ### Oportunidades de melhoria por processo
 
-**Processo 1, Cadastro e Publicação de Alimentos.** No cenário AS IS, a venda ocorre apenas no balcão, sem qualquer registro digital, cardápio online ou possibilidade de alcançar clientes fora do estabelecimento. No TO BE, o proprietário passa a cadastrar no aplicativo os alimentos excedentes com quantidade, data de validade e preço reduzido, publicando-os para uma base ampla de consumidores. As principais oportunidades de melhoria são: (1) ampliação do alcance comercial para além do fluxo presencial da lanchonete; (2) controle digital do estoque disponível, evitando reservas sobre itens esgotados; (3) possibilidade de aplicar desconto progressivo conforme o produto se aproxima do vencimento, antecipando o escoamento.
+- **Processo 1 — Compra via aplicativo:** elimina a dependência do fluxo físico imediato, permitindo que o comércio seja encontrado por clientes que não passariam em frente ao estabelecimento no momento do consumo. Introduz registro digital da transação e comprovante para ambas as partes.
+- **Processo 2 — Anúncio de excedente com desconto:** cria um canal antes inexistente para monetizar produtos que hoje configuram perda total, reduzindo o desperdício em favor de receita adicional e ampliando o alcance comercial do estabelecimento.
+- **Processo 3 — Avaliação interna do estabelecimento:** vincula a avaliação à experiência de compra, aumentando a taxa de retorno de feedback e fornecendo ao comerciante visibilidade sobre o desempenho individual de cada pedido e de cada anúncio.
 
-**Processo 2, Solicitação de Alimento.** No cenário AS IS, os produtos não comercializados durante o expediente são descartados integralmente, sem mecanismo de escoamento ou registro da perda. No TO BE, o consumidor localiza, seleciona e reserva diretamente pelo aplicativo os alimentos disponibilizados com desconto, concluindo o pagamento online e retirando o produto presencialmente. As oportunidades de melhoria são: (1) substituição do descarte por uma transação efetiva, transformando perda em receita marginal; (2) redução do atrito do consumidor, que descobre a oferta sem precisar se deslocar para verificar disponibilidade; (3) geração automática de histórico de reservas e avaliações, que alimenta os indicadores de desempenho do negócio.
+### Alinhamento com estratégia e objetivos
 
-### Alinhamento com objetivos estratégicos
-
-A proposta atende diretamente aos objetivos específicos declarados no documento de contexto: permite o cadastro dos excedentes, viabiliza a visualização em tempo real pelos consumidores, reduz o desperdício ao final do dia, mitiga a perda financeira do estabelecimento, reforça a adesão ao ODS 02 e amplia a visibilidade comercial da lanchonete por meio da plataforma digital. Do ponto de vista da viabilidade, a Restrição 004 (custo zero) é compatível com o uso dos planos gratuitos do Firebase, preservando o alinhamento com o escopo acadêmico.
+A proposta alinha-se ao objetivo extensionista de redução do desperdício de alimentos no varejo local e, simultaneamente, ao objetivo social de ampliação do acesso a alimentação a preços acessíveis. Atende, ainda, a objetivo econômico dos estabelecimentos parceiros, convertendo perda em receita e estabelecendo novo canal de captação de clientes.
 
 ### Limites da solução
 
-A proposta não substitui a venda regular ao longo do dia, que continua ocorrendo presencialmente, mas atua apenas na camada de escoamento de excedentes. Também não resolve problemas estruturais anteriores à oferta, como eventuais erros de produção excessiva ou de precificação dos produtos principais. Por fim, a efetividade do app depende da adesão simultânea de parceiros comerciais e consumidores na mesma região geográfica, o que no piloto com a Couto Lanches significa atuar de forma concentrada em um raio restrito ao redor do estabelecimento, antes de qualquer escalabilidade para outros parceiros ou regiões.
+- O FoodLoop não substitui sistemas internos de gestão do comércio (PDV, estoque, controle fiscal), atuando exclusivamente na ponta de divulgação, venda e avaliação de produtos.
+- A solução pressupõe a retirada presencial do produto pelo cliente, não contemplando logística de entrega própria na versão inicial.
+- A atuação é geograficamente limitada às regiões em que houver massa crítica de estabelecimentos parceiros e de usuários cadastrados.
+- A efetiva redução do desperdício depende da adesão do comerciante ao registro de anúncios: o aplicativo oferece o canal, mas a decisão de utilizá-lo é sempre do estabelecimento.
+
+### Capacidades de negócio habilitadas pela solução
+
+- Gestão de anúncios de excedente pelo comércio;
+- Descoberta geolocalizada de ofertas pelo cliente;
+- Transação digital com retirada agendada;
+- Avaliação e reputação interna dos estabelecimentos;
+- Geração de indicadores de desperdício evitado e de receita incremental proveniente de anúncios.
+
 
 ## Modelagem dos processos
 
 [PROCESSO 1 AS IS - Venda Presencial](./processes/processo-1-as-is.md "Detalhamento do processo 1 AS IS.")
 
-[PROCESSO 1 TO BE - Nome do processo](./processes/processo-1-to-be.md "Detalhamento do processo 1 TO BE.")
+[PROCESSO 1 TO BE - Compra via App FoodLoop](./processes/processo-1-to-be.md "Detalhamento do processo 1 TO BE.")
 
 [PROCESSO 2 AS IS - Gestão de Sobras no Fim do Expediente](./processes/processo-2-as-is.md "Detalhamento do processo 2 AS IS.")
 
-[PROCESSO 2 TO BE - Nome do processo](./processes/processo-2-to-be.md "Detalhamento do processo 2 TO BE.")
+[PROCESSO 2 TO BE - Anúncio de Excedente com Desconto](./processes/processo-2-to-be.md "Detalhamento do processo 2 TO BE.")
 
 [PROCESSO 3 AS IS - Avaliação do Estabelecimento pelo Cliente](./processes/processo-3-as-is.md "Detalhamento do processo 3 AS IS.")
 
-[PROCESSO 2 TO BE - Nome do processo](./processes/processo-2-to-be.md "Detalhamento do processo 2 TO BE.")
+[PROCESSO 3 TO BE - Avaliação do Estabelecimento no FoodLoop](./processes/processo-3-to-be.md "Detalhamento do processo 3 TO BE.")
 
 
 ## Indicadores de desempenho
