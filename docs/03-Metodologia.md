@@ -71,11 +71,11 @@ Atualizado em: 17/03/2026
 
 #### Sprint 2
 
-Atualizado em: 21/04/2024
+Atualizado em: 21/04/2026
 
 | Responsável   | Tarefa/Requisito | Iniciado em    | Prazo      | Status | Terminado em    |
 | :----         |    :----         |      :----:    | :----:     | :----: | :----:          |
-| Diogo Lamera dos Santos    | Update das ferramentas              | 08/04/2026   | 22/04/2026 | ✔️ | 16/02/2024 |
+| Diogo Lamera dos Santos    | Update das ferramentas              | 08/04/2026   | 22/04/2026 | ✔️ | 16/04/2026 |
 | Cristiano Tupynamba Reis   | Preencher carta do estabelecimento  | 08/04/2026   | 22/04/2026 | ✔️ | 21/04/2026 |
 | Rafael Lucas Mota Oliveira | Preencher quadro de tarefas         | 08/04/2026   | 22/04/2026 | ✔️ | 22/04/2026 |
 | Rafael Lucas Mota Oliveira | Criar os slides                     | 08/04/2026   | 22/04/2026 | ✔️ | 21/04/2026 |
