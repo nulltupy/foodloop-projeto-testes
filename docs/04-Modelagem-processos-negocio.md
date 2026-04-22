@@ -13,7 +13,6 @@ Processo de venda presencial — fluxo completo de atendimento ao cliente no bal
 Processo de gestão de sobras ao final do expediente — destinação dos salgados não vendidos.
 Processo de avaliação do estabelecimento pelo cliente — como a reputação é construída hoje, via Google.
 
-## Descrição geral da proposta (Modelagem TO BE)
 
 ## Descrição geral da proposta (Modelagem TO BE)
 
