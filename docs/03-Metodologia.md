@@ -40,10 +40,12 @@ Merges são realizados sempre via Pull Request, nunca diretamente na `main`. As 
 - Documentação (Histórias de usuário): Gabriel Santos Arpini
 
 #### Sprint 2
-- _Scrum master_: AlunaY
-- Desenvolvedor _front-end_: AlunoX
-- Desenvolvedor _back-end_: AlunoK
-- Testes: AlunaZ
+- _Scrum master_: Gabriel Santos Arpini
+- Documentação: Cristiano Tupynambá Reis
+- Documentação: Diogo Lamera dos Santos
+- Documentação: Gabriel Xavier de Souza
+- Documentação: Guilherme Setragni Freitas
+- Documentação: Rafael Lucas Mota Oliveira
 
 ###  Quadro de tarefas
 
