@@ -13,7 +13,7 @@ Fluxo do processo
 6. Sistema salva publicação
 7. Processo finalizado
  
-![Exemplo de um Modelo BPMN do PROCESSO 1](../images/process.png "Modelo BPMN do Processo 1.")
+![Modelo BPMN do PROCESSO 1](../images/processo1.png)
 
 #### Detalhamento das atividades
 
