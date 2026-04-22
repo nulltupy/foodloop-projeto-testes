@@ -1,67 +1,82 @@
-### Processo 1 TO BE – NOME DO PROCESSO
+### Processo 1 TO BE – CADASTRO E PUBLICAÇÃO DE ALIMENTOS
 
-_Apresente aqui o nome, as oportunidades de melhoria para o processo, seu fluxo e características. 
-Em seguida, apresente o modelo do processo 1, descrito no padrão BPMN._
+O processo atual consiste no cadastro de um usuário (doador ou estabelecimento) na plataforma FoodLoop e, em seguida, na publicação de alimentos disponíveis para doação ou venda. Atualmente, esse processo é realizado de forma simples, com preenchimento manual das informações, sem automações avançadas ou validações complexas.
+
+O usuário acessa o sistema, realiza seu cadastro informando dados básicos e, após autenticação, pode cadastrar um alimento com informações como descrição, quantidade, validade e imagem.
+
+Fluxo do processo
+1. Usuário acessa a plataforma
+2. Usuário realiza cadastro
+3. Sistema valida os dados
+4. Usuário realiza login
+5. Usuário cadastra alimento
+6. Sistema salva publicação
+7. Processo finalizado
  
-![Exemplo de um Modelo BPMN do PROCESSO 1](../images/process.png "Modelo BPMN do Processo 1.")
+![Modelo BPMN do PROCESSO 1](../images/Processo1.png)
 
 #### Detalhamento das atividades
 
-_Descreva aqui cada uma das propriedades das atividades do processo 1. 
-Devem estar relacionadas com o modelo de processo apresentado anteriormente._
+**Cadastro de Usuário**
 
-_Os tipos de dados a serem utilizados são:_
+Nesta atividade, o usuário informa seus dados para criar uma conta na plataforma. Os campos incluem nome, e-mail, senha, telefone e tipo de usuário. O sistema exige que o e-mail esteja em formato válido e que a senha possua no mínimo 8 caracteres. O usuário pode optar por concluir o cadastro ou cancelar a operação.
 
-_* **Área de texto** - campo texto de múltiplas linhas_
+| Campo            | Tipo            | Restrições              | Valor default |
+|------------------|-----------------|------------------------|--------------|
+| nome             | Caixa de texto  | obrigatório            |              |
+| email            | Caixa de texto  | formato de e-mail      |              |
+| senha            | Caixa de texto  | mínimo de 8 caracteres |              |
+| telefone         | Caixa de texto  | apenas números         |              |
+| tipo de usuário  | Seleção única   | doador/empresa         | doador       |
 
-_* **Caixa de texto** - campo texto de uma linha_
-
-_* **Número** - campo numérico_
-
-_* **Data** - campo do tipo data (dd-mm-aaaa)_
-
-_* **Hora** - campo do tipo hora (hh:mm:ss)_
-
-_* **Data e Hora** - campo do tipo data e hora (dd-mm-aaaa, hh:mm:ss)_
-
-_* **Imagem** - campo contendo uma imagem_
-
-_* **Seleção única** - campo com várias opções de valores que são mutuamente exclusivas (tradicional radio button ou combobox)_
-
-_* **Seleção múltipla** - campo com várias opções que podem ser selecionadas mutuamente (tradicional checkbox ou listbox)_
-
-_* **Arquivo** - campo de upload de documento_
-
-_* **Link** - campo que armazena uma URL_
-
-_* **Tabela** - campo formado por uma matriz de valores_
+| Comandos   | Destino              | Tipo     |
+|------------|---------------------|----------|
+| cadastrar  | Login               | default  |
+| cancelar   | Fim do Processo 1   | cancel   |
 
 
-**Nome da atividade 1**
+**Login**
 
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-| ***Exemplo:***  |                  |                |                   |
-| login           | Caixa de Texto   | formato de e-mail |                |
-| senha           | Caixa de Texto   | mínimo de 8 caracteres |           |
+Nesta atividade, o usuário realiza a autenticação no sistema informando e-mail e senha. Os dados devem seguir as mesmas restrições definidas no cadastro. Após o preenchimento, o usuário pode acessar o sistema ou retornar à tela de cadastro.
 
-| **Comandos**         |  **Destino**                   | **Tipo** |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel/  ) |
-| ***Exemplo:***       |                                |                   |
-| entrar               | Fim do Processo 1              | default           |
-| cadastrar            | Início do processo de cadastro |                   |
+| Campo  | Tipo           | Restrições              | Valor default |
+|--------|----------------|--------------------------|--------------|
+| email  | Caixa de texto | formato de e-mail        |              |
+| senha  | Caixa de texto | mínimo de 8 caracteres   |              |
+
+| Comandos | Destino                  | Tipo    |
+|----------|--------------------------|---------|
+| entrar   | Cadastro de Alimento     | default |
+| voltar   | Cadastro de Usuário      | cancel  |
 
 
-**Nome da atividade 2**
+**Cadastro de Alimento**
 
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-|                 |                  |                |                   |
+Nesta atividade, o usuário cadastra um alimento disponível para doação ou venda. São informados dados como nome do alimento, descrição, quantidade, data de validade, imagem e tipo. A quantidade deve ser maior que zero e a data de validade deve ser futura. O usuário pode publicar o alimento ou cancelar a operação.
 
-| **Comandos**         |  **Destino**                   | **Tipo**          |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel/  ) |
-|                      |                                |                   |
+| Campo            | Tipo            | Restrições        | Valor default |
+|------------------|-----------------|------------------|--------------|
+| nome do alimento | Caixa de texto  | obrigatório      |              |
+| descrição        | Área de texto   |                  |              |
+| quantidade       | Número          | maior que 0      |              |
+| data validade    | Data            | data futura      |              |
+| imagem           | Imagem          | opcional         |              |
+| tipo             | Seleção única   | doação/venda     | doação       |
+
+| Comandos  | Destino               | Tipo    |
+|-----------|----------------------|---------|
+| publicar  | Salvar Publicação    | default |
+| cancelar  | Fim do Processo 1    | cancel  |
+
+
+**Salvar Publicação**
+
+Nesta atividade, o sistema registra as informações do alimento no banco de dados e exibe uma mensagem de confirmação ao usuário indicando que a publicação foi realizada com sucesso. O processo é finalizado após essa etapa.
+
+| Campo       | Tipo           | Restrições | Valor default          |
+|-------------|----------------|-----------|-----------------------|
+| confirmação | Área de texto  | automático| Publicado com sucesso |
+
+| Comandos   | Destino            | Tipo    |
+|------------|--------------------|---------|
+| finalizar  | Fim do Processo 1  | default |
