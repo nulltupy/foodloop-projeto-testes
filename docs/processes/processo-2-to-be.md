@@ -1,4 +1,4 @@
-### Processo 2 TO-BE – Solicitação de Alimento
+### Processo 2 TO BE – Solicitação de Alimento
 
 O processo consiste na busca e solicitação de alimentos disponíveis na plataforma. O usuário acessa o sistema, visualiza os alimentos cadastrados e realiza uma solicitação de reserva ou compra. O sistema registra o pedido e aguarda confirmação.
 
