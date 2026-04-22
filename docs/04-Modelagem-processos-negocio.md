@@ -21,11 +21,21 @@ Processo de avaliação do estabelecimento pelo cliente — como a reputação �
 
 ## Descrição geral da proposta (Modelagem TO BE)
 
-Tendo identificado os gargalos dos modelos AS-IS, apresentem uma descrição da proposta de solução, buscando maior eficiência com a introdução da tecnologia. Abordem também os limites dessa solução e seu alinhamento com as estratégias e objetivos do contexto de negócio escolhido.
+A partir dos gargalos identificados nos modelos AS IS, a proposta do FoodLoop consiste em introduzir uma plataforma mobile que permite à Couto Lanches cadastrar seus produtos excedentes ao final do expediente com desconto e tornar essas ofertas visíveis, em tempo real, a consumidores próximos por meio de busca geolocalizada. A transição da operação exclusivamente manual e presencial para uma camada digital de anúncio e reserva rompe com o modelo atual em que todo alimento não vendido durante o dia é integralmente descartado, convertendo parte dessa perda em receita recuperada.
 
-Cole aqui os modelos da solução proposta (modelo TO-BE), elaborados com o apoio da ferramenta baseada em BPMN utilizada na disciplina. Cada processo identificado deve ter seu modelo TO-BE específico. Descrevam as oportunidades de melhoria de cada processo da solução proposta.
+### Oportunidades de melhoria por processo
 
-Apresente aqui uma descrição da sua proposta, abordando seus limites e suas ligações com as estratégias e objetivos do negócio. Apresente também as oportunidades de melhoria.
+**Processo 1, Cadastro e Publicação de Alimentos.** No cenário AS IS, a venda ocorre apenas no balcão, sem qualquer registro digital, cardápio online ou possibilidade de alcançar clientes fora do estabelecimento. No TO BE, o proprietário passa a cadastrar no aplicativo os alimentos excedentes com quantidade, data de validade e preço reduzido, publicando-os para uma base ampla de consumidores. As principais oportunidades de melhoria são: (1) ampliação do alcance comercial para além do fluxo presencial da lanchonete; (2) controle digital do estoque disponível, evitando reservas sobre itens esgotados; (3) possibilidade de aplicar desconto progressivo conforme o produto se aproxima do vencimento, antecipando o escoamento.
+
+**Processo 2, Solicitação de Alimento.** No cenário AS IS, os produtos não comercializados durante o expediente são descartados integralmente, sem mecanismo de escoamento ou registro da perda. No TO BE, o consumidor localiza, seleciona e reserva diretamente pelo aplicativo os alimentos disponibilizados com desconto, concluindo o pagamento online e retirando o produto presencialmente. As oportunidades de melhoria são: (1) substituição do descarte por uma transação efetiva, transformando perda em receita marginal; (2) redução do atrito do consumidor, que descobre a oferta sem precisar se deslocar para verificar disponibilidade; (3) geração automática de histórico de reservas e avaliações, que alimenta os indicadores de desempenho do negócio.
+
+### Alinhamento com objetivos estratégicos
+
+A proposta atende diretamente aos objetivos específicos declarados no documento de contexto: permite o cadastro dos excedentes, viabiliza a visualização em tempo real pelos consumidores, reduz o desperdício ao final do dia, mitiga a perda financeira do estabelecimento, reforça a adesão ao ODS 02 e amplia a visibilidade comercial da lanchonete por meio da plataforma digital. Do ponto de vista da viabilidade, a Restrição 004 (custo zero) é compatível com o uso dos planos gratuitos do Firebase, preservando o alinhamento com o escopo acadêmico.
+
+### Limites da solução
+
+A proposta não substitui a venda regular ao longo do dia, que continua ocorrendo presencialmente, mas atua apenas na camada de escoamento de excedentes. Também não resolve problemas estruturais anteriores à oferta, como eventuais erros de produção excessiva ou de precificação dos produtos principais. Por fim, a efetividade do app depende da adesão simultânea de parceiros comerciais e consumidores na mesma região geográfica, o que no piloto com a Couto Lanches significa atuar de forma concentrada em um raio restrito ao redor do estabelecimento, antes de qualquer escalabilidade para outros parceiros ou regiões.
 
 ## Modelagem dos processos
 
