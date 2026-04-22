@@ -33,13 +33,18 @@ A proposta não substitui a venda regular ao longo do dia, que continua ocorrend
 
 ## Modelagem dos processos
 
-[PROCESSO 1 AS IS - Nome do processo](./processes/processo-1-as-is.md "Detalhamento do processo 1 AS IS.")
+[PROCESSO 1 AS IS - Venda Presencial](./processes/processo-1-as-is.md "Detalhamento do processo 1 AS IS.")
 
 [PROCESSO 1 TO BE - Nome do processo](./processes/processo-1-to-be.md "Detalhamento do processo 1 TO BE.")
 
-[PROCESSO 2 AS IS - Nome do processo](./processes/processo-2-as-is.md "Detalhamento do processo 2 AS IS.")
+[PROCESSO 2 AS IS - Gestão de Sobras no Fim do Expediente](./processes/processo-2-as-is.md "Detalhamento do processo 2 AS IS.")
 
 [PROCESSO 2 TO BE - Nome do processo](./processes/processo-2-to-be.md "Detalhamento do processo 2 TO BE.")
+
+[PROCESSO 3 AS IS - Avaliação do Estabelecimento pelo Cliente](./processes/processo-3-as-is.md "Detalhamento do processo 3 AS IS.")
+
+[PROCESSO 2 TO BE - Nome do processo](./processes/processo-2-to-be.md "Detalhamento do processo 2 TO BE.")
+
 
 ## Indicadores de desempenho
 
