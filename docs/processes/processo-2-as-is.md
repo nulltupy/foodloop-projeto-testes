@@ -2,64 +2,71 @@
 
 O processo consiste na busca e solicitação de alimentos disponíveis na plataforma. O usuário acessa o sistema, visualiza os alimentos cadastrados e realiza uma solicitação de reserva ou compra. O sistema registra o pedido e aguarda confirmação.
 
-![Exemplo de um Modelo BPMN do PROCESSO 2](../images/Processo2.png.")
+Fluxo do processo
+1. Usuário acessa a plataforma
+2. Usuário realiza login
+3. Usuário busca alimentos
+4. Usuário seleciona um alimento
+5. Usuário solicita reserva/compra
+6. Sistema registra solicitação
+7. Processo finalizado
+
+![Modelo BPMN do PROCESSO 2](../images/Processo2.png)
 
 #### Detalhamento das atividades
 
-_Descreva aqui cada uma das propriedades das atividades do processo 2. 
-Devem estar relacionadas com o modelo de processo apresentado anteriormente._
+**Buscar Alimentos**
 
-_Os tipos de dados a serem utilizados são:_
+Nesta atividade, o usuário pode pesquisar alimentos disponíveis na plataforma utilizando filtros como nome, categoria e localização. O usuário pode iniciar a busca ou cancelar o processo.
 
-_* **Área de texto** - campo texto de múltiplas linhas_
+| Campo            | Tipo            | Restrições        | Valor default |
+|------------------|-----------------|------------------|--------------|
+| nome do alimento | Caixa de texto  | opcional         |              |
+| categoria        | Seleção única   | alimento/bebida  |              |
+| localização      | Caixa de texto  | opcional         |              |
 
-_* **Caixa de texto** - campo texto de uma linha_
+| Comandos | Destino                | Tipo    |
+|----------|------------------------|---------|
+| buscar   | Selecionar Alimento    | default |
+| voltar   | Fim do Processo 2      | cancel  |
 
-_* **Número** - campo numérico_
+**Selecionar Alimentos**
 
-_* **Data** - campo do tipo data (dd-mm-aaaa)_
+Nesta etapa, o usuário visualiza uma lista de alimentos disponíveis e pode selecionar um item específico para visualizar mais detalhes ou retornar à busca.
 
-_* **Hora** - campo do tipo hora (hh:mm:ss)_
+| Campo              | Tipo          | Restrições | Valor default |
+|--------------------|--------------|-----------|--------------|
+| lista de alimentos | Tabela       | obrigatório |              |
+| detalhes           | Área de texto| automático |              |
 
-_* **Data e Hora** - campo do tipo data e hora (dd-mm-aaaa, hh:mm:ss)_
+| Comandos  | Destino               | Tipo    |
+|-----------|----------------------|---------|
+| selecionar| Solicitar Alimento   | default |
+| voltar    | Buscar Alimentos     | cancel  |
 
-_* **Imagem** - campo contendo uma imagem_
+**Solicitar Alimentos**
 
-_* **Seleção única** - campo com várias opções de valores que são mutuamente exclusivas (tradicional radio button ou combobox)_
+Nesta atividade, o usuário informa a quantidade desejada e o tipo de solicitação (reserva ou compra). Também pode adicionar observações. Após isso, pode confirmar ou cancelar a solicitação.
 
-_* **Seleção múltipla** - campo com várias opções que podem ser selecionadas mutuamente (tradicional checkbox ou listbox)_
+| Campo        | Tipo            | Restrições        | Valor default |
+|--------------|-----------------|------------------|--------------|
+| quantidade   | Número          | maior que 0      |              |
+| tipo         | Seleção única   | reserva/compra   | reserva      |
+| observação   | Área de texto   | opcional         |              |
 
-_* **Arquivo** - campo de upload de documento_
+| Comandos   | Destino                 | Tipo    |
+|------------|------------------------|---------|
+| confirmar  | Registrar Solicitação  | default |
+| cancelar   | Fim do Processo 2      | cancel  |
 
-_* **Link** - campo que armazena uma URL_
+**Registrar Solicitação**
 
-_* **Tabela** - campo formado por uma matriz de valores_
+Nesta etapa, o sistema registra a solicitação e exibe uma mensagem de confirmação ao usuário, finalizando o processo.
 
-**Nome da atividade 1**
+| Campo        | Tipo            | Restrições | Valor default          |
+|--------------|-----------------|-----------|-----------------------|
+| confirmação  | Área de texto   | automático| Solicitação realizada |
 
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-| ***Exemplo:***  |                  |                |                   |
-| login           | Caixa de Texto   | formato de e-mail |                |
-| senha           | Caixa de Texto   | mínimo de 8 caracteres |           |
-
-| **Comandos**         |  **Destino**                   | **Tipo** |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel/  ) |
-| ***Exemplo:***       |                                |                   |
-| entrar               | Fim do Processo 2              | default           |
-| cadastrar            | Início do processo de cadastro  |                   |
-
-
-**Nome da atividade 2**
-
-| **Campo**       | **Tipo**         | **Restrições** | **Valor default** |
-| ---             | ---              | ---            | ---               |
-| [Nome do campo] | [tipo de dados]  |                |                   |
-|                 |                  |                |                   |
-
-| **Comandos**         |  **Destino**                   | **Tipo**          |
-| ---                  | ---                            | ---               |
-| [Nome do botão/link] | Atividade/processo de destino  | (default/cancel/  ) |
-|                      |                                |                   |
+| Comandos   | Destino            | Tipo    |
+|------------|--------------------|---------|
+| finalizar  | Fim do Processo 2  | default |
