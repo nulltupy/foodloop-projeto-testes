@@ -47,6 +47,19 @@ Além disso, o projeto está alinhado aos Objetivos de Desenvolvimento Sustentá
 
 Dessa forma, este trabalho se justifica pela aplicação de conhecimentos tecnológicos na criação de uma solução com impacto social positivo, promovendo sustentabilidade, redução do desperdício e maior eficiência no uso dos recursos alimentares.
 
+## Diferencial e Inovação
+
+O FoodLoop ocupa um nicho que, no Brasil, ainda não possui concorrência direta. Plataformas internacionais voltadas especificamente ao combate ao desperdício de alimentos, como a Too Good To Go, operam majoritariamente na Europa e nos Estados Unidos e não têm presença no mercado brasileiro. Os aplicativos de delivery já consolidados no país, como iFood, Rappi e Uber Eats, atuam na venda de refeições em valor cheio e não oferecem funcionalidade dedicada à comercialização de excedentes alimentares com desconto ao fim do expediente.
+
+Os principais diferenciais do projeto são:
+
+- **Pioneirismo no mercado brasileiro**, ao introduzir o modelo de escoamento de sobras alimentares com desconto em um contexto sem concorrente direto operando no país.
+- **Foco exclusivo em excedentes**, permitindo desenhar fluxos, indicadores e política de preço específicos para o cenário de fim de expediente, em vez de adaptar um app de delivery generalista.
+- **Inclusão de pequenos comércios de bairro**, como lanchonetes, padarias e mercearias, que geralmente não têm escala para aderir aos marketplaces dominantes e são os principais geradores locais de sobras alimentares.
+- **Dupla alavanca de impacto**, combinando redução do desperdício (ODS 12, Consumo e Produção Responsáveis) e ampliação do acesso a alimentos a preços acessíveis (ODS 02, Fome Zero) em uma única proposta de valor para parceiros e consumidores.
+
+Esse conjunto de características posiciona o FoodLoop não como uma alternativa aos aplicativos de delivery existentes, mas como uma nova categoria de serviço voltada à economia circular de alimentos no Brasil.
+
 ## Público-alvo
 
 O público-alvo da aplicação é composto por diferentes perfis de usuários que podem se beneficiar diretamente da solução proposta. 
