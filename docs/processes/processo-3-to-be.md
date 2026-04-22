@@ -21,7 +21,7 @@ O sistema convida ativamente o cliente a avaliar sua experiência imediatamente 
 
 **Figura 1 – Diagrama de atividades do processo de avaliação do estabelecimento (TO-BE)**
 
-![Diagrama TO-BE do Processo 3](/docs/images/AvaliacaoTOBE.png)
+![Diagrama TO-BE do Processo 3](/docs/images/Avaliacao.png)
 
 Fonte: Elaborado pelos autores (2026).
 
