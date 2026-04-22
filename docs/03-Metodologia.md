@@ -26,13 +26,6 @@ Para commits, adota-se o mesmo prefixo seguido de uma descrição curta:
 
 Merges são realizados sempre via Pull Request, nunca diretamente na `main`. As issues são gerenciadas pelo GitHub Projects e vinculadas aos PRs com `Closes #<número>`, permitindo o fechamento automático ao merge.
 
-> **Links úteis**:
-> - [Tutorial GitHub](https://guides.github.com/activities/hello-world/)
-> - [Git e GitHub](https://www.youtube.com/playlist?list=PLHz_AreHm4dm7ZULPAmadvNhH6vk9oNZA)
-> - [Comparando fluxos de trabalho](https://www.atlassian.com/br/git/tutorials/comparing-workflows)
-> - [Understanding the GitHub flow](https://guides.github.com/introduction/flow/)
-> - [The gitflow workflow - in less than 5 mins](https://www.youtube.com/watch?v=1SXpE08hvGs)
-
 ## Planejamento do projeto
 
 ###  Divisão de papéis
@@ -91,24 +84,11 @@ Legenda:
 - ⌛: atrasado
 - ❌: não iniciado
 
-
-> **Links úteis**:
-> - [11 passos essenciais para implantar Scrum no seu projeto](https://mindmaster.com.br/scrum-11-passos/)
-> - [Scrum em 9 minutos](https://www.youtube.com/watch?v=XfvQWnRgxG0)
-> - [Os papéis do Scrum e a verdade sobre cargos nessa técnica](https://www.atlassian.com/br/agile/scrum/roles)
-
 ### Processo
 
 O grupo adotou uma abordagem baseada em Scrum, com entregas organizadas em Sprints. O gerenciamento das tarefas foi realizado por meio do GitHub Projects, utilizando um quadro Kanban onde cada tarefa foi cadastrada como um card e distribuída entre os membros da equipe. Os integrantes selecionavam as tarefas disponíveis no quadro e atualizavam o status conforme o andamento, permitindo acompanhar o progresso da Sprint de forma colaborativa e transparente.
 
 O quadro do projeto pode ser acessado em: https://github.com/orgs/ICEI-PUC-Minas-PBE-SI-TI/projects/6/views/1
-
-> **Links úteis**:
-> - [Planejamento e gestão ágil de projetos](https://pucminas.instructure.com/courses/87878/pages/unidade-2-tema-2-utilizacao-de-ferramentas-para-controle-de-versoes-de-software)
-> - [Sobre quadros de projeto](https://docs.github.com/pt/issues/organizing-your-work-with-project-boards/managing-project-boards/about-project-boards)
-> - [Project management, made simple](https://github.com/features/project-management/)
-> - [Como criar backlogs no GitHub](https://www.youtube.com/watch?v=RXEy6CFu9Hk)
-> - [Tutorial slack](https://slack.com/intl/en-br/)
 
 ## Ferramentas
 
