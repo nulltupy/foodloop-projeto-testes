@@ -1,9 +1,8 @@
-### Processo 2 AS IS – NOME DO PROCESSO
+### Processo 2 AS IS – Solicitação de Alimento
 
-_Apresente aqui o nome, a descrição do processo atual, seu fluxo e características. 
-Em seguida, apresente o modelo do processo 2, descrito no padrão BPMN._
+O processo consiste na busca e solicitação de alimentos disponíveis na plataforma. O usuário acessa o sistema, visualiza os alimentos cadastrados e realiza uma solicitação de reserva ou compra. O sistema registra o pedido e aguarda confirmação.
 
-![Exemplo de um Modelo BPMN do PROCESSO 2](../images/process.png "Modelo BPMN do Processo 2.")
+![Exemplo de um Modelo BPMN do PROCESSO 2](../images/Processo2.png.")
 
 #### Detalhamento das atividades
 
