@@ -12,7 +12,7 @@ Como o comércio não possui mecanismo de remarcação, promoções ou canal dig
 4. Descarte dos produtos não consumidos
 5. Processo finalizado
 
-![Diagrama AS-IS do Processo 2](caminho/para/imagem-processo-2.png)
+![Diagrama AS-IS do Processo 2](../images/GestaoSobras.jpeg)
 
 ## Detalhamento das atividades
 
