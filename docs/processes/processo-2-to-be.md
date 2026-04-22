@@ -1,72 +1,117 @@
-### Processo 2 TO BE – Solicitação de Alimento
+# PROCESSO 2 TO-BE – ANÚNCIO DE EXCEDENTE COM DESCONTO
 
-O processo consiste na busca e solicitação de alimentos disponíveis na plataforma. O usuário acessa o sistema, visualiza os alimentos cadastrados e realiza uma solicitação de reserva ou compra. O sistema registra o pedido e aguarda confirmação.
+## 1 Descrição do processo
 
-Fluxo do processo
-1. Usuário acessa a plataforma
-2. Usuário realiza login
-3. Usuário busca alimentos
-4. Usuário seleciona um alimento
-5. Usuário solicita reserva/compra
-6. Sistema registra solicitação
-7. Processo finalizado
+O processo proposto confere ao estabelecimento a capacidade de publicar, a qualquer momento, anúncios promocionais a respeito de produtos em excedente, estabelecendo um canal digital inexistente no AS-IS para o escoamento desses itens antes do término do expediente.
 
-![Modelo BPMN do PROCESSO 2](../images/Processo2.png)
+A digitalização desse fluxo converte em receita potencial o que hoje constitui perda financeira integral, uma vez que os produtos remanescentes passam a contar com divulgação geolocalizada e notificação direcionada a clientes próximos.
 
-#### Detalhamento das atividades
+## 2 Fluxo do processo
 
-**Buscar Alimentos**
+1. Comércio identifica produtos em excedente;
+2. Comércio acessa o painel do comércio no FoodLoop;
+3. Comércio cadastra o anúncio do produto;
+4. Comércio define preço promocional e prazo de retirada;
+5. Comércio publica o anúncio;
+6. Sistema exibe o anúncio aos clientes próximos;
+7. Sistema notifica clientes com interesse compatível;
+8. Comércio acompanha as reservas recebidas;
+9. Comércio prepara o produto para retirada ou registra sobra residual ao fim do prazo;
+10. Processo finalizado.
 
-Nesta atividade, o usuário pode pesquisar alimentos disponíveis na plataforma utilizando filtros como nome, categoria e localização. O usuário pode iniciar a busca ou cancelar o processo.
+**Figura 1 – Diagrama de atividades do processo de anúncio de excedente com desconto (TO-BE)**
 
-| Campo            | Tipo            | Restrições        | Valor default |
-|------------------|-----------------|------------------|--------------|
-| nome do alimento | Caixa de texto  | opcional         |              |
-| categoria        | Seleção única   | alimento/bebida  |              |
-| localização      | Caixa de texto  | opcional         |              |
+![Diagrama TO-BE do Processo 2](/docs/images/AnuncioExcedenteTOBE.png)
 
-| Comandos | Destino                | Tipo    |
-|----------|------------------------|---------|
-| buscar   | Selecionar Alimento    | default |
-| voltar   | Fim do Processo 2      | cancel  |
+Fonte: Elaborado pelos autores (2026).
 
-**Selecionar Alimentos**
+## 3 Detalhamento das atividades
 
-Nesta etapa, o usuário visualiza uma lista de alimentos disponíveis e pode selecionar um item específico para visualizar mais detalhes ou retornar à busca.
+### 3.1 Identificação do excedente
 
-| Campo              | Tipo          | Restrições | Valor default |
-|--------------------|--------------|-----------|--------------|
-| lista de alimentos | Tabela       | obrigatório |              |
-| detalhes           | Área de texto| automático |              |
+O comerciante avalia, ao longo do expediente ou nas proximidades do fechamento, quais produtos apresentam estoque superior à demanda esperada. Tal avaliação é realizada a partir da observação do balcão, mas passa a contar com histórico digital das vendas registradas no FoodLoop para subsidiar decisões futuras.
 
-| Comandos  | Destino               | Tipo    |
-|-----------|----------------------|---------|
-| selecionar| Solicitar Alimento   | default |
-| voltar    | Buscar Alimentos     | cancel  |
+**Quadro 1 – Campos da atividade "Identificação do excedente"**
 
-**Solicitar Alimentos**
+| Campo | Tipo | Restrições | Valor default |
+|---|---|---|---|
+| produto em excedente | seleção | item do catálogo do estabelecimento | — |
+| quantidade disponível | número | maior que 0 | — |
 
-Nesta atividade, o usuário informa a quantidade desejada e o tipo de solicitação (reserva ou compra). Também pode adicionar observações. Após isso, pode confirmar ou cancelar a solicitação.
+Fonte: Elaborado pelos autores (2026).
 
-| Campo        | Tipo            | Restrições        | Valor default |
-|--------------|-----------------|------------------|--------------|
-| quantidade   | Número          | maior que 0      |              |
-| tipo         | Seleção única   | reserva/compra   | reserva      |
-| observação   | Área de texto   | opcional         |              |
+**Quadro 2 – Comandos da atividade "Identificação do excedente"**
 
-| Comandos   | Destino                 | Tipo    |
-|------------|------------------------|---------|
-| confirmar  | Registrar Solicitação  | default |
-| cancelar   | Fim do Processo 2      | cancel  |
+| Comando | Destino | Tipo |
+|---|---|---|
+| cadastrar anúncio | Cadastro e publicação do anúncio | default |
 
-**Registrar Solicitação**
+Fonte: Elaborado pelos autores (2026).
 
-Nesta etapa, o sistema registra a solicitação e exibe uma mensagem de confirmação ao usuário, finalizando o processo.
+### 3.2 Cadastro e publicação do anúncio
 
-| Campo        | Tipo            | Restrições | Valor default          |
-|--------------|-----------------|-----------|-----------------------|
-| confirmação  | Área de texto   | automático| Solicitação realizada |
+No painel do comércio, o comerciante cria um anúncio contendo os dados do produto, o preço promocional e o prazo para retirada. Após a revisão das informações, o anúncio é publicado e passa a estar disponível para visualização no aplicativo.
 
-| Comandos   | Destino            | Tipo    |
-|------------|--------------------|---------|
-| finalizar  | Fim do Processo 2  | default |
+**Quadro 3 – Campos da atividade "Cadastro e publicação do anúncio"**
+
+| Campo | Tipo | Restrições | Valor default |
+|---|---|---|---|
+| produto | seleção | item do catálogo | — |
+| quantidade | número | maior que 0 | 1 |
+| preço promocional | número | menor que o preço regular | — |
+| prazo de retirada | data/hora | posterior ao momento atual | fim do expediente |
+| descrição adicional | área de texto | opcional | — |
+
+Fonte: Elaborado pelos autores (2026).
+
+**Quadro 4 – Comandos da atividade "Cadastro e publicação do anúncio"**
+
+| Comando | Destino | Tipo |
+|---|---|---|
+| publicar | Divulgação e notificação | default |
+| cancelar | Fim do Processo 2 | cancel |
+
+Fonte: Elaborado pelos autores (2026).
+
+### 3.3 Divulgação e notificação aos clientes
+
+Após a publicação, o sistema FoodLoop exibe automaticamente o anúncio para clientes localizados no raio de alcance do estabelecimento e, adicionalmente, envia notificação ativa aos usuários que manifestaram interesse compatível com o produto anunciado.
+
+**Quadro 5 – Campos da atividade "Divulgação e notificação aos clientes"**
+
+| Campo | Tipo | Restrições | Valor default |
+|---|---|---|---|
+| raio de divulgação | número | em quilômetros | 5 |
+| público-alvo | automático | clientes com preferências compatíveis | — |
+
+Fonte: Elaborado pelos autores (2026).
+
+**Quadro 6 – Comandos da atividade "Divulgação e notificação aos clientes"**
+
+| Comando | Destino | Tipo |
+|---|---|---|
+| divulgar automaticamente | Acompanhamento e fechamento | default |
+
+Fonte: Elaborado pelos autores (2026).
+
+### 3.4 Acompanhamento e fechamento do anúncio
+
+O comerciante acompanha, em tempo real, as reservas realizadas sobre o anúncio. Ao final do prazo, o anúncio é encerrado automaticamente: caso todos os itens tenham sido reservados, o produto é separado para retirada; caso contrário, o sistema registra a sobra residual para subsídio de análises futuras de desperdício e de eficácia de precificação.
+
+**Quadro 7 – Campos da atividade "Acompanhamento e fechamento do anúncio"**
+
+| Campo | Tipo | Restrições | Valor default |
+|---|---|---|---|
+| reservas recebidas | número | entre 0 e a quantidade anunciada | 0 |
+| status do anúncio | seleção | ativo / encerrado com reserva / encerrado com sobra | ativo |
+
+Fonte: Elaborado pelos autores (2026).
+
+**Quadro 8 – Comandos da atividade "Acompanhamento e fechamento do anúncio"**
+
+| Comando | Destino | Tipo |
+|---|---|---|
+| encerrar com reserva | Preparação para retirada | default |
+| encerrar com sobra | Fim do Processo 2 | cancel |
+
+Fonte: Elaborado pelos autores (2026).
