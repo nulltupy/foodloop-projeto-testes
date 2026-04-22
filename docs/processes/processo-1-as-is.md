@@ -1,82 +1,64 @@
-### Processo 1 AS IS – Cadastro e Publicação de Alimentos
+### Processo 1 AS IS – Venda Presencial 
 
-O processo atual consiste no cadastro de um usuário (doador ou estabelecimento) na plataforma FoodLoop e, em seguida, na publicação de alimentos disponíveis para doação ou venda. Atualmente, esse processo é realizado de forma simples, com preenchimento manual das informações, sem automações avançadas ou validações complexas.
+O processo atual consiste na venda de salgados e sucos aos clientes da lanchonete, realizada de forma integralmente manual e presencial. Atualmente, esse processo ocorre sem qualquer suporte tecnológico, com preços fixos pré-determinados, sem cardápio digital e sem registro informatizado das transações.
 
-O usuário acessa o sistema, realiza seu cadastro informando dados básicos e, após autenticação, pode cadastrar um alimento com informações como descrição, quantidade, validade e imagem.
+O cliente se desloca fisicamente até o estabelecimento, observa os produtos expostos na vitrine, solicita o pedido verbalmente ao atendente, realiza o pagamento no balcão e recebe o produto para consumo no local ou retirada.
 
-Fluxo do processo
-1. Usuário acessa a plataforma
-2. Usuário realiza cadastro
-3. Sistema valida os dados
-4. Usuário realiza login
-5. Usuário cadastra alimento
-6. Sistema salva publicação
-7. Processo finalizado
+### Fluxo do processo
+
+1. Cliente chega ao estabelecimento
+2. Cliente visualiza os produtos no balcão
+3. Cliente solicita o pedido verbalmente
+4. Atendente verifica a disponibilidade
+5. Atendente informa o valor
+6. Cliente efetua o pagamento presencial
+7. Atendente entrega o produto
+8. Processo finalizado
  
-![Modelo BPMN do PROCESSO 1](../images/Processo1.png)
+![Modelo BPMN do PROCESSO 1](../images/VendaPresencial.png)
 
 #### Detalhamento das atividades
 
-**Cadastro de Usuário**
+**Solicitação de Pedido**
 
-Nesta atividade, o usuário informa seus dados para criar uma conta na plataforma. Os campos incluem nome, e-mail, senha, telefone e tipo de usuário. O sistema exige que o e-mail esteja em formato válido e que a senha possua no mínimo 8 caracteres. O usuário pode optar por concluir o cadastro ou cancelar a operação.
+Nesta atividade, o cliente, já presente no estabelecimento, comunica ao atendente qual produto deseja consumir. A escolha é feita visualmente, a partir dos itens expostos na vitrine, e a comunicação é exclusivamente verbal. Não há cardápio digital nem reserva prévia: o cliente só tem acesso ao catálogo no momento em que chega ao balcão.
 
 | Campo            | Tipo            | Restrições              | Valor default |
-|------------------|-----------------|------------------------|--------------|
-| nome             | Caixa de texto  | obrigatório            |              |
-| email            | Caixa de texto  | formato de e-mail      |              |
-| senha            | Caixa de texto  | mínimo de 8 caracteres |              |
-| telefone         | Caixa de texto  | apenas números         |              |
-| tipo de usuário  | Seleção única   | doador/empresa         | doador       |
+|------------------|-----------------|-------------------------|---------------|
+| Produto          | Verbal          | Precisa estar na vitrine|        -       |
+| Quantidade       | Verbal          | Limitado ao estoque do dia |      1        |
+
 
 | Comandos   | Destino              | Tipo     |
 |------------|---------------------|----------|
-| cadastrar  | Login               | default  |
-| cancelar   | Fim do Processo 1   | cancel   |
+| disponível  | Informação do Valor               | default  |
+| indisponível   | Fim do Processo 1   | cancel   |
 
 
-**Login**
+**Informação do Valor e Pagamento**
 
-Nesta atividade, o usuário realiza a autenticação no sistema informando e-mail e senha. Os dados devem seguir as mesmas restrições definidas no cadastro. Após o preenchimento, o usuário pode acessar o sistema ou retornar à tela de cadastro.
+Nesta atividade, o atendente comunica verbalmente o preço do produto, fixo e pré-determinado pelo proprietário (sem variação ao longo do dia e sem promoções). O cliente então realiza o pagamento no balcão, podendo utilizar dinheiro, cartão físico ou PIX. Não há emissão de comprovante digital associado ao cliente.
 
 | Campo  | Tipo           | Restrições              | Valor default |
 |--------|----------------|--------------------------|--------------|
-| email  | Caixa de texto | formato de e-mail        |              |
-| senha  | Caixa de texto | mínimo de 8 caracteres   |              |
+| preço	  | tabela fixa |	valor pré-determinado pelo proprietário        |        -      |
+| forma de pagamento  | seleção única	| dinheiro / cartão / PIX  |     -         |
 
 | Comandos | Destino                  | Tipo    |
 |----------|--------------------------|---------|
-| entrar   | Cadastro de Alimento     | default |
-| voltar   | Cadastro de Usuário      | cancel  |
+| pagar   | Entrega do Produto     | default |
+| desistir   | Fim do Processo 1      | cancel  |
 
 
-**Cadastro de Alimento**
+**Entrega do Produto**
 
-Nesta atividade, o usuário cadastra um alimento disponível para doação ou venda. São informados dados como nome do alimento, descrição, quantidade, data de validade, imagem e tipo. A quantidade deve ser maior que zero e a data de validade deve ser futura. O usuário pode publicar o alimento ou cancelar a operação.
+Nesta atividade, o atendente entrega o produto ao cliente, que pode consumi-lo no próprio estabelecimento ou levá-lo para viagem. A entrega é imediata e presencial, e não existe qualquer registro da transação em sistema: nem o comerciante tem histórico digital da venda nem o cliente mantém vínculo posterior com o pedido.
 
 | Campo            | Tipo            | Restrições        | Valor default |
 |------------------|-----------------|------------------|--------------|
-| nome do alimento | Caixa de texto  | obrigatório      |              |
-| descrição        | Área de texto   |                  |              |
-| quantidade       | Número          | maior que 0      |              |
-| data validade    | Data            | data futura      |              |
-| imagem           | Imagem          | opcional         |              |
-| tipo             | Seleção única   | doação/venda     | doação       |
+| entrega	 | física	  | produto retirado no balcão      |       -       |
+
 
 | Comandos  | Destino               | Tipo    |
 |-----------|----------------------|---------|
-| publicar  | Salvar Publicação    | default |
-| cancelar  | Fim do Processo 1    | cancel  |
-
-
-**Salvar Publicação**
-
-Nesta atividade, o sistema registra as informações do alimento no banco de dados e exibe uma mensagem de confirmação ao usuário indicando que a publicação foi realizada com sucesso. O processo é finalizado após essa etapa.
-
-| Campo       | Tipo           | Restrições | Valor default          |
-|-------------|----------------|-----------|-----------------------|
-| confirmação | Área de texto  | automático| Publicado com sucesso |
-
-| Comandos   | Destino            | Tipo    |
-|------------|--------------------|---------|
-| finalizar  | Fim do Processo 1  | default |
+| finalizar  | Fim do Processo 1    | default |
