@@ -35,11 +35,11 @@ Desenvolver um aplicativo que auxilie o estabelecimento Couto Lanches a disponib
 
 ## Justificativa
 
-A escolha deste projeto está relacionada à crescente preocupação global com o desperdício de alimentos e com a insegurança alimentar. Segundo a Organização das Nações Unidas para a Alimentação e Agricultura (FAO), aproximadamente 1,3 bilhão de toneladas de alimentos são desperdiçadas anualmente no mundo, o que corresponde a cerca de um terço de toda a produção global. Ao mesmo tempo, dados da Organização das Nações Unidas (ONU) indicam que mais de 700 milhões de pessoas ainda enfrentam a fome, evidenciando um cenário de desigualdade no acesso à alimentação.
+A escolha deste projeto está relacionada à crescente preocupação global com o desperdício de alimentos e com a insegurança alimentar. Segundo a Organização das Nações Unidas para a Alimentação e Agricultura (FAO), aproximadamente 1,3 bilhão de toneladas de alimentos são desperdiçadas anualmente no mundo, o que representa cerca de um terço de toda a produção global. Ao mesmo tempo, dados da Organização das Nações Unidas (ONU) indicam que mais de 700 milhões de pessoas enfrentam dificuldades para ter acesso a uma alimentação adequada.
 
-No Brasil, a Empresa Brasileira de Pesquisa Agropecuária (Embrapa) aponta que cerca de 30% dos alimentos produzidos são desperdiçados, reforçando a existência de falhas na cadeia de produção, distribuição e consumo. Esse contexto demonstra que, enquanto uma grande quantidade de alimentos é descartada diariamente, milhões de pessoas enfrentam dificuldades para ter acesso a uma alimentação adequada.
+Segundo diversas pesquisas e relatórios internacionais, uma grande quantidade de alimentos produzidos no mundo é descartada diariamente, enquanto milhões de pessoas ainda sofrem com a fome. No Brasil, a Empresa Brasileira de Pesquisa Agropecuária (Embrapa) aponta que cerca de 30% dos alimentos produzidos são desperdiçados, evidenciando falhas na distribuição e no consumo.
 
-Diante desse cenário, soluções tecnológicas podem desempenhar um papel fundamental na criação de sistemas mais eficientes de distribuição de alimentos. O desenvolvimento de um aplicativo que conecte estabelecimentos com excedentes de alimentos a consumidores representa uma forma prática de reduzir o desperdício, otimizar o aproveitamento dos recursos e promover o consumo consciente.
+Nesse contexto, soluções tecnológicas podem desempenhar um papel fundamental na criação de sistemas mais eficientes de distribuição de alimentos. O desenvolvimento de um aplicativo que conecte estabelecimentos com excedentes de alimentos a consumidores representa uma forma prática de reduzir o desperdício e promover o consumo consciente.
 
 Além disso, o projeto contribui diretamente para os Objetivos de Desenvolvimento Sustentável, especialmente o ODS 02 – Fome Zero, que busca garantir o acesso a alimentos seguros, nutritivos e suficientes para todas as pessoas.
 
