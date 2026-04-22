@@ -18,7 +18,7 @@ O cliente que decide registrar sua opinião busca o nome do comércio no Google,
 
 **Figura 1 – Diagrama de atividades do processo de avaliação do estabelecimento (AS-IS)**
 
-![Modelo BPMN do Processo 2](../images/AvaliacaoEstabelecimento.jpeg)
+![Modelo BPMN do Processo 2](../images/AvaliacaoEstabelecimento.png)
 
 
 
