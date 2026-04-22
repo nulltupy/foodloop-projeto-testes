@@ -39,15 +39,15 @@ Apresente aqui uma descrição da sua proposta, abordando seus limites e suas li
 
 ## Indicadores de desempenho
 
-Apresente aqui os principais indicadores de desempenho e algumas metas para o processo. Atenção: as informações necessárias para gerar os indicadores devem estar contempladas no diagrama de classe. Coloque no mínimo 5 indicadores.
+Os indicadores a seguir foram definidos para monitorar os dois processos modelados (Cadastro e Publicação de Alimentos e Solicitação de Alimento) e a missão central do FoodLoop: reduzir o desperdício de alimentos ao conectar excedentes de estabelecimentos a consumidores. Cada indicador cobre uma dimensão distinta, sendo elas: **missão/impacto**, **funil de conversão**, **operacional**, **qualidade**, **velocidade de escoamento** e **engajamento**, de modo a evitar pontos cegos no acompanhamento do negócio. Todas as informações necessárias estão previstas no diagrama de classe (entidades `Usuario`, `Oferta`, `Pedido`, `Avaliacao`).
 
-Use o seguinte modelo:
+| **Indicador** | **Objetivos** | **Descrição** | **Fonte de dados** | **Fórmula de cálculo** | **Meta** |
+| --- | --- | --- | --- | --- | --- |
+| Taxa de aproveitamento de ofertas | Medir quanto do alimento publicado efetivamente deixa de ser descartado, traduzindo diretamente a missão de sustentabilidade da plataforma | Percentual das unidades cadastradas em ofertas que foram retiradas por consumidores (reservas/compras concluídas), em relação ao total publicado no período | Tabelas `Oferta` e `Pedido` (status concluído) | (Σ quantidade de pedidos concluídos no período / Σ quantidade publicada nas ofertas do período) × 100 | ≥ 40% ao mês |
+| Taxa de conversão de ofertas em pedidos | Avaliar a atratividade das ofertas publicadas e a eficácia do funil entre descoberta e reserva | Percentual de ofertas publicadas que receberam ao menos um pedido confirmado antes do vencimento | Tabelas `Oferta` e `Pedido` | (nº de ofertas com ao menos 1 pedido confirmado / nº total de ofertas publicadas no período) × 100 | ≥ 30% ao mês |
+| Taxa de cancelamento de pedidos | Monitorar a confiabilidade operacional da plataforma e identificar atrito entre consumidores e estabelecimentos | Percentual de pedidos que foram cancelados (pelo consumidor ou pelo estabelecimento) em relação ao total de pedidos criados | Tabela `Pedido` (status = cancelado) | (nº de pedidos cancelados no período / nº total de pedidos criados no período) × 100 | ≤ 15% ao mês |
+| Avaliação média dos estabelecimentos | Garantir a qualidade dos parceiros e oferecer aos consumidores um critério confiável de escolha | Média ponderada das notas atribuídas pelos consumidores aos estabelecimentos após a retirada do pedido | Tabela `Avaliacao` | Σ (nota das avaliações) / nº total de avaliações no período | ≥ 3,5 (escala de 1 a 5) |
+| Tempo médio de escoamento de oferta | Medir a velocidade com que ofertas publicadas encontram consumidores, indicando eficiência da descoberta geolocalizada | Tempo médio, em horas, entre a publicação de uma oferta e a primeira reserva confirmada da mesma | Tabelas `Oferta` (data_publicacao) e `Pedido` (data_criacao) | AVG (data_primeiro_pedido_confirmado − data_publicacao_oferta), em horas, considerando apenas ofertas com pelo menos uma reserva | ≤ 6 horas |
+| Volume de desperdício evitado | Quantificar o impacto ambiental direto gerado pela plataforma, para uso em relatórios de sustentabilidade e comunicação com stakeholders | Soma das unidades (ou quilos, quando aplicável) de alimentos comercializados/doados via app no período, que teriam sido descartadas sem a plataforma | Tabelas `Oferta` e `Pedido` (status concluído) | Σ (quantidade de cada pedido concluído no período) | ≥ 45 unidades ao mês |
 
-| **Indicador** | **Objetivos** | **Descrição** | **Fonte de dados** | **Fórmula de cálculo** |
-| ---           | ---           | ---           | ---             | ---             |
-| Percentual de reclamações | Avaliar quantitativamente as reclamações | Percentual de reclamações em relação ao total de atendimentos | Tabela Reclamações | número total de reclamações / número total de atendimentos |
-| Taxa de requisições atendidas | Melhorar a prestação de serviços medindo a porcentagem de requisições atendidas| Mede a % de requisições atendidas na semana | Tabela Solicitações | (número de requisições atendidas / número total de requisições) * 100 |
-| Taxa de entrega de material | Manter controle sobre os materiais que estão sendo entregues | Mede % de material entregue dentro do mês | Tabela Pedidos | (número de pedidos entregues / número total de pedidos) * 100 |
-
-
-Obs.: todas as informações necessárias para gerar os indicadores devem estar no diagrama de classe a ser apresentado posteriormente.
+Obs.: todas as informações necessárias para gerar os indicadores acima estão contempladas nas entidades `Usuario`, `Oferta`, `Pedido` e `Avaliacao` do diagrama de classe a ser apresentado na seção de Arquitetura da Solução.
