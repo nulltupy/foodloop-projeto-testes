@@ -7,11 +7,11 @@ Com base nisso, o projeto propõe o desenvolvimento de um aplicativo que conecta
 Além de contribuir para a diminuição do desperdício, a proposta também se relaciona com iniciativas voltadas à segurança alimentar e à sustentabilidade, promovendo o uso mais consciente dos recursos e ampliando o acesso a alimentos a preços mais acessíveis. Assim, o projeto busca unir tecnologia e impacto social para gerar benefícios para a comunidade.
 
 ## Cliente 
-O projeto tem como público parceiro estabelecimentos do setor alimentício, como restaurantes, padarias, mercados e supermercados, que frequentemente lidam com excedentes de alimentos ao longo do dia. Esses estabelecimentos atuam no comércio e na produção de alimentos, um setor marcado pela alta rotatividade de produtos perecíveis, o que gera desafios relacionados à gestão de estoque e ao desperdício.
+O projeto será aplicado no estabelecimento Couto Lanches, que atua no setor alimentício, oferecendo lanches e refeições rápidas ao público. Como é comum nesse tipo de negócio, há a produção diária de alimentos perecíveis, o que pode gerar excedentes ao final do dia e, consequentemente, desperdício.
 
-De modo geral, essas organizações buscam oferecer alimentos de qualidade e um bom atendimento à população, tendo como missão atender bem seus clientes e como visão crescer de forma sustentável e fortalecer a relação com a comunidade. Entre seus valores, destacam-se a responsabilidade social, a qualidade dos produtos e a adoção de práticas mais sustentáveis.
+Nesse contexto, a proposta do aplicativo será utilizada como uma ferramenta para auxiliar o Couto Lanches na gestão desses excedentes, permitindo que os produtos que não foram vendidos durante o período regular sejam disponibilizados na plataforma com preços reduzidos.
 
-Nesse contexto, o aplicativo proposto surge como uma solução tecnológica que pode auxiliar esses parceiros a reduzir perdas financeiras causadas pelo desperdício de alimentos, além de contribuir para um impacto social positivo e para práticas mais alinhadas com a sustentabilidade.
+Dessa forma, o estabelecimento poderá diminuir perdas financeiras, melhorar o aproveitamento dos alimentos produzidos e adotar práticas mais sustentáveis, ao mesmo tempo em que amplia seu alcance a novos clientes.
 
 ## Problema
 O desperdício de alimentos é um problema significativo na sociedade atual, especialmente em estabelecimentos como restaurantes, padarias e supermercados. Nesses locais, uma grande quantidade de alimentos acaba sendo descartada diariamente devido à proximidade da data de validade ou à impossibilidade de venda no mesmo dia, mesmo estando ainda próprios para consumo.
@@ -22,16 +22,17 @@ Diante desse contexto, surge a necessidade de uma solução que facilite a liga�
 ## Objetivos
 
 ### Objetivo Geral 
-Desenvolver um aplicativo que conecte estabelecimentos com excedentes de alimentos a consumidores interessados em adquiri-los por preços reduzidos, contribuindo para a diminuição do desperdício e promovendo práticas alinhadas aos objetivos de desenvolvimento sustentável. 
+Desenvolver um aplicativo que auxilie o estabelecimento Couto Lanches a disponibilizar seus alimentos excedentes a consumidores interessados, por meio de preços reduzidos, contribuindo para a diminuição do desperdício, a redução de perdas financeiras e a promoção de práticas sustentáveis alinhadas aos Objetivos de Desenvolvimento Sustentável.
 
 ### Objetivos Específicos 
 
-- Desenvolver uma plataforma digital intuitiva que permita aos estabelecimentos cadastrarem e gerenciarem alimentos excedentes de forma prática.
-- Possibilitar que consumidores encontrem, visualizem e adquiram alimentos disponíveis com facilidade e rapidez.
-- Reduzir o desperdício de alimentos por meio da comercialização de produtos ainda próprios para consumo.
-- Incentivar práticas sustentáveis e o consumo consciente, alinhados ao ODS 02 – Fome Zero.
-- Promover benefícios econômicos tanto para os estabelecimentos, ao reduzir prejuízos, quanto para os consumidores, ao oferecer produtos com preços acessíveis.
-  
+- Desenvolver uma funcionalidade no aplicativo que permita ao Couto Lanches cadastrar, ao final do dia, os alimentos excedentes disponíveis para venda.
+- Possibilitar que consumidores visualizem, em tempo real, os produtos disponibilizados pelo Couto Lanches, com preços reduzidos.
+- Reduzir o desperdício de alimentos no Couto Lanches, promovendo o aproveitamento de produtos ainda próprios para consumo.
+- Diminuir as perdas financeiras do Couto Lanches por meio da comercialização de itens que seriam descartados.
+- Incentivar práticas sustentáveis no Couto Lanches, alinhadas ao ODS 02 – Fome Zero.
+- Ampliar a visibilidade e atrair novos clientes para o Couto Lanches por meio da utilização da plataforma digital.
+
 ## Justificativa
 
 A escolha deste projeto está relacionada à crescente preocupação global com o desperdício de alimentos e com a insegurança alimentar. Segundo a Organização das Nações Unidas para a Alimentação e Agricultura (FAO), aproximadamente 1,3 bilhão de toneladas de alimentos são desperdiçadas anualmente no mundo, o que corresponde a cerca de um terço de toda a produção global. Ao mesmo tempo, dados da Organização das Nações Unidas (ONU) indicam que mais de 700 milhões de pessoas ainda enfrentam a fome, evidenciando um cenário de desigualdade no acesso à alimentação.
