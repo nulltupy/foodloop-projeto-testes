@@ -14,6 +14,18 @@ A seguir, apresenta-se o modelo de negócio desenvolvido para o projeto.
 
 ![Modelo de negócio do FoodLoop](images/ModeloDeNegócio.png)
 
+### Sustentabilidade financeira e mecanismos de monetização
+
+O modelo de monetização do FoodLoop foi pensado para alinhar a receita da plataforma ao impacto gerado, garantindo que o crescimento do negócio acompanhe o aumento de alimentos aproveitados. Três fluxos de receita sustentam a operação.
+
+**Comissão sobre transações (RF-011).** A plataforma retém automaticamente um percentual fixo sobre cada venda concluída entre estabelecimento e consumidor. Esse percentual é definido contratualmente com o parceiro no momento do cadastro e incide sobre o preço final já com desconto. Como a receita só é gerada quando o alimento é efetivamente vendido, o mecanismo incentiva a plataforma a maximizar a conversão de ofertas publicadas em pedidos concluídos, o que coincide diretamente com a missão de reduzir desperdício.
+
+**Planos de destaque para parceiros (RF-010).** Estabelecimentos podem aderir a um plano de assinatura mensal que garante maior visibilidade na listagem de ofertas, aparecendo em posições privilegiadas nas buscas por geolocalização. Esse fluxo funciona como receita recorrente e previsível, complementando a comissão variável, e atende principalmente parceiros com alto volume de sobras que se beneficiam de mais exposição.
+
+**Escalabilidade futura.** Em médio prazo, o modelo prevê parcerias com marcas de sustentabilidade, campanhas patrocinadas no feed de ofertas e relatórios agregados de impacto ambiental vendidos como produto B2B. Essas fontes não fazem parte do escopo da Sprint atual, mas estão mapeadas no BMC como possibilidades de expansão.
+
+Do lado dos custos, o projeto opera integralmente nos planos gratuitos do Firebase (Auth e Firestore) conforme a Restrição 004, mantendo o custo fixo próximo de zero no piloto com a Couto Lanches e permitindo validar o modelo de negócio antes de eventual migração para planos pagos.
+
 ## Personas
 
 ![Persona 01](images/Persona_1.png)
