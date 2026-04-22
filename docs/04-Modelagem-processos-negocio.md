@@ -10,9 +10,14 @@ Com o tema do projeto definido, escolham dois processos no contexto de negócios
 
 ## Modelagem da situação atual (Modelagem AS IS)
 
-Apresente uma descrição textual de como os sistemas atuais resolvem o problema que seu projeto se propõe a resolver. Caso sua proposta seja inovadora e não existam processos claramente definidos, apresente como as tarefas que seu sistema pretende implementar são executadas atualmente, mesmo que não se utilize tecnologia computacional.
+Modelagem da situação atual (Modelagem AS-IS)
+O contexto de negócio analisado é uma lanchonete que comercializa salgados e sucos para consumo local. O estabelecimento opera de forma inteiramente presencial, sem sistema informatizado de vendas, sem presença em redes sociais e sem política de promoções — os preços são fixos e pré-determinados pelo proprietário. A interação com o cliente ocorre integralmente no balcão, e a única forma atual de registro público de opinião sobre o comércio é via avaliações no Google. Ao final do expediente, os produtos que não foram vendidos durante o dia tornam-se perda para o estabelecimento, uma vez que não há mecanismo para escoá-los antes do fechamento.
 
-Cole aqui os modelos dos processos atuais (modelo AS-IS), elaborados com o apoio da ferramenta baseada em BPMN utilizada na disciplina. Cada processo identificado deve ter seu modelo AS-IS específico. 
+Como a proposta do FoodLoop envolve funcionalidades que o estabelecimento ainda não executa de forma tecnológica (anúncio de produtos com desconto, descoberta geolocalizada, avaliações internas ao app, compra via aplicativo), o modelo AS-IS descreve como essas tarefas acontecem hoje no mundo real, mesmo quando realizadas de forma manual, improvisada ou inexistente. Foram identificados três processos principais que serão impactados pela solução proposta:
+
+Processo de venda presencial — fluxo completo de atendimento ao cliente no balcão.
+Processo de gestão de sobras ao final do expediente — destinação dos salgados não vendidos.
+Processo de avaliação do estabelecimento pelo cliente — como a reputação é construída hoje, via Google.
 
 ## Descrição geral da proposta (Modelagem TO BE)
 
