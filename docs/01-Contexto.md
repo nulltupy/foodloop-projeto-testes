@@ -26,12 +26,12 @@ Desenvolver um aplicativo que conecte estabelecimentos com excedentes de aliment
 
 ### Objetivos Específicos 
 
-Criar uma plataforma digital que permita aos estabelecimentos cadastrarem alimentos excedentes disponíveis para venda. 
-Permitir que consumidores visualizem e adquiram esses produtos de forma rápida e acessível. 
-Reduzir o desperdício de alimentos por meio da comercialização de produtos que seriam descartados. 
-Incentivar práticas sustentáveis alinhadas ao ODS 02 – Fome Zero. 
-Promover benefícios econômicos tanto para empresas quanto para consumidores. 
-
+- Desenvolver uma plataforma digital intuitiva que permita aos estabelecimentos cadastrarem e gerenciarem alimentos excedentes de forma prática.
+- Possibilitar que consumidores encontrem, visualizem e adquiram alimentos disponíveis com facilidade e rapidez.
+- Reduzir o desperdício de alimentos por meio da comercialização de produtos ainda próprios para consumo.
+- Incentivar práticas sustentáveis e o consumo consciente, alinhados ao ODS 02 – Fome Zero.
+- Promover benefícios econômicos tanto para os estabelecimentos, ao reduzir prejuízos, quanto para os consumidores, ao oferecer produtos com preços acessíveis.
+  
 ## Justificativa
 
 A escolha deste projeto está relacionada à crescente preocupação global com o desperdício de alimentos e com a insegurança alimentar. Segundo diversas pesquisas e relatórios internacionais, uma grande quantidade de alimentos produzidos no mundo é descartada diariamente, enquanto milhões de pessoas enfrentam dificuldades para ter acesso a uma alimentação adequada. 
