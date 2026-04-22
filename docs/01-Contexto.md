@@ -35,15 +35,17 @@ Desenvolver um aplicativo que auxilie o estabelecimento Couto Lanches a disponib
 
 ## Justificativa
 
-A escolha deste projeto está relacionada à crescente preocupação global com o desperdício de alimentos e com a insegurança alimentar. Segundo a Organização das Nações Unidas para a Alimentação e Agricultura (FAO), aproximadamente 1,3 bilhão de toneladas de alimentos são desperdiçadas anualmente no mundo, o que representa cerca de um terço de toda a produção global. Ao mesmo tempo, dados da Organização das Nações Unidas (ONU) indicam que mais de 700 milhões de pessoas enfrentam dificuldades para ter acesso a uma alimentação adequada.
+A escolha deste projeto está relacionada à crescente preocupação com o desperdício de alimentos e a insegurança alimentar, problemas que afetam tanto o Brasil quanto o cenário global. De acordo com o Índice de Desperdício de Alimentos 2024, divulgado pela ONU, o mundo desperdiçou cerca de 1,05 bilhão de toneladas de alimentos em 2022, o que equivale a aproximadamente 132 kg por pessoa ao ano, representando quase 20% de todos os alimentos disponíveis para consumo.
 
-Segundo diversas pesquisas e relatórios internacionais, uma grande quantidade de alimentos produzidos no mundo é descartada diariamente, enquanto milhões de pessoas ainda sofrem com a fome. No Brasil, a Empresa Brasileira de Pesquisa Agropecuária (Embrapa) aponta que cerca de 30% dos alimentos produzidos são desperdiçados, evidenciando falhas na distribuição e no consumo.
+No Brasil, a situação também é preocupante. Segundo dados divulgados pelo G1, cada brasileiro desperdiça, em média, cerca de 41 kg de alimentos por ano, evidenciando hábitos de consumo que contribuem significativamente para o problema. Além disso, estudos da Embrapa indicam que o desperdício ocorre em todas as etapas da cadeia produtiva, podendo chegar a 40% ou mais em alguns tipos de alimentos, especialmente frutas e hortaliças, devido a falhas no transporte, armazenamento e comercialização.
 
-Nesse contexto, soluções tecnológicas podem desempenhar um papel fundamental na criação de sistemas mais eficientes de distribuição de alimentos. O desenvolvimento de um aplicativo que conecte estabelecimentos com excedentes de alimentos a consumidores representa uma forma prática de reduzir o desperdício e promover o consumo consciente.
+Esse cenário gera impactos não apenas sociais, mas também ambientais e econômicos. Ainda segundo a ONU, o desperdício de alimentos é responsável por cerca de 8% a 10% das emissões globais de gases de efeito estufa, além de causar prejuízos financeiros significativos.
 
-Além disso, o projeto contribui diretamente para os Objetivos de Desenvolvimento Sustentável, especialmente o ODS 02 – Fome Zero, que busca garantir o acesso a alimentos seguros, nutritivos e suficientes para todas as pessoas.
+Diante disso, torna-se essencial buscar soluções que contribuam para a redução desse desperdício. Nesse contexto, o uso da tecnologia se apresenta como uma alternativa eficiente para melhorar a distribuição de alimentos. O desenvolvimento de um aplicativo que conecte estabelecimentos com excedentes a consumidores interessados representa uma forma prática de reduzir perdas, incentivar o consumo consciente e ampliar o acesso à alimentação.
 
-Assim, este trabalho se justifica pela possibilidade de aplicar conhecimentos tecnológicos na criação de uma solução que gere impacto social positivo, promovendo sustentabilidade, redução de desperdício e maior acesso à alimentação.
+Além disso, o projeto está alinhado aos Objetivos de Desenvolvimento Sustentável, especialmente o ODS 02 – Fome Zero, que busca garantir o acesso a alimentos seguros, nutritivos e suficientes para todas as pessoas.
+
+Dessa forma, este trabalho se justifica pela aplicação de conhecimentos tecnológicos na criação de uma solução com impacto social positivo, promovendo sustentabilidade, redução do desperdício e maior eficiência no uso dos recursos alimentares.
 
 ## Público-alvo
 
