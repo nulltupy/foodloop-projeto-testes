@@ -7,6 +7,11 @@ G1 DISTRITO FEDERAL. Desperdício de alimentos: cada brasileiro joga fora, em m�
 
 ONU BRASIL. Índice de desperdício de alimentos 2024. Disponível em: https://brasil.un.org/pt-br/264460-%C3%ADndice-de-desperd%C3%ADcio-de-alimentos-2024
 . Acesso em: 17 mar. 2026.
+FAO. The State of Food and Agriculture 2019: Moving forward on food loss and waste reduction. Roma: Food and Agriculture Organization of the United Nations, 2019. FAO. Disponível em: https://www.fao.org
+
+ONU. The Sustainable Development Goals Report 2023. Nova York: United Nations, 2023. Disponível em: https://www.un.org
+
+EMBRAPA. Perdas e desperdício de alimentos no Brasil. Brasília: Empresa Brasileira de Pesquisa Agropecuária, 2018. Disponível em: https://www.embrapa.br
 
 ## Personas
 
