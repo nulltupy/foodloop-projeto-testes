@@ -1,72 +1,65 @@
-### Processo 2 AS IS – Solicitação de Alimento
+# Processo 2 AS IS – Gestão de Sobras no Fim do Expediente
 
-O processo consiste na busca e solicitação de alimentos disponíveis na plataforma. O usuário acessa o sistema, visualiza os alimentos cadastrados e realiza uma solicitação de reserva ou compra. O sistema registra o pedido e aguarda confirmação.
+O processo atual consiste na destinação dos salgados que não foram vendidos durante o expediente. Atualmente, esse processo é realizado de forma totalmente manual pelo atendente ou pelo proprietário no momento do fechamento, sem qualquer sistema de controle de estoque ou de perdas.
 
-Fluxo do processo
-1. Usuário acessa a plataforma
-2. Usuário realiza login
-3. Usuário busca alimentos
-4. Usuário seleciona um alimento
-5. Usuário solicita reserva/compra
-6. Sistema registra solicitação
-7. Processo finalizado
+Como o comércio não possui mecanismo de remarcação, promoções ou canal digital de divulgação, os produtos que sobram ao final do dia não encontram nenhuma forma de escoamento e são integralmente descartados, representando perda financeira para o estabelecimento.
 
-![Modelo BPMN do PROCESSO 2](../images/Processo2.png)
+**Fluxo do processo**
 
-#### Detalhamento das atividades
+1. Encerramento do expediente
+2. Identificação dos salgados não vendidos
+3. Recolhimento dos produtos do balcão
+4. Descarte dos produtos não consumidos
+5. Processo finalizado
 
-**Buscar Alimentos**
+![Diagrama AS-IS do Processo 2](caminho/para/imagem-processo-2.png)
 
-Nesta atividade, o usuário pode pesquisar alimentos disponíveis na plataforma utilizando filtros como nome, categoria e localização. O usuário pode iniciar a busca ou cancelar o processo.
+## Detalhamento das atividades
 
-| Campo            | Tipo            | Restrições        | Valor default |
-|------------------|-----------------|------------------|--------------|
-| nome do alimento | Caixa de texto  | opcional         |              |
-| categoria        | Seleção única   | alimento/bebida  |              |
-| localização      | Caixa de texto  | opcional         |              |
+### Encerramento do Expediente
 
-| Comandos | Destino                | Tipo    |
-|----------|------------------------|---------|
-| buscar   | Selecionar Alimento    | default |
-| voltar   | Fim do Processo 2      | cancel  |
+Nesta atividade, o atendente ou proprietário encerra as operações de venda do dia. O fechamento segue o horário padrão do estabelecimento e marca o início das rotinas de avaliação dos produtos que ainda permanecem expostos no balcão.
 
-**Selecionar Alimentos**
+| Campo | Tipo | Restrições | Valor default |
+|---|---|---|---|
+| horário de fechamento | horário | segue o horário operacional do comércio | — |
 
-Nesta etapa, o usuário visualiza uma lista de alimentos disponíveis e pode selecionar um item específico para visualizar mais detalhes ou retornar à busca.
+| Comandos | Destino | Tipo |
+|---|---|---|
+| encerrar | Identificação de Sobras | default |
 
-| Campo              | Tipo          | Restrições | Valor default |
-|--------------------|--------------|-----------|--------------|
-| lista de alimentos | Tabela       | obrigatório |              |
-| detalhes           | Área de texto| automático |              |
+### Identificação das Sobras
 
-| Comandos  | Destino               | Tipo    |
-|-----------|----------------------|---------|
-| selecionar| Solicitar Alimento   | default |
-| voltar    | Buscar Alimentos     | cancel  |
+Nesta atividade, o atendente realiza a verificação visual dos produtos que permanecem no balcão após o fechamento. A contagem é manual e baseada exclusivamente no que está fisicamente exposto, uma vez que não existe registro informatizado de estoque.
 
-**Solicitar Alimentos**
+| Campo | Tipo | Restrições | Valor default |
+|---|---|---|---|
+| itens não vendidos | observação visual | contagem manual dos produtos no balcão | — |
 
-Nesta atividade, o usuário informa a quantidade desejada e o tipo de solicitação (reserva ou compra). Também pode adicionar observações. Após isso, pode confirmar ou cancelar a solicitação.
+| Comandos | Destino | Tipo |
+|---|---|---|
+| identificar | Recolhimento dos Produtos | default |
 
-| Campo        | Tipo            | Restrições        | Valor default |
-|--------------|-----------------|------------------|--------------|
-| quantidade   | Número          | maior que 0      |              |
-| tipo         | Seleção única   | reserva/compra   | reserva      |
-| observação   | Área de texto   | opcional         |              |
+### Recolhimento dos Produtos
 
-| Comandos   | Destino                 | Tipo    |
-|------------|------------------------|---------|
-| confirmar  | Registrar Solicitação  | default |
-| cancelar   | Fim do Processo 2      | cancel  |
+Nesta atividade, o atendente retira fisicamente do balcão todos os produtos que não foram comercializados durante o expediente. Os itens são agrupados para serem destinados ao descarte, pois não há alternativa de reaproveitamento ou escoamento disponível.
 
-**Registrar Solicitação**
+| Campo | Tipo | Restrições | Valor default |
+|---|---|---|---|
+| produtos recolhidos | físico | todos os itens não vendidos do dia | — |
 
-Nesta etapa, o sistema registra a solicitação e exibe uma mensagem de confirmação ao usuário, finalizando o processo.
+| Comandos | Destino | Tipo |
+|---|---|---|
+| recolher | Descarte | default |
 
-| Campo        | Tipo            | Restrições | Valor default          |
-|--------------|-----------------|-----------|-----------------------|
-| confirmação  | Área de texto   | automático| Solicitação realizada |
+### Descarte
 
-| Comandos   | Destino            | Tipo    |
-|------------|--------------------|---------|
-| finalizar  | Fim do Processo 2  | default |
+Nesta atividade, os produtos não vendidos são descartados pelo comércio, configurando perda financeira integral do estoque remanescente do dia. Não há destinação alternativa (doação, remarcação ou venda promocional) porque o estabelecimento não dispõe de nenhum canal para converter esses produtos em receita antes do fechamento.
+
+| Campo | Tipo | Restrições | Valor default |
+|---|---|---|---|
+| produtos descartados | físico | total das sobras do dia | — |
+
+| Comandos | Destino | Tipo |
+|---|---|---|
+| descartar | Fim do Processo 2 | default |
