@@ -1,7 +1,17 @@
-### Processo 1 AS IS – NOME DO PROCESSO
+### Processo 1 AS IS – Cadastro e Publicação de Alimentos
 
-_Apresente aqui o nome, a descrição do processo atual, seu fluxo e características. 
-Em seguida, apresente o modelo do processo 1, descrito no padrão BPMN._
+O processo atual consiste no cadastro de um usuário (doador ou estabelecimento) na plataforma FoodLoop e, em seguida, na publicação de alimentos disponíveis para doação ou venda. Atualmente, esse processo é realizado de forma simples, com preenchimento manual das informações, sem automações avançadas ou validações complexas.
+
+O usuário acessa o sistema, realiza seu cadastro informando dados básicos e, após autenticação, pode cadastrar um alimento com informações como descrição, quantidade, validade e imagem.
+
+Fluxo do processo
+1. Usuário acessa a plataforma
+2. Usuário realiza cadastro
+3. Sistema valida os dados
+4. Usuário realiza login
+5. Usuário cadastra alimento
+6. Sistema salva publicação
+7. Processo finalizado
  
 ![Exemplo de um Modelo BPMN do PROCESSO 1](../images/process.png "Modelo BPMN do Processo 1.")
 
