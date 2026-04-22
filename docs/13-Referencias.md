@@ -1,6 +1,6 @@
 ## Referencias
 
-## Contexto/justificativa
+## Contexto e justificativa
 
 G1 DISTRITO FEDERAL. Desperdício de alimentos: cada brasileiro joga fora, em média, 41 kg de comida por ano. 2024. Disponível em: https://g1.globo.com/google/amp/df/distrito-federal/noticia/2024/09/29/desperdicio-de-alimentos-voce-sabia-que-cada-brasileiro-joga-fora-em-media-41-kg-de-comida-por-ano.ghtml
 . Acesso em: 17 mar. 2026.
