@@ -12,7 +12,9 @@ Como o comércio não possui mecanismo de remarcação, promoções ou canal dig
 4. Descarte dos produtos não consumidos
 5. Processo finalizado
 
-![Modelo BPMN do PROCESSO 2](../images/GestaoSobras.png)
+![Modelo BPMN do Processo 2](../images/GestaoSobras.jpeg)
+
+
 
 ## Detalhamento das atividades
 
