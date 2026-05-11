@@ -1,26 +1,26 @@
 # Arquitetura da solução
 
-## 1 Visão geral
+##  Visão geral
 
 A solução do FoodLoop adota uma arquitetura **cliente-servidor** baseada em três camadas principais: um **aplicativo mobile multiplataforma** no lado do cliente, uma **API REST** no lado do servidor e um **banco de dados relacional** responsável pela persistência das informações. A comunicação entre as camadas é realizada por meio do protocolo **HTTPS**, com troca de mensagens no formato **JSON**, e a autenticação dos usuários é mediada por **tokens JWT**.
 
 Adicionalmente, a solução integra-se a um conjunto de **serviços externos especializados** — pagamento, geolocalização, armazenamento de mídia e notificações push — que ampliam as capacidades do sistema sem demandar desenvolvimento próprio dessas funcionalidades. Tal abordagem reduz a complexidade do back-end, encurta o ciclo de desenvolvimento e aumenta a confiabilidade dos componentes não centrais ao domínio do negócio.
 
-## 2 Componentes da solução
+##  Componentes da solução
 
-### 2.1 Front-end (aplicativo mobile)
+###  Front-end (aplicativo mobile)
 
 O aplicativo é desenvolvido em **React Native**, framework que permite a construção de uma única base de código compilada simultaneamente para os sistemas operacionais Android e iOS. Essa escolha reduz o esforço de desenvolvimento e manutenção e garante consistência visual entre as plataformas. O aplicativo atende aos dois perfis de usuário (cliente e comerciante), com telas e fluxos diferenciados de acordo com o tipo de conta autenticada.
 
-### 2.2 Back-end (API REST)
+###  Back-end (API REST)
 
 O back-end é implementado em **Node.js com o framework Express**, expondo uma **API REST** que recebe requisições do aplicativo mobile e devolve respostas em JSON. A API é responsável pelas regras de negócio do FoodLoop, incluindo gestão de usuários, de estabelecimentos parceiros, de anúncios de excedente, de pedidos, de pagamentos e de avaliações. A autenticação dos usuários é tratada por um módulo dedicado, baseado no padrão **JWT (JSON Web Token)**, garantindo que cada requisição seja validada antes de acessar recursos protegidos.
 
-### 2.3 Banco de dados
+###  Banco de dados
 
 A persistência das informações é realizada em um banco **PostgreSQL**, sistema relacional robusto e de código aberto. O modelo relacional foi escolhido por refletir adequadamente a natureza estruturada do domínio (usuários, estabelecimentos, anúncios, pedidos e avaliações são entidades com relacionamentos bem definidos) e por oferecer recursos transacionais necessários ao registro de pedidos e pagamentos.
 
-### 2.4 Serviços externos
+###  Serviços externos
 
 A solução delega funcionalidades especializadas a serviços externos consolidados:
 
@@ -29,13 +29,13 @@ A solução delega funcionalidades especializadas a serviços externos consolida
 - **Google Maps API** — fornecimento dos mapas, da geolocalização do cliente e das rotas até os estabelecimentos parceiros;
 - **Firebase Cloud Messaging (FCM)** — envio de notificações push ao aplicativo, utilizadas para alertar clientes sobre novos anúncios próximos e o status de seus pedidos, bem como para informar comerciantes sobre novas reservas.
 
-## 3 Ambiente de hospedagem
+##  Ambiente de hospedagem
 
 O back-end e o banco de dados são hospedados na plataforma **Render**, serviço de cloud que oferece **plano gratuito** suficiente para o ciclo de desenvolvimento e para a apresentação do projeto. A plataforma fornece deploy automatizado a partir do repositório Git, certificado SSL nativo e gerenciamento simplificado de variáveis de ambiente, reduzindo a complexidade operacional do projeto.
 
 Os serviços externos (Firebase Storage, Firebase Cloud Messaging, Google Maps API e Mercado Pago) são consumidos diretamente de seus respectivos provedores, dispensando hospedagem própria. O aplicativo mobile, por sua vez, é executado nos dispositivos dos próprios usuários finais, distribuído por meio das lojas oficiais (Google Play Store e Apple App Store) ao final do ciclo de desenvolvimento.
 
-## 4 Fluxo de comunicação entre os componentes
+##  Fluxo de comunicação entre os componentes
 
 1. O usuário (cliente ou comerciante) interage com o **aplicativo mobile**;
 2. O aplicativo envia requisições **HTTPS** à **API REST**, transportando dados em formato **JSON**;
@@ -49,7 +49,7 @@ Os serviços externos (Firebase Storage, Firebase Cloud Messaging, Google Maps A
 ![Arquitetura da Solução](images/ArquiteturaSolução.png)
 
 
-## 5 Justificativas das escolhas arquiteturais
+##  Justificativas das escolhas arquiteturais
 
 A arquitetura proposta atende aos seguintes critérios:
 
@@ -64,15 +64,15 @@ A arquitetura proposta atende aos seguintes critérios:
 
 ## Diagrama de Classes
 
-## 1 Visão geral
+##  Visão geral
 
 O diagrama de classes apresenta a estrutura interna do sistema FoodLoop, mostrando quais são as classes do domínio, o que cada uma guarda, o que cada uma faz e como elas se conectam. Essas classes funcionam como o "molde" dos objetos que existem em memória quando o aplicativo está rodando, e correspondem diretamente às entidades que aparecem nos processos AS-IS e TO-BE.
 
 A modelagem usa notação UML e contempla herança, agregação, composição e enumerações para representar os conjuntos de valores fixos manipulados pelo sistema.
 
-## 2 Classes do domínio
+##  Classes do domínio
 
-### 2.1 Usuários
+###  Usuários
 
 A classe Usuario é abstrata e reúne o que todo perfil de usuário tem em comum: identificador, nome, e-mail, senha, telefone e data de cadastro, além das operações de autenticação e atualização de perfil. Dela derivam dois tipos concretos de usuário.
 
@@ -80,23 +80,23 @@ A classe Cliente representa o consumidor que usa o aplicativo para encontrar com
 
 A classe Comerciante representa o dono ou responsável pelo comércio parceiro. Guarda o CNPJ e é quem publica os anúncios e acompanha os pedidos recebidos.
 
-### 2.2 Estabelecimento e endereço
+###  Estabelecimento e endereço
 
 A classe Estabelecimento descreve o comércio parceiro: nome fantasia, descrição, horário de funcionamento e a nota média calculada a partir das avaliações. Cada estabelecimento tem um Endereco vinculado, com os dados físicos e as coordenadas geográficas usadas pelo mapa do aplicativo.
 
-### 2.3 Produto e anúncio
+###  Produto e anúncio
 
 A classe Produto representa o item do cardápio do comércio, com nome, descrição, preço regular, categoria e imagem. Já a classe Anuncio representa uma oferta promocional sobre um produto específico que está sobrando, com preço promocional, quantidade disponível, prazo de retirada e status atual. Um mesmo produto pode aparecer em vários anúncios ao longo do tempo, mas cada anúncio fala de um produto só.
 
-### 2.4 Pedido, item de pedido e pagamento
+###  Pedido, item de pedido e pagamento
 
 Quando o cliente compra um ou mais anúncios, o sistema cria um Pedido. Esse pedido pertence a um único cliente e agrupa os ItemPedido, que detalham quantidade, preço unitário e subtotal de cada item comprado. Para cada pedido existe também um Pagamento, que registra valor, forma de pagamento, código da transação e status — pendente, aprovado ou recusado.
 
-### 2.5 Avaliação
+### Avaliação
 
 A classe Avaliacao guarda o feedback que o cliente deixa depois de retirar o pedido. Cada avaliação fica ligada ao pedido que a originou e ao estabelecimento avaliado, com nota, comentário opcional e data. Essa ligação é o que permite calcular a nota média do estabelecimento e dar rastreabilidade ao feedback.
 
-## 3 Enumerações
+##  Enumerações
 
 O modelo usa quatro enumerações para padronizar os valores fixos:
 
@@ -105,7 +105,7 @@ O modelo usa quatro enumerações para padronizar os valores fixos:
 - FormaPagamento (CARTAO_CREDITO, PIX) descreve os meios de pagamento aceitos;
 - StatusPagamento (PENDENTE, APROVADO, RECUSADO) representa o resultado do processamento financeiro.
 
-## 4 Relacionamentos principais
+##  Relacionamentos principais
 
 A herança entre Usuario, Cliente e Comerciante evita repetir os campos comuns de cadastro. A relação um-para-um entre Comerciante e Estabelecimento traduz a regra de que cada comerciante administra apenas um comércio no FoodLoop. A composição entre Pedido e ItemPedido indica que os itens só fazem sentido dentro do pedido — se o pedido deixa de existir, os itens também deixam. As relações um-para-muitos cobrem as situações naturais: um estabelecimento publica vários anúncios, um cliente faz vários pedidos, um estabelecimento recebe várias avaliações.
 
