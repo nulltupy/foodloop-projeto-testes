@@ -241,13 +241,78 @@ Explique como a hospedagem e o lançamento da plataforma foram realizados.
 
 ## Qualidade de software
 
-Conceituar qualidade é uma tarefa complexa, mas ela pode ser vista como um método gerencial que, por meio de procedimentos disseminados por toda a organização, busca garantir um produto final que satisfaça às expectativas dos stakeholders.
 
-No contexto do desenvolvimento de software, qualidade pode ser entendida como um conjunto de características a serem atendidas, de modo que o produto de software atenda às necessidades de seus usuários. Entretanto, esse nível de satisfação nem sempre é alcançado de forma espontânea, devendo ser continuamente construído. Assim, a qualidade do produto depende fortemente do seu respectivo processo de desenvolvimento.
+## Visão geral
 
-A norma internacional ISO/IEC 25010, que é uma atualização da ISO/IEC 9126, define oito características e 30 subcaracterísticas de qualidade para produtos de software. Com base nessas características e nas respectivas subcaracterísticas, identifique as subcaracterísticas que sua equipe utilizará como base para nortear o desenvolvimento do projeto de software, considerando alguns aspectos simples de qualidade. Justifique as subcaracterísticas escolhidas pelo time e elenque as métricas que permitirão à equipe avaliar os objetos de interesse.
+Para orientar o desenvolvimento do FoodLoop, a equipe selecionou subcaracterísticas da norma ISO/IEC 25010 que dialogam diretamente com os requisitos funcionais e não funcionais do projeto. A norma define oito características (Adequação Funcional, Eficiência de Desempenho, Compatibilidade, Usabilidade, Confiabilidade, Segurança, Manutenibilidade e Portabilidade) e trinta subcaracterísticas no total.
 
-> **Links úteis**:
-> - [ISO/IEC 25010:2011 - Systems and Software Engineering — Systems and Software Quality Requirements and Evaluation (SQuaRE) — System and Software Quality Models](https://www.iso.org/standard/35733.html/)
-> - [Análise sobre a ISO 9126 – NBR 13596](https://www.tiespecialistas.com.br/analise-sobre-iso-9126-nbr-13596/)
-> - [Qualidade de software - Engenharia de Software](https://www.devmedia.com.br/qualidade-de-software-engenharia-de-software-29/18209)
+Foram escolhidas seis características e sete subcaracterísticas, cobrindo o que se considera essencial para um aplicativo mobile que envolve transações financeiras, geolocalização em tempo real e disponibilidade nos horários comerciais críticos. Cada subcaracterística está vinculada a um ou mais requisitos do projeto, com uma métrica concreta que permitirá à equipe avaliar o atendimento da qualidade ao longo das sprints.
+
+## Subcaracterísticas selecionadas
+
+### Adequação Funcional — Completude Funcional
+
+O FoodLoop precisa entregar fluxos críticos para dois perfis distintos (consumidor e estabelecimento), do cadastro à avaliação. A completude funcional garante que o produto cubra de fato o conjunto de requisitos acordados, evitando lacunas que comprometam a operação real do aplicativo.
+
+Requisitos amarrados: RF-001 a RF-012.
+
+Métrica: percentual de requisitos funcionais entregues e validados pela equipe ao final de cada sprint. Meta: 100% dos RFs com prioridade ALTA e MÉDIA entregues até a sprint final; RFs BAIXA podem ficar como melhoria pós-projeto.
+
+### Eficiência de Desempenho — Comportamento em Relação ao Tempo
+
+O fluxo principal do aplicativo passa por carregamento de mapa com ofertas geolocalizadas e processamento de transações em tempo real. Tempo de resposta ruim significa abandono antes da reserva, justamente o gargalo que o app pretende resolver.
+
+Requisitos amarrados: RNF-004 (carregamento do mapa em até 3 segundos) e RF-003 (listagem com filtros de geolocalização).
+
+Métrica: tempo médio de carregamento do mapa com até 50 ofertas ativas e tempo médio de resposta das requisições à API. Meta: até 3 segundos para o mapa e até 500 milissegundos para chamadas REST simples, medido em ambiente de homologação com conexão 4G.
+
+### Usabilidade — Operabilidade e Apreensibilidade
+
+O público-alvo inclui usuários com diferentes graus de familiaridade com tecnologia, em especial do lado dos comerciantes (lanchonetes, padarias, pequenos comércios). O aplicativo precisa ser fácil de aprender e operar sem treinamento prévio.
+
+Requisitos amarrados: RF-001 (cadastro e login), RF-002 (CRUD de ofertas pelo comerciante), RF-003 (busca e filtros pelo consumidor) e RF-008 (avaliação após retirada).
+
+Métrica: pontuação no questionário SUS (System Usability Scale) aplicado em testes com usuários representativos das duas personas, e tempo médio para completar três tarefas-chave (cadastrar oferta, realizar reserva, avaliar pedido). Meta: SUS maior ou igual a 70 e cada tarefa concluída em até 2 minutos por um usuário novo.
+
+### Confiabilidade — Disponibilidade
+
+O pico de uso do FoodLoop coincide com o fim do expediente comercial, momento em que os estabelecimentos publicam ofertas para escoar excedentes. Indisponibilidade nessa janela inviabiliza o uso principal do app.
+
+Requisitos amarrados: RNF-005 (99% de disponibilidade no horário de pico, 18h às 22h).
+
+Métrica: uptime mensal medido pelo painel de monitoramento da plataforma de hospedagem. Meta: pelo menos 99% no intervalo das 18h às 22h e 95% no restante do dia.
+
+### Segurança — Confidencialidade e Integridade
+
+O aplicativo processa pagamentos e armazena dados pessoais (e-mail, telefone, CPF de cadastro, histórico de pedidos e dados de comerciantes). A confidencialidade protege o que não deve ser visto por terceiros; a integridade garante que os dados não sejam adulterados em trânsito ou em repouso. As duas são fundamentais para a confiança do usuário e para a legitimidade das transações financeiras.
+
+Requisitos amarrados: RNF-002 (Firebase Auth para autenticação), RNF-003 (criptografia ponta a ponta nos pagamentos), RF-004 (processamento de reserva e pagamento) e RF-011 (cálculo e retenção automática da comissão da plataforma).
+
+Métrica: percentual de transações financeiras transmitidas via HTTPS com criptografia ativa; número de incidentes de acesso não autorizado por sprint; validação dos hashes de senha gerados pelo Firebase Auth. Meta: 100% das transações criptografadas, zero incidentes de acesso indevido e 100% dos cadastros usando autenticação válida.
+
+### Compatibilidade — Coexistência
+
+O RNF-001 determina que o aplicativo será construído em React Native, com publicação simultânea nas lojas Android e iOS. A subcaracterística de coexistência cobre a necessidade de o app operar bem ao lado de outros aplicativos no dispositivo, sem competir por recursos a ponto de degradar a experiência.
+
+Requisitos amarrados: RNF-001 (compatibilidade Android e iOS via React Native).
+
+Métrica: percentual de telas críticas (login, mapa, reserva, pagamento e avaliação) renderizadas corretamente nos dois sistemas operacionais, em pelo menos um dispositivo de cada gama (entrada e intermediário) por SO. Meta: 100% de equivalência funcional e visual nas telas críticas.
+
+## Síntese das métricas
+
+ Métricas de qualidade do FoodLoop
+
+| Característica | Subcaracterística | Métrica | Meta |
+|---|---|---|---|
+| Adequação Funcional | Completude funcional | RFs entregues e validados | 100% dos RFs ALTA e MÉDIA |
+| Eficiência de Desempenho | Comportamento em relação ao tempo | tempo de carregamento do mapa | até 3 segundos |
+| Eficiência de Desempenho | Comportamento em relação ao tempo | tempo de resposta da API | até 500 ms |
+| Usabilidade | Operabilidade e apreensibilidade | pontuação SUS | maior ou igual a 70 |
+| Usabilidade | Operabilidade e apreensibilidade | tempo para concluir tarefa-chave | até 2 minutos |
+| Confiabilidade | Disponibilidade | uptime das 18h às 22h | maior ou igual a 99% |
+| Segurança | Confidencialidade e integridade | transações criptografadas via HTTPS | 100% |
+| Segurança | Confidencialidade e integridade | incidentes de acesso não autorizado | zero por sprint |
+| Compatibilidade | Coexistência | telas críticas equivalentes em Android e iOS | 100% |
+
+
+
