@@ -111,7 +111,7 @@ A herança entre Usuario, Cliente e Comerciante evita repetir os campos comuns d
 
 Diagrama de classes do sistema FoodLoop
 
-![Arquitetura da Solução](images/DiagramaClasses.png)
+![Diagrama de Classes](images/DiagramaClasses.png)
 
 
 
@@ -135,16 +135,7 @@ Elabore o modelo utilizando uma ferramenta de modelagem apropriada.
 
 ### Modelo relacional
 
-O modelo relacional corresponde à representação dos dados, organizando as informações em tabelas (relações) compostas por linhas (tuplas) e colunas (atributos), juntamente com as restrições de integridade, chaves primárias e chaves estrangeiras.
-
-Elabore o modelo utilizando uma ferramenta de modelagem apropriada.
-
-![Exemplo de um modelo relacional](images/modelo_relacional.PNG "Exemplo de modelo relacional.")
----
-
-> **Links úteis**:
-> - [Criando um modelo relacional - documentação da IBM](https://www.ibm.com/docs/pt-br/cognos-analytics/12.0.0?topic=designer-creating-relational-model)
-> - [Como fazer um modelo relacional](https://www.youtube.com/watch?v=DWWIREUkxOI)
+![Modelo Relacional](images/ModeloRelacional.png)
 
 
 ### Modelo físico
