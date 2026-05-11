@@ -19,12 +19,9 @@ O desperdício de alimentos é um problema significativo na sociedade atual, esp
 Ao mesmo tempo, muitas pessoas enfrentam dificuldades financeiras para adquirir alimentos a preços convencionais. Esse cenário demonstra uma falha na conexão entre oferta e demanda: enquanto alguns estabelecimentos possuem alimentos excedentes, muitos consumidores poderiam se beneficiar desses produtos por valores mais acessíveis.
 
 Diante desse contexto, surge a necessidade de uma solução que facilite a ligação entre esses dois lados. Assim, a proposta do projeto é pensar em uma aplicação que ajude a aproximar estabelecimentos com excedentes de alimentos e consumidores interessados, contribuindo para a redução do desperdício e para o melhor aproveitamento dos recursos disponíveis.
-## Objetivos
+## Objetivo Geral e Objetivos Gerais
 
-### Objetivo Geral 
 Desenvolver um aplicativo que auxilie o estabelecimento Couto Lanches a disponibilizar seus alimentos excedentes a consumidores interessados, por meio de preços reduzidos, contribuindo para a diminuição do desperdício, a redução de perdas financeiras e a promoção de práticas sustentáveis alinhadas aos Objetivos de Desenvolvimento Sustentável.
-
-### Objetivos Específicos 
 
 - Desenvolver uma funcionalidade no aplicativo que permita ao Couto Lanches cadastrar, ao final do dia, os alimentos excedentes disponíveis para venda.
 - Possibilitar que consumidores visualizem, em tempo real, os produtos disponibilizados pelo Couto Lanches, com preços reduzidos.
