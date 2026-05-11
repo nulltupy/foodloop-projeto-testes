@@ -44,7 +44,7 @@ Os serviços externos (Firebase Storage, Firebase Cloud Messaging, Google Maps A
 5. O aplicativo também consome diretamente a **Google Maps API** para apresentar o mapa e a geolocalização;
 6. A API devolve a resposta em **JSON**, e o aplicativo atualiza a interface apresentada ao usuário.
 
-**Figura 1 – Diagrama de arquitetura da solução FoodLoop**
+**Diagrama de arquitetura da solução FoodLoop**
 
 ![Arquitetura da Solução](images/ArquiteturaSolução.png)
 
