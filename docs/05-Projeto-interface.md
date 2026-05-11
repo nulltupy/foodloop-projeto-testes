@@ -69,7 +69,7 @@ O mapa da jornada do usuário deve contemplar:
 3. Desejo: estimular a intenção de uso/compra (desejo)  
 4. Ação: execução da ação esperada (implementação)  
 
-> ![Exemplo Jornada de Usuário](images/jornada-usuario.jpg)
+![Exemplo Jornada de Usuário](images/jornada-usuario.jpg)
 
 > **Links úteis**:
 > - [Dicas sobre como mapear uma jornada do usuário](https://www.userinterviews.com/blog/best-customer-journey-map-templates-examples)
