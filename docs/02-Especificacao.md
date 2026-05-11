@@ -75,28 +75,28 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 
 | ID | Descrição do Requisito | Prioridade |
 | :--- | :--- | :--- |
-| **RF-001** | O sistema deve permitir o cadastro, login e gerenciamento de perfis para Consumidores e Estabelecimentos. | ALTA |
-| **RF-002** | O estabelecimento deve poder publicar e gerenciar (CRUD) suas ofertas, definindo descrição, preço, e **quantidade em estoque** em tempo real. | ALTA |
-| **RF-003** | O sistema deve listar as ofertas disponíveis, permitindo filtros por **geolocalização (distância) e faixa de preço**. | ALTA |
-| **RF-004** | O sistema deve processar a reserva e o pagamento online diretamente no aplicativo. | ALTA |
-| **RF-005** | O sistema deve permitir o **cancelamento de reservas** tanto pelo consumidor quanto pelo estabelecimento, com atualização de estoque. | ALTA |
-| **RF-006** | O sistema deve disponibilizar um **histórico de pedidos** para o consumidor e um **dashboard de desempenho de vendas** para o parceiro comercial. | MÉDIA |
-| **RF-007** | O sistema deve permitir a aplicação de cupons de desconto e oferecer benefícios de fidelidade para usuários recorrentes. | MÉDIA |
-| **RF-008** | O sistema deve permitir que os consumidores avaliem os estabelecimentos parceiros após a retirada do pedido. | MÉDIA |
-| **RF-009** | O sistema deve enviar **notificações push e alertas** sobre status de reservas, confirmações e promoções próximas. | MÉDIA |
-| **RF-010** | O sistema deve oferecer suporte à adesão de planos de assinatura para parceiros que desejam maior destaque (visibilidade) no aplicativo. | BAIXA |
-| **RF-011** | O sistema deve calcular e reter automaticamente a comissão da plataforma FoodLoop sobre cada transação processada. | ALTA |
-| **RF-012** | O sistema deve disponibilizar ao Administrador um painel de indicadores de uso, volume de transações e impacto de redução de desperdício. | BAIXA |
+| RF-001 | O sistema deve permitir o cadastro, login e gerenciamento de perfis para Consumidores e Estabelecimentos. | ALTA |
+| RF-002 | O estabelecimento deve poder publicar e gerenciar (CRUD) suas ofertas, definindo descrição, preço, e **quantidade em estoque** em tempo real. | ALTA |
+| RF-003 | O sistema deve listar as ofertas disponíveis, permitindo filtros por **geolocalização (distância) e faixa de preço**. | ALTA |
+| RF-004 | O sistema deve processar a reserva e o pagamento online diretamente no aplicativo. | ALTA |
+| RF-005 | O sistema deve permitir o **cancelamento de reservas** tanto pelo consumidor quanto pelo estabelecimento, com atualização de estoque. | ALTA |
+| RF-006 | O sistema deve disponibilizar um **histórico de pedidos** para o consumidor e um **dashboard de desempenho de vendas** para o parceiro comercial. | MÉDIA |
+| RF-007 | O sistema deve permitir a aplicação de cupons de desconto e oferecer benefícios de fidelidade para usuários recorrentes. | MÉDIA |
+| RF-008 | O sistema deve permitir que os consumidores avaliem os estabelecimentos parceiros após a retirada do pedido. | MÉDIA |
+| RF-009 | O sistema deve enviar **notificações push e alertas** sobre status de reservas, confirmações e promoções próximas. | MÉDIA |
+| RF-010 | O sistema deve oferecer suporte à adesão de planos de assinatura para parceiros que desejam maior destaque (visibilidade) no aplicativo. | BAIXA |
+| RF-011 | O sistema deve calcular e reter automaticamente a comissão da plataforma FoodLoop sobre cada transação processada. | ALTA |
+| RF-012 | O sistema deve disponibilizar ao Administrador um painel de indicadores de uso, volume de transações e impacto de redução de desperdício. | BAIXA |
 
 ### Requisitos não funcionais
 
 | ID | Descrição do Requisito | Prioridade |
 | :--- | :--- | :--- |
-| **RNF-001** | O aplicativo deve ser desenvolvido no framework **React Native**, garantindo compatibilidade com dispositivos móveis (Android e iOS). | ALTA |
-| **RNF-002** | A persistência de dados e a autenticação de usuários devem ser implementadas utilizando a plataforma **Firebase** (Auth, Firestore). | ALTA |
-| **RNF-003** | A integração com os provedores de meios de pagamento deve seguir protocolos de segurança avançados e criptografia ponta a ponta. | ALTA |
-| **RNF-004** | O tempo de carregamento da listagem de ofertas no mapa não deve ultrapassar 3 segundos. | MÉDIA |
-| **RNF-005** | O aplicativo deve estar disponível para uso em pelo menos 99% do tempo durante o horário de pico (18h–22h), minimizando interrupções no período de maior demanda. | ALTA |
+| RNF-001 | O aplicativo deve ser desenvolvido no framework **React Native**, garantindo compatibilidade com dispositivos móveis (Android e iOS). | ALTA |
+| RNF-002 | A persistência de dados e a autenticação de usuários devem ser implementadas utilizando a plataforma **Firebase** (Auth, Firestore). | ALTA |
+| RNF-003 | A integração com os provedores de meios de pagamento deve seguir protocolos de segurança avançados e criptografia ponta a ponta. | ALTA |
+| RNF-004 | O tempo de carregamento da listagem de ofertas no mapa não deve ultrapassar 3 segundos. | MÉDIA |
+| RNF-005 | O aplicativo deve estar disponível para uso em pelo menos 99% do tempo durante o horário de pico (18h–22h), minimizando interrupções no período de maior demanda. | ALTA |
 
 ## Restrições
 
