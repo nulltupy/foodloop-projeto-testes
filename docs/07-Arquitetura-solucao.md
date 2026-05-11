@@ -62,13 +62,55 @@ A arquitetura proposta atende aos seguintes critérios:
 
 ## Diagrama de classes
 
-O diagrama de classes ilustra graficamente a estrutura do software e como cada uma das classes estará interligada. Essas classes servem de modelo para materializar os objetos que serão executados na memória.
 
-Elabore o diagrama de classes utilizando uma ferramenta de modelagem apropriada.
+## 1 Visão geral
 
-> **Links úteis**:
-> - [Diagramas de classes - documentação da IBM](https://www.ibm.com/docs/pt-br/rational-soft-arch/9.7.0?topic=diagrams-class)
-> - [O que é um diagrama de classe UML?](https://www.lucidchart.com/pages/pt/o-que-e-diagrama-de-classe-uml)
+O diagrama de classes apresentado nesta seção ilustra a estrutura estática do sistema FoodLoop, descrevendo as principais classes que compõem o domínio da aplicação, seus atributos, suas operações e os relacionamentos estabelecidos entre elas. As classes identificadas servem de modelo para a materialização dos objetos que serão instanciados em memória durante a execução do software e correspondem diretamente às entidades manipuladas pelos processos de negócio descritos nas modelagens AS-IS e TO-BE.
+
+A modelagem adota o paradigma orientado a objetos e segue a notação UML, contemplando hierarquia de herança, agregações, composições e enumerações para representar conjuntos de valores discretos.
+
+## 2 Classes do domínio
+
+### 2.1 Hierarquia de usuários
+
+A classe abstrata Usuario concentra os atributos e operações comuns a todos os perfis de usuário do FoodLoop, incluindo identificador, nome, e-mail, senha, telefone e data de cadastro, bem como as operações de autenticação e atualização de perfil. A partir dela são derivadas duas especializações concretas, descritas a seguir.
+
+A classe Cliente representa o consumidor final, responsável por consultar anúncios, realizar pedidos e registrar avaliações. Possui como atributo específico a localização atual, utilizada para a apresentação dos estabelecimentos próximos no mapa.
+
+A classe Comerciante representa o proprietário ou responsável pelo estabelecimento parceiro. Possui como atributo específico o CNPJ e responde pela publicação e pelo acompanhamento dos anúncios, bem como pelo monitoramento dos pedidos recebidos.
+
+### 2.2 Estabelecimento e endereço
+
+A classe Estabelecimento representa o comércio parceiro cadastrado no FoodLoop. Mantém informações como nome fantasia, descrição, horário de funcionamento e nota média calculada a partir das avaliações recebidas. Cada estabelecimento está associado a exatamente uma instância da classe Endereco, que armazena os dados de localização física e as coordenadas geográficas necessárias à exibição do estabelecimento no mapa.
+
+### 2.3 Produto e anúncio
+
+A classe Produto representa o item comercializado pelo estabelecimento, contendo informações de catálogo como nome, descrição, preço regular, categoria e imagem. A classe Anuncio, por sua vez, representa uma publicação promocional realizada pelo comerciante sobre um produto específico em situação de excedente, contendo o preço promocional, a quantidade disponível, o prazo de retirada e o status corrente. Um produto pode estar associado a múltiplos anúncios ao longo do tempo, mas cada anúncio refere-se a apenas um produto.
+
+### 2.4 Pedido, item de pedido e pagamento
+
+A classe Pedido representa a transação realizada pelo cliente sobre um ou mais anúncios. Cada pedido pertence a exatamente um cliente e agrega uma ou mais instâncias da classe ItemPedido, que detalha a quantidade adquirida, o preço unitário praticado e o subtotal correspondente. O pedido também está associado a uma instância da classe Pagamento, responsável pelo registro das informações financeiras da transação, tais como valor, forma de pagamento, código de transação e status corrente.
+
+### 2.5 Avaliação
+
+A classe Avaliacao representa o registro de opinião emitido pelo cliente após a retirada do pedido. Cada avaliação vincula-se simultaneamente ao pedido que a originou e ao estabelecimento avaliado, contendo a nota atribuída, o comentário opcional e a data de publicação. Esse vínculo bidirecional garante a rastreabilidade de cada avaliação e subsidia o cálculo da nota média do estabelecimento.
+
+## 3 Enumerações
+
+O modelo inclui quatro enumerações que padronizam os valores discretos manipulados pelas classes:
+
+- StatusAnuncio, com os valores ATIVO, ENCERRADO_COM_RESERVA e ENCERRADO_COM_SOBRA, representando o ciclo de vida de um anúncio;
+- StatusPedido, com os valores RECEBIDO, EM_PREPARO, PRONTO_PARA_RETIRADA, RETIRADO e CANCELADO, representando as etapas do processamento do pedido;
+- FormaPagamento, com os valores CARTAO_CREDITO e PIX, representando os meios de pagamento aceitos;
+- StatusPagamento, com os valores PENDENTE, APROVADO e RECUSADO, representando o desfecho do processamento financeiro.
+
+## 4 Relacionamentos principais
+
+Os relacionamentos entre as classes refletem as regras de negócio do FoodLoop. A herança entre Usuario, Cliente e Comerciante assegura o compartilhamento de atributos comuns sem prejudicar a especialização de comportamentos. A associação um-para-um entre Comerciante e Estabelecimento expressa a regra de que cada comerciante administra um único estabelecimento parceiro. A composição entre Pedido e ItemPedido indica que os itens existem exclusivamente no contexto do pedido que os contém. As demais associações um-para-muitos descrevem a multiplicidade natural entre estabelecimento e seus anúncios, entre cliente e seus pedidos, e entre estabelecimento e suas avaliações.
+
+**Diagrama de classes do sistema FoodLoop**
+
+![Arquitetura da Solução](images/DiagramaClasses.png)
 
 ##  Modelo de dados
 
