@@ -60,57 +60,61 @@ A arquitetura proposta atende aos seguintes critérios:
   
 
 
-## Diagrama de classes
 
+
+## Diagrama de Classes
 
 ## 1 Visão geral
 
-O diagrama de classes apresentado nesta seção ilustra a estrutura estática do sistema FoodLoop, descrevendo as principais classes que compõem o domínio da aplicação, seus atributos, suas operações e os relacionamentos estabelecidos entre elas. As classes identificadas servem de modelo para a materialização dos objetos que serão instanciados em memória durante a execução do software e correspondem diretamente às entidades manipuladas pelos processos de negócio descritos nas modelagens AS-IS e TO-BE.
+O diagrama de classes apresenta a estrutura interna do sistema FoodLoop, mostrando quais são as classes do domínio, o que cada uma guarda, o que cada uma faz e como elas se conectam. Essas classes funcionam como o "molde" dos objetos que existem em memória quando o aplicativo está rodando, e correspondem diretamente às entidades que aparecem nos processos AS-IS e TO-BE.
 
-A modelagem adota o paradigma orientado a objetos e segue a notação UML, contemplando hierarquia de herança, agregações, composições e enumerações para representar conjuntos de valores discretos.
+A modelagem usa notação UML e contempla herança, agregação, composição e enumerações para representar os conjuntos de valores fixos manipulados pelo sistema.
 
 ## 2 Classes do domínio
 
-### 2.1 Hierarquia de usuários
+### 2.1 Usuários
 
-A classe abstrata Usuario concentra os atributos e operações comuns a todos os perfis de usuário do FoodLoop, incluindo identificador, nome, e-mail, senha, telefone e data de cadastro, bem como as operações de autenticação e atualização de perfil. A partir dela são derivadas duas especializações concretas, descritas a seguir.
+A classe Usuario é abstrata e reúne o que todo perfil de usuário tem em comum: identificador, nome, e-mail, senha, telefone e data de cadastro, além das operações de autenticação e atualização de perfil. Dela derivam dois tipos concretos de usuário.
 
-A classe Cliente representa o consumidor final, responsável por consultar anúncios, realizar pedidos e registrar avaliações. Possui como atributo específico a localização atual, utilizada para a apresentação dos estabelecimentos próximos no mapa.
+A classe Cliente representa o consumidor que usa o aplicativo para encontrar comércios, comprar produtos com desconto e avaliar a experiência. Guarda também a localização atual, que serve para mostrar os estabelecimentos próximos no mapa.
 
-A classe Comerciante representa o proprietário ou responsável pelo estabelecimento parceiro. Possui como atributo específico o CNPJ e responde pela publicação e pelo acompanhamento dos anúncios, bem como pelo monitoramento dos pedidos recebidos.
+A classe Comerciante representa o dono ou responsável pelo comércio parceiro. Guarda o CNPJ e é quem publica os anúncios e acompanha os pedidos recebidos.
 
 ### 2.2 Estabelecimento e endereço
 
-A classe Estabelecimento representa o comércio parceiro cadastrado no FoodLoop. Mantém informações como nome fantasia, descrição, horário de funcionamento e nota média calculada a partir das avaliações recebidas. Cada estabelecimento está associado a exatamente uma instância da classe Endereco, que armazena os dados de localização física e as coordenadas geográficas necessárias à exibição do estabelecimento no mapa.
+A classe Estabelecimento descreve o comércio parceiro: nome fantasia, descrição, horário de funcionamento e a nota média calculada a partir das avaliações. Cada estabelecimento tem um Endereco vinculado, com os dados físicos e as coordenadas geográficas usadas pelo mapa do aplicativo.
 
 ### 2.3 Produto e anúncio
 
-A classe Produto representa o item comercializado pelo estabelecimento, contendo informações de catálogo como nome, descrição, preço regular, categoria e imagem. A classe Anuncio, por sua vez, representa uma publicação promocional realizada pelo comerciante sobre um produto específico em situação de excedente, contendo o preço promocional, a quantidade disponível, o prazo de retirada e o status corrente. Um produto pode estar associado a múltiplos anúncios ao longo do tempo, mas cada anúncio refere-se a apenas um produto.
+A classe Produto representa o item do cardápio do comércio, com nome, descrição, preço regular, categoria e imagem. Já a classe Anuncio representa uma oferta promocional sobre um produto específico que está sobrando, com preço promocional, quantidade disponível, prazo de retirada e status atual. Um mesmo produto pode aparecer em vários anúncios ao longo do tempo, mas cada anúncio fala de um produto só.
 
 ### 2.4 Pedido, item de pedido e pagamento
 
-A classe Pedido representa a transação realizada pelo cliente sobre um ou mais anúncios. Cada pedido pertence a exatamente um cliente e agrega uma ou mais instâncias da classe ItemPedido, que detalha a quantidade adquirida, o preço unitário praticado e o subtotal correspondente. O pedido também está associado a uma instância da classe Pagamento, responsável pelo registro das informações financeiras da transação, tais como valor, forma de pagamento, código de transação e status corrente.
+Quando o cliente compra um ou mais anúncios, o sistema cria um Pedido. Esse pedido pertence a um único cliente e agrupa os ItemPedido, que detalham quantidade, preço unitário e subtotal de cada item comprado. Para cada pedido existe também um Pagamento, que registra valor, forma de pagamento, código da transação e status — pendente, aprovado ou recusado.
 
 ### 2.5 Avaliação
 
-A classe Avaliacao representa o registro de opinião emitido pelo cliente após a retirada do pedido. Cada avaliação vincula-se simultaneamente ao pedido que a originou e ao estabelecimento avaliado, contendo a nota atribuída, o comentário opcional e a data de publicação. Esse vínculo bidirecional garante a rastreabilidade de cada avaliação e subsidia o cálculo da nota média do estabelecimento.
+A classe Avaliacao guarda o feedback que o cliente deixa depois de retirar o pedido. Cada avaliação fica ligada ao pedido que a originou e ao estabelecimento avaliado, com nota, comentário opcional e data. Essa ligação é o que permite calcular a nota média do estabelecimento e dar rastreabilidade ao feedback.
 
 ## 3 Enumerações
 
-O modelo inclui quatro enumerações que padronizam os valores discretos manipulados pelas classes:
+O modelo usa quatro enumerações para padronizar os valores fixos:
 
-- StatusAnuncio, com os valores ATIVO, ENCERRADO_COM_RESERVA e ENCERRADO_COM_SOBRA, representando o ciclo de vida de um anúncio;
-- StatusPedido, com os valores RECEBIDO, EM_PREPARO, PRONTO_PARA_RETIRADA, RETIRADO e CANCELADO, representando as etapas do processamento do pedido;
-- FormaPagamento, com os valores CARTAO_CREDITO e PIX, representando os meios de pagamento aceitos;
-- StatusPagamento, com os valores PENDENTE, APROVADO e RECUSADO, representando o desfecho do processamento financeiro.
+- StatusAnuncio (ATIVO, ENCERRADO_COM_RESERVA, ENCERRADO_COM_SOBRA) representa o ciclo de vida do anúncio;
+- StatusPedido (RECEBIDO, EM_PREPARO, PRONTO_PARA_RETIRADA, RETIRADO, CANCELADO) representa as etapas do pedido;
+- FormaPagamento (CARTAO_CREDITO, PIX) descreve os meios de pagamento aceitos;
+- StatusPagamento (PENDENTE, APROVADO, RECUSADO) representa o resultado do processamento financeiro.
 
 ## 4 Relacionamentos principais
 
-Os relacionamentos entre as classes refletem as regras de negócio do FoodLoop. A herança entre Usuario, Cliente e Comerciante assegura o compartilhamento de atributos comuns sem prejudicar a especialização de comportamentos. A associação um-para-um entre Comerciante e Estabelecimento expressa a regra de que cada comerciante administra um único estabelecimento parceiro. A composição entre Pedido e ItemPedido indica que os itens existem exclusivamente no contexto do pedido que os contém. As demais associações um-para-muitos descrevem a multiplicidade natural entre estabelecimento e seus anúncios, entre cliente e seus pedidos, e entre estabelecimento e suas avaliações.
+A herança entre Usuario, Cliente e Comerciante evita repetir os campos comuns de cadastro. A relação um-para-um entre Comerciante e Estabelecimento traduz a regra de que cada comerciante administra apenas um comércio no FoodLoop. A composição entre Pedido e ItemPedido indica que os itens só fazem sentido dentro do pedido — se o pedido deixa de existir, os itens também deixam. As relações um-para-muitos cobrem as situações naturais: um estabelecimento publica vários anúncios, um cliente faz vários pedidos, um estabelecimento recebe várias avaliações.
 
-**Diagrama de classes do sistema FoodLoop**
+Diagrama de classes do sistema FoodLoop
 
 ![Arquitetura da Solução](images/DiagramaClasses.png)
+
+
+
 
 ##  Modelo de dados
 
