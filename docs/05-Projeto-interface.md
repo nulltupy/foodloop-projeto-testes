@@ -324,11 +324,12 @@ São protótipos usados no design de interface para sugerir a estrutura de um si
 > - [InvisionApp](https://www.invisionapp.com/) (Licença Educacional)
 
 ## Protótipo interativo
-
-Apresente o protótipo interativo das telas da aplicação, permitindo a navegação simulada pelo sistema. Esse protótipo deve refletir as funcionalidades e interações planejadas, e servir como base para validação com usuários e equipe.  
-
-> **Exemplo:** inserir link para o protótipo no Figma, MarvelApp, InvisionApp, etc.
-
+ 
+O protótipo interativo do FoodLoop foi desenvolvido no Figma e contempla a navegação simulada entre as telas do sistema para os perfis de Consumidor e Parceiro Comercial. O protótipo reflete as funcionalidades e interações planejadas, abrangendo os fluxos de cadastro, autenticação, compra de produtos, cadastro de itens excedentes e acompanhamento de pedidos, servindo como base para validação com usuários e equipe.
+ 
+Acesse o protótipo interativo pelo link abaixo:
+ 
+[🔗 Protótipo FoodLoop — Figma](https://www.figma.com/design/d2W9AGF2pEhukY9mHSVo51/Projeto_interativo?node-id=11-2979&t=e0ou0fcTieZ1B54Y-1)
 
 ## Jornada do usuário
 
