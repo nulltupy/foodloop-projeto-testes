@@ -21,7 +21,7 @@ A digitalização desse fluxo converte em receita potencial o que hoje constitui
 
 **Figura 1 – Diagrama de atividades do processo de anúncio de excedente com desconto (TO-BE)**
 
-![Diagrama TO-BE do Processo 2](/docs/images/AnuncioDesconto.png)
+![Diagrama TO-BE do Processo 2](/docs/images/Processo2TO-BE.png)
 
 Fonte: Elaborado pelos autores (2026).
 
