@@ -60,7 +60,6 @@ Com base na análise das personas, foram identificadas as seguintes histórias d
 | Pedro Santos, professor preocupado com sustentabilidade | acessar o histórico de pedidos realizados na plataforma | reaproveitar estabelecimentos já aprovados e acompanhar minha contribuição à redução do desperdício |
 | Rafael Souza, estudante universitário que acessou o app pela primeira vez | criar uma conta na plataforma como consumidor | ter acesso às ofertas disponíveis e conseguir fazer reservas nos estabelecimentos parceiros |
 | Mariana Lopes, proprietária de restaurante que quer começar a usar o app | cadastrar meu estabelecimento e fazer login na plataforma | começar a publicar ofertas e alcançar novos consumidores próximos |
-| Lucas Ferreira, designer gráfico que usa o app com frequência | acumular benefícios por ser um usuário recorrente e aplicar cupons de desconto | economizar ainda mais nas refeições e ser recompensado pela fidelidade à plataforma |
 | Ana Nogueira, proprietária de padaria que busca mais visibilidade no app | aderir a um plano de destaque para o meu estabelecimento | aparecer em posições privilegiadas na listagem e atrair um volume maior de consumidores próximos |
 | Rafael Souza, estudante universitário que fez uma reserva no app | pagar pela reserva diretamente no aplicativo, sem precisar levar dinheiro | concluir a compra de forma prática e segura antes de ir buscar o pedido |
 | Lucas Ferreira, designer gráfico que não conseguirá retirar um pedido reservado | cancelar uma reserva que fiz | evitar que o estabelecimento separe o produto inutilmente e preservar minha reputação na plataforma |
@@ -81,7 +80,6 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 | RF-004 | O sistema deve processar a reserva e o pagamento online diretamente no aplicativo. | ALTA |
 | RF-005 | O sistema deve permitir o **cancelamento de reservas** tanto pelo consumidor quanto pelo estabelecimento, com atualização de estoque. | ALTA |
 | RF-006 | O sistema deve disponibilizar um **histórico de pedidos** para o consumidor e um **dashboard de desempenho de vendas** para o parceiro comercial. | MÉDIA |
-| RF-007 | O sistema deve permitir a aplicação de cupons de desconto e oferecer benefícios de fidelidade para usuários recorrentes. | MÉDIA |
 | RF-008 | O sistema deve permitir que os consumidores avaliem os estabelecimentos parceiros após a retirada do pedido. | MÉDIA |
 | RF-009 | O sistema deve enviar **notificações push e alertas** sobre status de reservas, confirmações e promoções próximas. | MÉDIA |
 | RF-010 | O sistema deve oferecer suporte à adesão de planos de assinatura para parceiros que desejam maior destaque (visibilidade) no aplicativo. | BAIXA |
