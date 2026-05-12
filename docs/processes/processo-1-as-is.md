@@ -15,7 +15,7 @@ O cliente se desloca fisicamente até o estabelecimento, observa os produtos exp
 7. Atendente entrega o produto
 8. Processo finalizado
  
-![Modelo BPMN do PROCESSO 1](../images/VendaPresencial.png)
+![Modelo BPMN do PROCESSO 1](../images/Processo1AS-IS.png)
 
 #### Detalhamento das atividades
 
