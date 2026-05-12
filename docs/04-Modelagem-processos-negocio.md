@@ -56,9 +56,6 @@ A proposta alinha-se ao objetivo extensionista de redução do desperdício de a
 
 [PROCESSO 2 TO BE - Anúncio de Excedente com Desconto](./processes/processo-2-to-be.md "Detalhamento do processo 2 TO BE.")
 
-[PROCESSO 3 AS IS - Avaliação do Estabelecimento pelo Cliente](./processes/processo-3-as-is.md "Detalhamento do processo 3 AS IS.")
-
-[PROCESSO 3 TO BE - Avaliação do Estabelecimento no FoodLoop](./processes/processo-3-to-be.md "Detalhamento do processo 3 TO BE.")
 
 
 ## Indicadores de desempenho
