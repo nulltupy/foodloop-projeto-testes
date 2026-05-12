@@ -57,6 +57,8 @@ Atualizado em: 17/03/2026
 
 | Responsável   | Tarefa/Requisito | Iniciado em    | Prazo      | Status | Terminado em    |
 | :----         |    :----         |      :----:    | :----:     | :----: | :----:          |
+| Cristiano Tupynamba Reis   | Contexto                  | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
+| Guilherme Setragni de Freitas   | Contexto                  | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
 | Gabriel Santos Arpini      | Histórias de usuário      | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
 | Gabriel Xavier de Souza    | Personas                  | 11/03/2026 | 17/03/2026 | ✔️ | 17/03/2026 |
 | Diogo Lamera dos Santos    | Business Model Canvas     | 11/03/2026 | 17/03/2026 | ✔️ | 16/03/2026 |
