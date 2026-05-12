@@ -105,5 +105,8 @@ Os artefatos do projeto são desenvolvidos a partir de diversas plataformas e a 
 | Gerenciamento do projeto            | GitHub Projects                    | https://github.com/orgs/ICEI-PUC-Minas-PBE-SI-TI/projects/6/views/1 |
 | Comunicação da equipe               | WhatsApp                           | —                                      |
 | Desenvolvimento mobile              | React Native (Expo)                | https://reactnative.dev/   -   https://expo.dev/            |
-| Banco de dados e autenticação       | Firebase                           | https://firebase.google.com/           |
+| Back-end, banco e hospedagem        | Render (Node.js + Express + PostgreSQL) | https://render.com/                |
+| Armazenamento de mídia e push       | Firebase (Storage e Cloud Messaging) | https://firebase.google.com/         |
+| Mapas e geolocalização              | Google Maps Platform               | https://developers.google.com/maps     |
+| Gateway de pagamento                | Mercado Pago                       | https://www.mercadopago.com.br/developers |
  

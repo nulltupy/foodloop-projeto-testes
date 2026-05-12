@@ -24,7 +24,7 @@ O modelo de monetização do FoodLoop foi pensado para alinhar a receita da plat
 
 **Escalabilidade futura.** Em médio prazo, o modelo prevê parcerias com marcas de sustentabilidade, campanhas patrocinadas no feed de ofertas e relatórios agregados de impacto ambiental vendidos como produto B2B. Essas fontes não fazem parte do escopo da Sprint atual, mas estão mapeadas no BMC como possibilidades de expansão.
 
-Do lado dos custos, o projeto opera integralmente nos planos gratuitos do Firebase (Auth e Firestore) conforme a Restrição 004, mantendo o custo fixo próximo de zero no piloto com a Couto Lanches e permitindo validar o modelo de negócio antes de eventual migração para planos pagos.
+Do lado dos custos, o projeto opera integralmente nos planos gratuitos do Render (back-end Node.js e PostgreSQL), do Firebase (Storage e Cloud Messaging no plano Spark) e na cota mensal gratuita do Google Maps Platform, conforme a Restrição 004, mantendo o custo fixo próximo de zero no piloto com a Couto Lanches e permitindo validar o modelo de negócio antes de eventual migração para planos pagos.
 
 ## Personas
 
@@ -93,7 +93,7 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 | ID | Descrição do Requisito | Prioridade |
 | :--- | :--- | :--- |
 | RNF-001 | O aplicativo deve ser desenvolvido no framework **React Native**, garantindo compatibilidade com dispositivos móveis (Android e iOS). | ALTA |
-| RNF-002 | A persistência de dados e a autenticação de usuários devem ser implementadas utilizando a plataforma **Firebase** (Auth, Firestore). | ALTA |
+| RNF-002 | A persistência de dados deve ser implementada em **PostgreSQL** acessado por uma API REST em **Node.js + Express**, com autenticação de usuários baseada em **tokens JWT**. Os serviços auxiliares de armazenamento de mídia e notificações push devem usar o **Firebase** (Storage e Cloud Messaging) no plano gratuito. | ALTA |
 | RNF-003 | A integração com os provedores de meios de pagamento deve seguir protocolos de segurança avançados e criptografia ponta a ponta. | ALTA |
 | RNF-004 | O tempo de carregamento da listagem de ofertas no mapa não deve ultrapassar 3 segundos. | MÉDIA |
 | RNF-005 | O aplicativo deve estar disponível para uso em pelo menos 99% do tempo durante o horário de pico (18h–22h), minimizando interrupções no período de maior demanda. | ALTA |
@@ -106,7 +106,7 @@ O projeto está restrito aos itens apresentados na tabela a seguir, que delimita
 | :--- | :--- |
 | **001** | O projeto e a apresentação deverão ser entregues obrigatoriamente dentro do prazo estipulado pelo cronograma acadêmico. |
 | **002** | O desenvolvimento do software deve ser realizado exclusivamente pelos integrantes do grupo, sendo proibida a contratação de terceiros. |
-| **003** | A arquitetura de software está restrita ao uso de React Native (Front-end) e Firebase (Back-end/BaaS), conforme validação técnica da equipe. |
+| **003** | A arquitetura de software está restrita à combinação React Native (Front-end), Node.js + Express + PostgreSQL hospedados no Render (Back-end e banco) e Firebase nos planos gratuitos para Storage e Cloud Messaging, conforme validação técnica da equipe. |
 | **004** | O custo total do projeto deve ser contido no orçamento zero, utilizando apenas os planos gratuitos (*Free Tier*) de plataformas de hospedagem e APIs. |
 ## Diagrama de casos de uso
 
@@ -116,4 +116,4 @@ O diagrama de casos de uso a seguir ilustra as principais interações entre os 
 
 A modelagem apresenta três atores primários: o Consumidor, que utiliza a plataforma para buscar ofertas e realizar reservas; o Parceiro Comercial, que gerencia a publicação de alimentos excedentes e valida as retiradas; e o Administrador, que acompanha os indicadores da plataforma. Adicionalmente, o sistema interage com dois atores externos essenciais para o seu funcionamento: o Serviço de GPS (responsável pela filtragem de localização) e o Gateway de Pagamento (responsável por processar as transações financeiras).
 
-O fluxo central do diagrama destaca que todas as operações críticas do aplicativo, como gerenciar ofertas, buscar restaurantes, efetuar pagamentos, cancelar reservas e avaliar os pedidos, possuem uma dependência de inclusão obrigatória (<<include>>) com o caso de uso "Autenticar Usuário". Essa estrutura garante que todas as ações ocorram em um ambiente logado (via Firebase Auth), assegurando a segurança, o controle de estoque em tempo real e a confiabilidade de ponta a ponta na jornada de redução de desperdício.
+O fluxo central do diagrama destaca que todas as operações críticas do aplicativo, como gerenciar ofertas, buscar restaurantes, efetuar pagamentos, cancelar reservas e avaliar os pedidos, possuem uma dependência de inclusão obrigatória (<<include>>) com o caso de uso "Autenticar Usuário". Essa estrutura garante que todas as ações ocorram em um ambiente logado (autenticação por token JWT validado pela API), assegurando a segurança, o controle de estoque em tempo real e a confiabilidade de ponta a ponta na jornada de redução de desperdício.
