@@ -308,10 +308,10 @@ flowchart TD
 > - Os diagramas acima foram escritos em [Mermaid](https://mermaid.js.org/), renderizado nativamente pelo GitHub. Para gerar imagens estáticas (PNG/SVG) basta colar o código em [mermaid.live](https://mermaid.live) e exportar.
 
 ## Wireframes
-
+ 
 São protótipos usados no design de interface para sugerir a estrutura de um site web e seu relacionamento entre suas páginas. Um wireframe web é uma ilustração que mostra o layout dos elementos fundamentais na interface.
-
-![Exemplo de wireframe](images/wireframe.png)
+ 
+![Wireframe FoodLoop](images/Wireframe_FoodLoop)
  
 > **Links úteis**:
 > - [Protótipos: baixa, média ou alta fidelidade?](https://medium.com/ladies-that-ux-br/prot%C3%B3tipos-baixa-m%C3%A9dia-ou-alta-fidelidade-71d897559135)
