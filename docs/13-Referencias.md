@@ -55,6 +55,13 @@ GITMIND. Como criar diagrama de caso de uso: tutorial passo a passo. Disponível
 IBM. Criando casos de uso. Disponível em: https://www.ibm.com/docs/pt-br/engineering-lifecycle-management-suite/design-rhapsody/10.0?topic=cases-creating-use
 . Acesso em: 17 mar. 2026.
 
+## Diagrama de Fluxo
+Lucidchart. How to make a user flow diagram. Disponível em: https://www.lucidchart.com/blog/how-to-make-a-user-flow-diagram
+. Acesso em: 12 maio 2026.
+
+TechTudo. Fluxograma online: seis sites para fazer gráfico sem instalar nada. Disponível em: https://www.techtudo.com.br/listas/2019/03/fluxograma-online-seis-sites-para-fazer-grafico-sem-instalar-nada.ghtml
+. Acesso em: 12 maio 2026.
+
 **Links úteis**:
  - [Padrão PUC Minas de normalização ABNT](https://www.pucminas.br/biblioteca/DocumentoBiblioteca/ABNT-GUIA-COMPLETO-Elaborar-formatar-trabalho-cientifico.pdf)
  - [Formato ABNT](https://www.normastecnicas.com/abnt/)
