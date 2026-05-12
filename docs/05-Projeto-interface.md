@@ -354,33 +354,225 @@ O mapa da jornada do usuário deve contemplar:
 
 
 ## Interface do sistema
-
-Apresente **todas as interfaces do sistema**, em sua versão final, descrevendo brevemente a função de cada tela.
-
-Dê ênfase especial às telas relacionadas aos processos BPMN já mapeados e documentados no item <a href="04-Modelagem-processos-negocio.md"> Modelagem dos processos de negócio</a>.
-
+ 
+Este tópico apresenta todas as interfaces do sistema FoodLoop em sua versão final, descrevendo a função de cada tela e evidenciando aquelas diretamente relacionadas aos processos de negócio modelados em BPMN, conforme documentado no item <a href="04-Modelagem-processos-negocio.md">Modelagem dos processos de negócio</a>.
+ 
+O aplicativo é estruturado para atender dois perfis distintos de usuário: o **consumidor**, que localiza e adquire produtos alimentícios com desconto, e o **parceiro** (estabelecimento comercial), que cadastra e gerencia anúncios de itens excedentes. As interfaces foram desenvolvidas para dispositivos móveis, com identidade visual coesa em paleta verde escuro, representando o posicionamento sustentável da plataforma. O conjunto completo compreende 12 telas funcionais e um conjunto de overlays de feedback ao usuário.
+ 
+---
+ 
 ### Tela principal do sistema
-
-Descrição da tela principal do sistema.
-
-> Insira aqui a imagem da tela principal do sistema.
-
+ 
+A tela principal do sistema, exibida após a autenticação do consumidor, é a **tela de Listagem de Produtos** Ela constitui o ponto central de navegação do aplicativo, reunindo busca, filtragem por categoria e visualização dos anúncios publicados pelos estabelecimentos cadastrados.
+ 
+A interface é composta pelos seguintes elementos:
+ 
+- **Campo de busca** (*Buscar restaurante ou produto*): permite pesquisa textual por estabelecimento ou produto;
+- **Filtros de categoria**: etiquetas selecionáveis para *Padaria*, *Doces*, *Refeições*, *Frutas*, *Até 1 km*, *Salada* e *Bebidas*;
+- **Cards de produtos**: cada cartão exibe imagem do item, nome, descrição resumida, avaliação em estrelas e botão de adição ao carrinho;
+- **Barra de navegação inferior**: acesso rápido às seções de Mapa, Início e Perfil.
+![Tela Principal — Listagem de Produtos](images/tela_principal.jpeg)
+ 
+---
+ 
 ### Telas dos processos BPMN
-
-#### Processo 1
-
-Descrição das telas relativas às atividades do processo 1.
-
-> Inserir imagens das telas correspondentes às atividades do processo 1.
-
-#### Processo 2
-
-Descrição das telas relativas às atividades do processo 2.
-
-> Inserir imagens das telas correspondentes às atividades do processo 2.
-
+ 
+#### Processo 1 — Compra de Produto pelo Consumidor
+ 
+O Processo 1 modela o fluxo digital de aquisição de produtos excedentes pelo consumidor, substituindo a dependência do atendimento presencial por uma experiência geolocalizada. As telas descritas a seguir cobrem as etapas de acesso ao sistema, descoberta de produtos, seleção, pagamento e confirmação do pedido.
+ 
+---
+ 
+**Tela 1.1 — Login do Consumidor**
+ 
+Tela exibida ao usuário já cadastrado que deseja autenticar-se na plataforma. Corresponde à **etapa 1 do Processo 1** (acesso ao aplicativo FoodLoop).
+ 
+Elementos da interface:
+ 
+- Mensagem de engajamento (*"Pronto para fechar mais um ciclo? Entre na sua conta e faça parte da nossa revolução sustentável."*);
+- Campos de entrada para **Endereço de e-mail** e **Senha**;
+- Botão **Entrar**, para autenticação com credenciais cadastradas;
+- Botão **Criar conta**, para redirecionamento ao fluxo de cadastro;
+- Botão **Seja nosso parceiro**, para acesso ao cadastro de estabelecimentos;
+- Botão **Continuar com o Google**, para autenticação via conta Google;
+- Link **Saiba +**, que redireciona à tela institucional da plataforma.
+![Tela de Login do Consumidor](images/tela_login_usuario.jpeg)
+ 
+---
+ 
+**Tela 1.2 — Listagem de Produtos**
+ 
+Após autenticação, o consumidor é direcionado à tela principal descrita anteriormente. No contexto do Processo 1, esta tela corresponde às **etapas 2 a 4**: visualização dos estabelecimentos próximos e consulta aos anúncios disponíveis. O consumidor pode utilizar filtros de categoria ou o campo de busca para localizar produtos de seu interesse.
+ 
+![Tela de Listagem de Produtos](images/tela_principal.jpeg)
+ 
+---
+ 
+**Tela 1.3 — Mapa de Estabelecimentos**
+ 
+Exibe em interface cartográfica interativa a localização dos estabelecimentos parceiros cadastrados. Suporta a **etapa 2 do Processo 1**, na qual o cliente visualiza comércios próximos à sua localização.
+ 
+Elementos da interface:
+ 
+- **Mapa interativo** com marcadores posicionados nos estabelecimentos parceiros;
+- **Seleção de marcador**: cada ponto pode ser selecionado para exibição de informações do estabelecimento;
+- **Barra de navegação inferior** com acesso a Mapa, Início e Perfil.
+![Tela de Mapa de Estabelecimentos](images/maps.jpeg)
+ 
+---
+ 
+**Tela 1.4 — Detalhe do Produto e Seleção de Pagamento**
+ 
+Exibida quando o consumidor seleciona um produto para aquisição. Cobre as **etapas 5 e 6 do Processo 1**: adição do produto ao carrinho, confirmação do pedido e escolha do método de pagamento.
+ 
+Elementos da interface:
+ 
+- **Carrossel de imagens** do produto com indicador de posição;
+- **Nome e descrição** do produto anunciado;
+- **Seção de método de pagamento**, com as opções: *PIX*, *Dinheiro (Apenas no local)* e *Cartão de crédito*.
+![Tela de Detalhe do Produto e Pagamento](images/tela_pagamento.jpeg)
+ 
+---
+ 
+**Tela 1.5 — Confirmação de Pedido**
+ 
+Tela exibida imediatamente após a conclusão do pagamento, informando o consumidor sobre o resultado da transação. Contempla dois estados distintos:
+ 
+- **Pagamento confirmado**: mensagem de sucesso com indicação de que o estabelecimento foi notificado e o pedido está sendo preparado;
+- **Pedido recusado**: mensagem de erro com orientação para nova tentativa ou troca de forma de pagamento.
+Esta tela encerra o fluxo de compra do lado do consumidor e dá início ao acompanhamento do status do pedido.
+ 
+![Tela de Confirmação de Pedido](images/confirmacao_pedido.jpeg)
+ 
+---
+ 
+#### Processo 2 — Cadastro e Publicação de Anúncio pelo Parceiro
+ 
+O Processo 2 modela o fluxo pelo qual o estabelecimento comercial identifica produtos excedentes, cadastra-os na plataforma e os disponibiliza com preço promocional para consumidores próximos.
+ 
+---
+ 
+**Tela 2.1 — Cadastro de Parceiro**
+ 
+Tela de registro inicial do estabelecimento comercial, ponto de entrada para que o parceiro acesse as funcionalidades do Processo 2.
+ 
+Campos disponíveis:
+ 
+- **Nome Completo** (representante do estabelecimento);
+- **Endereço de e-mail**;
+- **Senha** e **Confirme sua senha**;
+- **CNPJ**;
+- **Telefone**.
+Ações disponíveis: **Criar conta** e **Entrar**.
+ 
+![Tela de Cadastro de Parceiro](images/cadastro_parceiro.jpeg)
+ 
+---
+ 
+**Tela 2.2 — Painel do Parceiro / Dashboard**
+ 
+Interface central de gestão do estabelecimento comercial. Corresponde à **etapa 2 do Processo 2** (acesso ao painel) e às **etapas 8 e 9** (acompanhamento de reservas e preparação para retirada).
+ 
+Elementos da interface:
+ 
+- **Cabeçalho** com nome do estabelecimento (*Couto Lanches*), endereço, horário de funcionamento e botão **Cadastrar Item**;
+- **Lista de pedidos ativos** com nome do item, valor e indicador de status;
+- **Painel de métricas**: Receita do dia (R$ 105), Pedidos do dia (7), Avaliação média (4,5) e Ticket médio (R$ 15,00);
+- **Painel de impacto sustentável**: CO₂ evitado (0,8 kg) e Refeições salvas (90).
+![Tela do Painel do Parceiro](images/Dashboard.jpeg)
+ 
+---
+ 
+**Tela 2.3 — Cadastro de Item**
+ 
+Operacionaliza as **etapas 3, 4 e 5 do Processo 2**: cadastro do anúncio, definição do preço promocional e publicação do produto excedente.
+ 
+Campos e elementos disponíveis:
+ 
+- **Tipo de anúncio**: *Refeição* ou *Sacola surpresa*;
+- **Nome do item** e **Descrição**;
+- **Categoria**: seleção por etiquetas (*Padaria*, *Doce*, *Refeição*, *Lanche*, *Suco*, *Fruta*, *Pudim*);
+- **Quantidade disponível**: controle numérico com incremento e decremento;
+- **Disponível até**: campo de data para prazo de retirada;
+- **Valor original** e **Valor especial**: precificação promocional;
+- **Upload de foto** do produto;
+- Botão **Enviar** para publicação do anúncio.
+![Tela de Cadastro de Item](images/cadastro_item.jpeg)
+ 
+---
+ 
+**Tela 2.4 — Dashboard Expandido do Parceiro**
+ 
+Versão expandida do painel do parceiro, exibindo o detalhamento financeiro dos pedidos ativos e o histórico de pedidos finalizados. Suporta as **etapas 8 e 9 do Processo 2**, oferecendo ao estabelecimento visibilidade completa sobre as reservas recebidas e o desempenho operacional.
+ 
+Elementos da interface:
+ 
+- **Cabeçalho** com nome do estabelecimento e acesso ao cadastro de novos itens;
+- **Resumo financeiro dos pedidos ativos**: listagem com nome do item, preço unitário, quantidade disponível e valor acumulado;
+- **Histórico de pedidos**: registro dos pedidos já realizados no estabelecimento, com indicação de status;
+- **Aviso de análise de pedidos em andamento**, sinalizando pedidos aguardando confirmação.
+![Tela de Dashboard Expandido do Parceiro](images/dashboard_pedidos.jpeg)
+ 
+---
+ 
 ### Demais telas do sistema
-
-Apresente e descreva brevemente as demais telas que compõem o sistema, mesmo que não estejam vinculadas diretamente a processos BPMN.
-
-> Inserir imagens das demais telas.
+ 
+Esta seção apresenta as telas do FoodLoop que complementam a experiência do sistema sem estarem vinculadas diretamente a um processo BPMN específico.
+ 
+---
+ 
+**Cadastro de Consumidor**
+ 
+Tela de registro inicial de novos consumidores. Coleta as informações necessárias para criação da conta e oferece alternativa de autenticação via Google.
+ 
+Campos: **Endereço de e-mail**, **Nome Completo**, **Senha** e **Confirme sua senha**.  
+Ações: **Criar conta**, **Entrar** e **Inscrever-se com o Google**.
+ 
+![Tela de Cadastro de Consumidor](images/cadastro_consumidor.jpeg)
+ 
+---
+ 
+**Perfil do Consumidor e Impacto Sustentável**
+ 
+Reúne informações pessoais e indicadores de impacto ambiental gerado pelo uso da plataforma.
+ 
+Elementos da interface:
+ 
+- **Cabeçalho** com iniciais, nome completo e endereço do usuário (*Gustavo Pontes, Rua Redelvim Andrade 215, Betim*);
+- **Último pedido**: nome do item adquirido mais recentemente (*Morango*);
+- **Painel "Seu impacto sustentável"**: CO₂ Evitado (5,7 kg) e Pedidos realizados (27);
+- **Avaliação de pedidos recentes**: card do último pedido com sistema de avaliação por estrelas.
+![Tela de Perfil e Impacto Sustentável](images/perfil_consumidor.jpeg)
+ 
+---
+ 
+**Tela Institucional — Sobre o FoodLoop**
+ 
+Tela informativa acessível pelo link *Saiba +* na tela de login, apresentando a proposta de valor e a missão da plataforma para novos usuários.
+ 
+Blocos de conteúdo:
+ 
+- **"O Ciclo da Abundância"**: posicionamento do FoodLoop como ponte tecnológica entre estabelecimentos com excedentes e pessoas que buscam alimentos de qualidade por preço justo;
+- **"Nossa Missão"**: compromisso com o consumo consciente, redução de emissões de efeito estufa e promoção da economia circular;
+- **Ícones de benefícios**: síntese visual dos três pilares da plataforma.
+![Tela Institucional — Sobre o FoodLoop](images/sobre.jpeg)
+ 
+---
+ 
+**Overlays de feedback ao usuário**
+ 
+O sistema conta com um conjunto de overlays modais que fornecem retorno imediato ao usuário após ações críticas, sem necessidade de navegação para nova tela. Os overlays identificados no protótipo são:
+ 
+| Overlay | Descrição |
+|---|---|
+| **Edit_profile** | Formulário de edição de perfil do consumidor (nome, endereço, bairro, cidade e CEP) |
+| **Frame 3** | Confirmação de conta criada com sucesso, orientando o usuário a verificar o e-mail para validação |
+| **Produto cadastrado com sucesso** | Confirmação de que o anúncio foi publicado com êxito na plataforma |
+| **Forma seu Espaço** | Formulário de endereço do estabelecimento (campos: endereço, bairro, cidade e CEP) |
+| **Pedido realizado com sucesso** | Confirmação de pedido com nome do produto e ID do pedido, com botão de acompanhamento |
+| **Pedido cancelado** | Notificação de cancelamento de pedido com informações resumidas e confirmação via botão *OK* |
+| **Preparo do pedido** | Notificação ao parceiro com nome do cliente e ID do pedido a ser preparado |
+ 
+![Overlays de feedback ao usuário](images/overlays.jpeg)
+ 
+---
