@@ -217,27 +217,83 @@ Esse script deverá ser incluído em um arquivo .sql na pasta [de scripts SQL](.
 
 ## Tecnologias
 
-Descreva as tecnologias utilizadas para implementar a solução proposta. Liste todas as tecnologias envolvidas, incluindo linguagens de programação, frameworks, bibliotecas, serviços web, IDEs, ferramentas de apoio e quaisquer outros recursos relevantes para o desenvolvimento.  
+A escolha do conjunto de tecnologias do FoodLoop priorizou três critérios: **alinhamento com a arquitetura proposta** na Visão geral, **custo operacional compatível com o volume da operação inicial** (free tiers que comportam o tráfego do MVP sem comprometer a evolução paga conforme o produto cresce) e **velocidade de iteração da equipe**, evitando ferramentas que demandariam tempo significativo de configuração de ambiente nativo em troca de pouco ganho funcional.
 
-Apresente também um diagrama ou figura que ilustre a visão operacional, mostrando como as tecnologias interagem entre si durante o uso do sistema, desde a ação do usuário até a obtenção da resposta.
+### Visão consolidada por camada
 
-| **Dimensão**   | **Tecnologia**  |
-| ---            | ---             |
-| Front-end      | HTML + CSS + JS + React |
-| Back-end       | Node.js         |
-| SGBD           | MySQL           |
-| Deploy         | Vercel          |
-
+| **Camada / Dimensão** | **Tecnologia** | **Função no projeto** |
+| --- | --- | --- |
+| Front-end (mobile) | React Native via Expo (managed workflow) | Aplicativo multiplataforma Android e iOS a partir de uma única base de código |
+| Front-end (build/distribuição) | EAS Build (Expo Application Services) | Geração de APK/IPA na nuvem, sem necessidade de Mac para iOS |
+| Front-end (navegação) | React Navigation | Pilha de telas, abas e navegação por perfil de usuário |
+| Front-end (HTTP) | Axios | Cliente HTTP para consumo da API REST |
+| Front-end (mapa) | react-native-maps + Google Maps SDK | Mapa nativo e marcadores de estabelecimentos próximos |
+| Front-end (push) | Expo Notifications + Firebase Cloud Messaging | Recebimento de notificações de status de pedido e novos anúncios |
+| Front-end (armazenamento local) | AsyncStorage | Persistência do token JWT e preferências locais |
+| Back-end | Node.js LTS (v20) + Express | Servidor HTTP que expõe a API REST do FoodLoop |
+| Back-end (autenticação) | jsonwebtoken + bcrypt | Emissão e verificação de tokens JWT e hash seguro de senhas |
+| Back-end (banco) | Driver `pg` ou Prisma ORM | Acesso ao PostgreSQL a partir do Node.js |
+| Back-end (integrações) | firebase-admin, mercadopago, @googlemaps/google-maps-services-js | SDKs oficiais para FCM, gateway de pagamento e API do Google Maps |
+| Back-end (qualidade) | helmet, cors, express-rate-limit | Cabeçalhos de segurança, controle de origem e limitação de requisições |
+| Banco de dados | PostgreSQL 16 | SGBD relacional para usuários, ofertas, pedidos, pagamentos e avaliações |
+| Serviços externos | Firebase Storage | Armazenamento de imagens de produtos e fotos de perfil |
+| Serviços externos | Firebase Cloud Messaging | Entrega de notificações push aos dispositivos |
+| Serviços externos | Mercado Pago (Checkout Pro) | Processamento de pagamentos via cartão de crédito e PIX |
+| Serviços externos | Google Maps Platform | Mapa, geocodificação reversa e cálculo de proximidade |
+| Hospedagem (back + banco) | Render (free tier) | Web service Node.js e banco PostgreSQL gerenciado |
+| Hospedagem (storage e push) | Firebase (plano Spark, gratuito) | Storage e FCM consumidos diretamente do Google |
+| IDE | Visual Studio Code | Desenvolvimento mobile e back-end |
+| Versionamento | Git + GitHub | Controle de versão e CI/CD via integração com Render |
+| Teste de API | Postman ou Insomnia | Validação manual de endpoints durante o desenvolvimento |
+| Emulador | Android Studio (AVD) e Expo Go em dispositivo físico | Execução do app durante o desenvolvimento |
+| Distribuição | Google Play Store e Apple App Store | Publicação pública do aplicativo após validação do MVP em campo |
+| Padronização de código | ESLint + Prettier | Linting e formatação consistente em todo o repositório |
+| Documentação | Markdown no repositório GitHub | Documentos do projeto e diagramas Mermaid renderizados nativamente |
 
 ## Hospedagem
 
-Explique como a hospedagem e o lançamento da plataforma foram realizados.
+A hospedagem do FoodLoop foi estruturada para atender três requisitos práticos do estágio inicial do produto: **custo operacional próximo de zero enquanto o volume de transações ainda é baixo**, **deploy automatizado a partir do repositório** para eliminar fricção de release, e **separação clara entre serviços geridos pela equipe e serviços externos delegados**, permitindo escalar cada componente de forma independente. Cada peça do sistema é hospedada no provedor mais adequado à sua natureza, com caminho de upgrade pago já mapeado para o momento em que a operação justificar.
 
-> **Links úteis**:
-> - [Website com GitHub Pages](https://pages.github.com/)
-> - [Programação colaborativa com Repl.it](https://repl.it/)
-> - [Getting started with Heroku](https://devcenter.heroku.com/start)
-> - [Publicando seu site no Heroku](http://pythonclub.com.br/publicando-seu-hello-world-no-heroku.html)
+### Back-end e banco de dados — Render
+
+O servidor Node.js e a instância PostgreSQL ficam hospedados no [Render](https://render.com), no plano gratuito. A escolha do Render se justifica pelos seguintes pontos:
+
+- Free tier sem cartão de crédito, suficiente para sustentar o tráfego do MVP enquanto a base de usuários é construída;
+- Deploy contínuo: cada `git push` na branch `main` do repositório GitHub dispara automaticamente o build e o deploy do serviço;
+- Certificado SSL (HTTPS) emitido e renovado automaticamente, atendendo ao RNF-003;
+- Gerenciamento centralizado de variáveis de ambiente (chaves de API, segredos JWT, credenciais do banco) pelo painel do Render;
+- PostgreSQL gerenciado, com backups automáticos diários e string de conexão fornecida como variável de ambiente.
+
+A configuração do serviço é descrita por um arquivo `render.yaml` versionado no repositório, garantindo que qualquer membro da equipe possa reproduzir o ambiente sem dependência de configuração manual no painel.
+
+**Limitação conhecida do free tier:** o web service hiberna após 15 minutos sem requisições, o que adiciona um tempo de cold start na primeira chamada após o período de inatividade. A mitigação imediata é um cron de keep-alive (interno ou externo, via UptimeRobot) batendo em um endpoint leve a cada 10 minutos durante a janela de pico do produto (18h às 22h, conforme RNF-005). A mitigação definitiva é a migração para o plano pago de 7 dólares por mês no Render, prevista a partir do momento em que a operação justificar disponibilidade contínua 24/7.
+
+### Serviços externos — sem hospedagem própria
+
+Os serviços abaixo são consumidos diretamente de seus provedores, sem qualquer infraestrutura mantida pela equipe:
+
+- **Firebase Storage e Firebase Cloud Messaging:** projeto criado no [Firebase Console](https://console.firebase.google.com) no plano Spark (gratuito), com migração para o plano pago Blaze prevista quando o volume de mídia ou de mensagens push ultrapassar a cota gratuita. As credenciais de administrador são geradas no console e injetadas como variáveis de ambiente na API hospedada no Render. O `google-services.json` (Android) e o `GoogleService-Info.plist` (iOS) ficam no projeto Expo do front-end.
+- **Google Maps Platform:** chave de API gerada no [Google Cloud Console](https://console.cloud.google.com) com a cota gratuita mensal de 200 dólares em uso. As APIs habilitadas são Maps SDK for Android, Maps SDK for iOS e Geocoding API. A chave é restringida por aplicativo (SHA-1 do APK e bundle id do iOS) para evitar uso indevido.
+- **Mercado Pago:** conta de desenvolvedor criada no [Mercado Pago Developers](https://www.mercadopago.com.br/developers). Durante o desenvolvimento usa-se o par de credenciais de teste, e no lançamento substitui-se pelas credenciais de produção. O webhook de notificação de pagamento é apontado para a URL pública do back-end no Render. A comissão por transação (RF-011) é descontada no momento da liquidação, sem custo fixo mensal.
+
+### Aplicativo mobile — distribuição
+
+Durante o desenvolvimento, o aplicativo roda em dispositivos físicos via app **Expo Go** ou via **development build** gerado pelo EAS Build. Para a fase de validação com usuários reais (clientes da Couto Lanches e do primeiro grupo de estabelecimentos parceiros), o EAS Build gera APKs Android distribuídos por link direto e builds iOS via TestFlight, permitindo rodadas rápidas de feedback antes da publicação pública.
+
+A publicação na Google Play Store e na Apple App Store ocorre quando o produto atingir os critérios de prontidão definidos pela equipe (estabilidade, completude dos RFs de alta prioridade e cobertura mínima das duas plataformas). As contas de desenvolvedor já estão dimensionadas no orçamento do produto: 25 dólares de taxa única na Google Play Console e 99 dólares anuais na Apple Developer Program.
+
+### Resumo da topologia de hospedagem
+
+| Componente | Provedor | Plano | Custo |
+| --- | --- | --- | --- |
+| API REST (Node.js + Express) | Render | Free Web Service | Zero |
+| Banco de dados (PostgreSQL) | Render | Free Postgres | Zero |
+| Armazenamento de imagens | Firebase Storage | Spark | Zero |
+| Notificações push | Firebase Cloud Messaging | Spark | Zero |
+| Mapas e geocodificação | Google Maps Platform | Free monthly credit | Zero dentro da cota |
+| Gateway de pagamento | Mercado Pago | Conta padrão | Comissão por transação |
+| Build do aplicativo | EAS Build (Expo) | Free | 30 builds/mês gratuitos |
+| Distribuição de teste | Link interno do EAS | — | Zero |
 
 ## Qualidade de software
 
@@ -286,9 +342,9 @@ Métrica: uptime mensal medido pelo painel de monitoramento da plataforma de hos
 
 O aplicativo processa pagamentos e armazena dados pessoais (e-mail, telefone, CPF de cadastro, histórico de pedidos e dados de comerciantes). A confidencialidade protege o que não deve ser visto por terceiros; a integridade garante que os dados não sejam adulterados em trânsito ou em repouso. As duas são fundamentais para a confiança do usuário e para a legitimidade das transações financeiras.
 
-Requisitos amarrados: RNF-002 (Firebase Auth para autenticação), RNF-003 (criptografia ponta a ponta nos pagamentos), RF-004 (processamento de reserva e pagamento) e RF-011 (cálculo e retenção automática da comissão da plataforma).
+Requisitos amarrados: RNF-002 (autenticação por token JWT emitido pela API e persistência em PostgreSQL), RNF-003 (criptografia ponta a ponta nos pagamentos), RF-004 (processamento de reserva e pagamento) e RF-011 (cálculo e retenção automática da comissão da plataforma).
 
-Métrica: percentual de transações financeiras transmitidas via HTTPS com criptografia ativa; número de incidentes de acesso não autorizado por sprint; validação dos hashes de senha gerados pelo Firebase Auth. Meta: 100% das transações criptografadas, zero incidentes de acesso indevido e 100% dos cadastros usando autenticação válida.
+Métrica: percentual de transações financeiras transmitidas via HTTPS com criptografia ativa; número de incidentes de acesso não autorizado por sprint; validação dos hashes de senha gerados por bcrypt no back-end. Meta: 100% das transações criptografadas, zero incidentes de acesso indevido e 100% dos cadastros usando autenticação válida.
 
 ### Compatibilidade — Coexistência
 
