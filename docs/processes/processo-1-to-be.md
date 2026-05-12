@@ -22,7 +22,7 @@ A digitalização do canal de compra amplia o alcance do estabelecimento, permit
 
 **Figura 1 – Diagrama de atividades do processo de compra via aplicativo (TO-BE)**
 
-![Diagrama TO-BE do Processo 1](/docs/images/CompraApp.png)
+![Diagrama TO-BE do Processo 1](/docs/images/Processo1TO-BE.png)
 
 Fonte: Elaborado pelos autores (2026).
 
