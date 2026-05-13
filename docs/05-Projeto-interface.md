@@ -360,7 +360,7 @@ O aplicativo é estruturado para atender dois perfis distintos de usuário: o **
  
 ### Tela principal do sistema
  
-A tela principal do sistema, exibida após a autenticação do consumidor, é a **tela de Listagem de Produtos** Ela constitui o ponto central de navegação do aplicativo, reunindo busca, filtragem por categoria e visualização dos anúncios publicados pelos estabelecimentos cadastrados.
+A tela principal do sistema, exibida após a autenticação do consumidor, é a **tela de Listagem de Produtos**. Ela constitui o ponto central de navegação do aplicativo, reunindo busca, filtragem por categoria e visualização dos anúncios publicados pelos estabelecimentos cadastrados.
  
 A interface é composta pelos seguintes elementos:
  
@@ -368,6 +368,7 @@ A interface é composta pelos seguintes elementos:
 - **Filtros de categoria**: etiquetas selecionáveis para *Padaria*, *Doces*, *Refeições*, *Frutas*, *Até 1 km*, *Salada* e *Bebidas*;
 - **Cards de produtos**: cada cartão exibe imagem do item, nome, descrição resumida, avaliação em estrelas e botão de adição ao carrinho;
 - **Barra de navegação inferior**: acesso rápido às seções de Mapa, Início e Perfil.
+
 ![Tela Principal — Listagem de Produtos](images/tela_principal.jpeg)
  
 ---
@@ -393,7 +394,8 @@ Elementos da interface:
 - Botão **Seja nosso parceiro**, para acesso ao cadastro de estabelecimentos;
 - Botão **Continuar com o Google**, para autenticação via conta Google;
 - Link **Saiba +**, que redireciona à tela institucional da plataforma.
-![Tela de Login do Consumidor](images/tela_login_usuario.jpeg)
+
+![Tela de Login do Consumidor](images/tela_login_usuario.png)
  
 ---
  
@@ -414,7 +416,8 @@ Elementos da interface:
 - **Mapa interativo** com marcadores posicionados nos estabelecimentos parceiros;
 - **Seleção de marcador**: cada ponto pode ser selecionado para exibição de informações do estabelecimento;
 - **Barra de navegação inferior** com acesso a Mapa, Início e Perfil.
-![Tela de Mapa de Estabelecimentos](images/maps.jpeg)
+
+![Tela de Mapa de Estabelecimentos](images/maps.png)
  
 ---
  
@@ -427,7 +430,8 @@ Elementos da interface:
 - **Carrossel de imagens** do produto com indicador de posição;
 - **Nome e descrição** do produto anunciado;
 - **Seção de método de pagamento**, com as opções: *PIX*, *Dinheiro (Apenas no local)* e *Cartão de crédito*.
-![Tela de Detalhe do Produto e Pagamento](images/tela_pagamento.jpeg)
+
+![Tela de Detalhe do Produto e Pagamento](images/tela_pagamento.png)
  
 ---
  
@@ -437,8 +441,9 @@ Tela exibida imediatamente após a conclusão do pagamento, informando o consumi
  
 - **Pagamento confirmado**: mensagem de sucesso com indicação de que o estabelecimento foi notificado e o pedido está sendo preparado;
 - **Pedido recusado**: mensagem de erro com orientação para nova tentativa ou troca de forma de pagamento.
+
 Esta tela encerra o fluxo de compra do lado do consumidor e dá início ao acompanhamento do status do pedido.
- 
+
 ![Tela de Confirmação de Pedido](images/confirmacao_pedido.jpeg)
  
 ---
@@ -460,8 +465,9 @@ Campos disponíveis:
 - **Senha** e **Confirme sua senha**;
 - **CNPJ**;
 - **Telefone**.
+
 Ações disponíveis: **Criar conta** e **Entrar**.
- 
+
 ![Tela de Cadastro de Parceiro](images/cadastro_parceiro.jpeg)
  
 ---
@@ -476,6 +482,7 @@ Elementos da interface:
 - **Lista de pedidos ativos** com nome do item, valor e indicador de status;
 - **Painel de métricas**: Receita do dia (R$ 105), Pedidos do dia (7), Avaliação média (4,5) e Ticket médio (R$ 15,00);
 - **Painel de impacto sustentável**: CO₂ evitado (0,8 kg) e Refeições salvas (90).
+
 ![Tela do Painel do Parceiro](images/Dashboard.jpeg)
  
 ---
@@ -494,6 +501,7 @@ Campos e elementos disponíveis:
 - **Valor original** e **Valor especial**: precificação promocional;
 - **Upload de foto** do produto;
 - Botão **Enviar** para publicação do anúncio.
+
 ![Tela de Cadastro de Item](images/cadastro_item.jpeg)
  
 ---
@@ -508,6 +516,7 @@ Elementos da interface:
 - **Resumo financeiro dos pedidos ativos**: listagem com nome do item, preço unitário, quantidade disponível e valor acumulado;
 - **Histórico de pedidos**: registro dos pedidos já realizados no estabelecimento, com indicação de status;
 - **Aviso de análise de pedidos em andamento**, sinalizando pedidos aguardando confirmação.
+
 ![Tela de Dashboard Expandido do Parceiro](images/dashboard_pedidos.jpeg)
  
 ---
@@ -539,6 +548,7 @@ Elementos da interface:
 - **Último pedido**: nome do item adquirido mais recentemente (*Morango*);
 - **Painel "Seu impacto sustentável"**: CO₂ Evitado (5,7 kg) e Pedidos realizados (27);
 - **Avaliação de pedidos recentes**: card do último pedido com sistema de avaliação por estrelas.
+
 ![Tela de Perfil e Impacto Sustentável](images/perfil_consumidor.jpeg)
  
 ---
@@ -552,6 +562,7 @@ Blocos de conteúdo:
 - **"O Ciclo da Abundância"**: posicionamento do FoodLoop como ponte tecnológica entre estabelecimentos com excedentes e pessoas que buscam alimentos de qualidade por preço justo;
 - **"Nossa Missão"**: compromisso com o consumo consciente, redução de emissões de efeito estufa e promoção da economia circular;
 - **Ícones de benefícios**: síntese visual dos três pilares da plataforma.
+
 ![Tela Institucional — Sobre o FoodLoop](images/sobre.jpeg)
  
 ---
