@@ -333,19 +333,15 @@ Acesse o protótipo interativo pelo link abaixo:
 
 ## Jornada do usuário
 
-A jornada do usuário descreve, em alto nível de detalhes, as etapas que diferentes perfis de usuários realizam para concluir uma tarefa específica na aplicação. Essa técnica ajuda a identificar pontos fortes e oportunidades de melhoria na experiência.  
+## Texto Explicativo — Jornada do Usuário
 
-O mapa da jornada do usuário deve contemplar:  
-- Etapas: desde a descoberta até a finalização da tarefa.  
-- Ações do usuário: o que o usuário faz em cada etapa.  
-- Pontos de contato: onde a interação acontece (site, app, suporte).  
-- Emoções e percepções: como o usuário se sente em cada momento.  
+A jornada do usuário do FoodLoop foi desenvolvida com base no modelo AIDA, permitindo representar as etapas percorridas pelo consumidor desde o primeiro contato com a plataforma até o pós-uso do serviço. O objetivo é compreender como o usuário interage com a aplicação, identificando ações, pontos de contato e percepções ao longo da experiência.
 
-**Fases baseadas no modelo AIDA**:  
-1. Conscientização: despertar conhecimento sobre o produto (inspiração)  
-2. Interesse: aumentar o interesse e engajamento (favoritismo)  
-3. Desejo: estimular a intenção de uso/compra (desejo)  
-4. Ação: execução da ação esperada (implementação)  
+Na fase de conscientização, o usuário conhece o FoodLoop por meio de anúncios, redes sociais, influenciadores ou indicações, despertando curiosidade e interesse pela proposta do aplicativo. Em seguida, na etapa de interesse, o consumidor realiza o download da aplicação, cria sua conta e começa a explorar as ofertas disponíveis.
+
+Na fase de desejo, o usuário compara preços, avaliações, localização e produtos disponíveis, aumentando sua intenção de compra. Já na etapa de ação, ocorre a reserva ou compra do alimento excedente, seguida da retirada no estabelecimento parceiro.
+
+Por fim, no pós-uso, o consumidor avalia a experiência, compartilha sua opinião e pode reutilizar a plataforma futuramente, fortalecendo a fidelização e incentivando práticas de consumo mais sustentáveis. Dessa forma, a jornada demonstra como o FoodLoop busca unir tecnologia, economia e redução do desperdício de alimentos em uma experiência simples e acessível para os usuários.
 
 ![Exemplo Jornada de Usuario](images/JornadadoUsuario.jpg)
 
