@@ -94,7 +94,7 @@ O grupo adotou uma abordagem baseada em Scrum, com entregas organizadas em Sprin
 
 O quadro do projeto pode ser acessado em: https://github.com/orgs/ICEI-PUC-Minas-PBE-SI-TI/projects/6/views/1
 
-print da sprint 1 ![sprint 1](docs/images/sprint1.png)
+print da sprint 1 ![Sprint 1](docs/images/sprint1.png)
 
  ![sprint 1](docs/images/spint1.png)
 
