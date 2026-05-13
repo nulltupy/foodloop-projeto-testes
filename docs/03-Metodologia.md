@@ -96,8 +96,11 @@ O quadro do projeto pode ser acessado em: https://github.com/orgs/ICEI-PUC-Minas
 
 Imagem da Sprint 1 ![Sprint 1](images/sprint1.png)
 
-
  ![sprint 1](images/spint1.png)
+ 
+Imagem da Sprint 2
+
+ ![sprint 2](images/sprin2.png)
 
 
 
