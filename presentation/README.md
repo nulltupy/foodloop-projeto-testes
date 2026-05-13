@@ -11,6 +11,8 @@
 
 [Sprint 3 — FoodLoop: Tecnologia e Sustentabilidade contra o Desperdício de Alimentos](presentation_sprint_3.pdf)
 
+[Sprint 3 (versão pitch) — FoodLoop](sprint3.pdf) · gerado a partir de [`sprint3.md`](sprint3.md) com [Marp](https://marp.app). Para regenerar: `npx @marp-team/marp-cli sprint3.md --pdf --allow-local-files`
+
 > **Links úteis**:
 > - [10 dicas de design para slides](https://rockcontent.com/blog/design-para-slides/)
 > - [7 dicas de design para criar apresentações de PowerPoint incríveis e eficientes](https://www.shutterstock.com/pt/blog/7-dicas-de-design-para-criar-apresentacoes-de-powerpoint-incriveis-e-eficientes)
