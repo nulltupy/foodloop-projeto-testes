@@ -214,11 +214,7 @@ Usuario (abstrata)
 - **status_pagamento**: `PENDENTE`, `APROVADO`, `RECUSADO`
 - **origem_cancelamento**: `CLIENTE`, `COMERCIANTE`, `SISTEMA`
 
-![Diagrama Entidade-Relacionamento do FoodLoop em notação Peter Chen](images/modelo_conceitual.PNG "Modelo conceitual do FoodLoop em notação Peter Chen.")
-
-> **Links úteis**:
-> - [Notação de Peter Chen para modelagem conceitual de banco de dados](https://www.youtube.com/watch?v=_y31cFi_ByY)
-> - [Como fazer um diagrama entidade-relacionamento](https://www.lucidchart.com/pages/pt/como-fazer-um-diagrama-entidade-relacionamento)
+> **Diagrama:** o DER do FoodLoop em notação Peter Chen está disponível em `docs/images/modelo_conceitual.png` (a ser publicado pela equipe a partir do desenho elaborado em ferramenta de modelagem).
 
 ### Modelo relacional
 
