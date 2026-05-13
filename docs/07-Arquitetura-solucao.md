@@ -120,14 +120,101 @@ Diagrama de classes do sistema FoodLoop
 
 O desenvolvimento da solução proposta requer a existência de bases de dados que permitam realizar o cadastro de dados e os controles associados aos processos identificados, assim como suas recuperações.
 
-### Modelo conceitual 
+### Modelo conceitual
 
-O Diagrama Entidade-Relacionamento (DER), em notação Peter Chen, representa de forma conceitual como as entidades (objetos ou conceitos do minimundo) se relacionam entre si. O DER deve incluir entidades, atributos, relacionamentos, cardinalidade, conforme as regras do minimundo. Deve ser elaborado um único DER que suporte todos os processos mapeados, de modo a garantir uma base de dados integrada. O modelo também deve representar, quando aplicável, o controle de acesso dos usuários (partes interessadas nos processos) de acordo com os papéis definidos nos modelos de processo de negócio.
+O Diagrama Entidade-Relacionamento (DER) do FoodLoop foi elaborado em notação **Peter Chen** e cobre todos os processos modelados em [04-Modelagem dos processos de negócio](04-Modelagem-processos-negocio.md), garantindo uma base de dados integrada para os perfis de Consumidor e Estabelecimento Parceiro.
 
-Elabore o modelo utilizando uma ferramenta de modelagem apropriada.
+#### Entidades
 
-![Exemplo de um modelo conceitual](images/modelo_conceitual.PNG "Exemplo de modelo conceitual.")
----
+| Entidade | Função no minimundo |
+|---|---|
+| **Usuario** (abstrata) | Atributos comuns a todo perfil de usuário (login, contato, foto). |
+| **Cliente** | Subtipo de Usuario. Consumidor que descobre, compra e avalia. |
+| **Comerciante** | Subtipo de Usuario. Responsável pelo estabelecimento parceiro. |
+| **Estabelecimento** | Comércio parceiro cadastrado no sistema. |
+| **Endereco** | Endereço físico e coordenadas geográficas do estabelecimento. |
+| **Produto** | Item do cardápio do estabelecimento. |
+| **Anuncio** | Oferta de excedente publicada pelo comerciante a partir de um produto. |
+| **Pedido** | Compra realizada por um cliente em um estabelecimento. |
+| **ItemPedido** | Cada linha de anúncio dentro de um pedido. |
+| **Pagamento** | Transação financeira vinculada a um único pedido. |
+| **Avaliacao** | Feedback do cliente após retirar o pedido. |
+| **DeviceToken** | Tokens FCM dos dispositivos do usuário, usados para envio de push. |
+| **Notificacao** | Histórico das notificações enviadas, com suporte a deep link. |
+| **PreferenciaNotificacao** | Preferências de alerta por tipo, por usuário. |
+
+#### Herança
+
+A entidade `Usuario` é abstrata e o atributo `tipo` discrimina o subtipo:
+
+```
+Usuario (abstrata)
+  ├── Cliente
+  └── Comerciante
+```
+
+#### Atributos por entidade
+
+**Usuario**: `id` (PK), `nome`, `email` (único), `senha_hash`, `telefone`, `tipo` (cliente|comerciante), `foto_url`, `data_cadastro`, `ativo`.
+
+**Cliente**: `id_usuario` (PK, FK → Usuario), `latitude_atual`, `longitude_atual`.
+
+**Comerciante**: `id_usuario` (PK, FK → Usuario), `cnpj` (único).
+
+**Estabelecimento**: `id` (PK), `id_comerciante` (FK, único), `id_endereco` (FK, único), `nome_fantasia`, `descricao`, `horario_funcionamento`, `nota_media`, `logo_url`, `ativo`.
+
+**Endereco**: `id` (PK), `rua`, `numero`, `bairro`, `cidade`, `estado`, `cep`, `latitude`, `longitude`.
+
+**Produto**: `id` (PK), `id_estabelecimento` (FK), `nome`, `descricao`, `preco_regular`, `categoria`, `imagem`, `ativo`.
+
+**Anuncio**: `id` (PK), `id_produto` (FK), `id_estabelecimento` (FK), `preco_promocional`, `quantidade_inicial`, `quantidade_disponivel`, `quantidade_sobra`, `prazo_retirada`, `data_publicacao`, `status`.
+
+**Pedido**: `id` (PK), `id_cliente` (FK), `id_estabelecimento` (FK), `data_pedido`, `valor_total`, `taxa_comissao`, `valor_comissao`, `codigo_retirada` (único), `status`, `cancelado_por`, `motivo_cancelamento`, `data_cancelamento`.
+
+**ItemPedido**: `id` (PK), `id_pedido` (FK), `id_anuncio` (FK), `quantidade`, `preco_unitario`, `subtotal` (calculado).
+
+**Pagamento**: `id` (PK), `id_pedido` (FK, único), `valor`, `forma_pagamento`, `data_pagamento`, `codigo_transacao`, `status_pagamento`.
+
+**Avaliacao**: `id` (PK), `id_pedido` (FK, único), `id_estabelecimento` (FK), `nota` (1 a 5), `comentario` (até 500 caracteres), `data_avaliacao`.
+
+**DeviceToken**: `id` (PK), `id_usuario` (FK), `token` (único), `plataforma`, `data_registro`.
+
+**Notificacao**: `id` (PK), `id_usuario` (FK), `titulo`, `corpo`, `deep_link`, `lida`, `data_envio`.
+
+**PreferenciaNotificacao**: `id` (PK), `id_usuario` (FK, único), `novos_anuncios_proximos`, `status_pedido`, `promocoes`.
+
+#### Relacionamentos e cardinalidades
+
+| Entidades | Cardinalidade | Observação |
+|---|:---:|---|
+| Usuario – Cliente | 1:1 | Herança |
+| Usuario – Comerciante | 1:1 | Herança |
+| Comerciante – Estabelecimento | 1:1 | Um comerciante administra um único estabelecimento |
+| Estabelecimento – Endereco | 1:1 | Composição |
+| Estabelecimento – Produto | 1:N | — |
+| Produto – Anuncio | 1:N | Um produto pode aparecer em vários anúncios ao longo do tempo |
+| Estabelecimento – Anuncio | 1:N | — |
+| Cliente – Pedido | 1:N | — |
+| Estabelecimento – Pedido | 1:N | — |
+| Pedido – ItemPedido | 1:N | Composição |
+| Anuncio – ItemPedido | 1:N | — |
+| Pedido – Pagamento | 1:1 | Composição |
+| Pedido – Avaliacao | 1:0..1 | Uma avaliação opcional por pedido |
+| Estabelecimento – Avaliacao | 1:N | — |
+| Usuario – DeviceToken | 1:N | Um usuário pode ter vários dispositivos |
+| Usuario – Notificacao | 1:N | — |
+| Usuario – PreferenciaNotificacao | 1:1 | — |
+
+#### Enumerações
+
+- **tipo_usuario**: `cliente`, `comerciante`
+- **status_anuncio**: `ATIVO`, `ENCERRADO_COM_RESERVA`, `ENCERRADO_COM_SOBRA`
+- **status_pedido**: `RECEBIDO`, `EM_PREPARO`, `PRONTO_PARA_RETIRADA`, `RETIRADO`, `CANCELADO`
+- **forma_pagamento**: `CARTAO_CREDITO`, `PIX`
+- **status_pagamento**: `PENDENTE`, `APROVADO`, `RECUSADO`
+- **origem_cancelamento**: `CLIENTE`, `COMERCIANTE`, `SISTEMA`
+
+![Diagrama Entidade-Relacionamento (Peter Chen)](images/modelo_conceitual.PNG "Modelo conceitual do FoodLoop em notação Peter Chen.")
 
 > **Links úteis**:
 > - [Notação de Peter Chen para modelagem conceitual de banco de dados](https://www.youtube.com/watch?v=_y31cFi_ByY)
@@ -135,84 +222,82 @@ Elabore o modelo utilizando uma ferramenta de modelagem apropriada.
 
 ### Modelo relacional
 
-![Modelo Relacional](images/ModeloRelacional.png)
+O modelo lógico em notação Pé de Galinha (Crow's Foot) traduz o DER conceitual para o esquema relacional implementado no PostgreSQL. O mapeamento aplicou as seguintes decisões:
 
+- **Herança Usuario → Cliente / Comerciante** foi implementada por **tabelas separadas com chave primária compartilhada** (`cliente.id_usuario` e `comerciante.id_usuario` referenciam `usuario.id`), preservando integridade e permitindo evolução independente dos atributos de cada subtipo;
+- **Composições** (`Pedido → ItemPedido`, `Pedido → Pagamento`, `Estabelecimento → Endereco`) usam `ON DELETE CASCADE` ou `RESTRICT` conforme a regra de negócio;
+- **Restrições de unicidade** garantem regras como "um e-mail por usuário" (`uq_usuario_email`), "um CNPJ por comerciante" (`uq_comerciante_cnpj`), "um estabelecimento por comerciante" (`uq_estab_comerciante`), "um pagamento por pedido" (`uq_pagamento_pedido`) e "uma avaliação por pedido" (`uq_avaliacao_pedido`);
+- **Restrições CHECK** validam domínios de valor (`nota_media` entre 0 e 5, `nota` da avaliação entre 1 e 5, preços e quantidades positivos, `prazo_retirada > data_publicacao`, coerência do cancelamento) diretamente no banco;
+- **Enumerações** do DER conceitual viraram tipos `ENUM` nativos do PostgreSQL, padronizando os valores aceitos sem depender da camada de aplicação.
+
+| Tabela | PK | Chaves estrangeiras | Restrições principais |
+|---|---|---|---|
+| `usuario` | `id` | — | `email` único; `tipo` ∈ {cliente, comerciante} |
+| `cliente` | `id_usuario` | → `usuario` | Herança 1:1 |
+| `comerciante` | `id_usuario` | → `usuario` | Herança 1:1; `cnpj` único |
+| `endereco` | `id` | — | Coordenadas obrigatórias |
+| `estabelecimento` | `id` | → `comerciante`, → `endereco` | `id_comerciante` e `id_endereco` únicos; `nota_media` ∈ [0, 5] |
+| `produto` | `id` | → `estabelecimento` | `preco_regular > 0` |
+| `anuncio` | `id` | → `produto`, → `estabelecimento` | Quantidades não-negativas; `prazo_retirada > data_publicacao` |
+| `pedido` | `id` | → `cliente`, → `estabelecimento` | `codigo_retirada` único; coerência do cancelamento |
+| `item_pedido` | `id` | → `pedido`, → `anuncio` | `subtotal` gerado (`quantidade × preco_unitario`) |
+| `pagamento` | `id` | → `pedido` | `id_pedido` único (1:1) |
+| `avaliacao` | `id` | → `pedido`, → `estabelecimento` | `id_pedido` único; `nota` entre 1 e 5 |
+| `device_token` | `id` | → `usuario` | `token` único; `plataforma` ∈ {android, ios} |
+| `notificacao` | `id` | → `usuario` | — |
+| `preferencia_notificacao` | `id` | → `usuario` | `id_usuario` único (1:1) |
+
+![Modelo relacional do FoodLoop em notação Pé de Galinha](images/ModeloRelacional.png)
 
 ### Modelo físico
 
-Insira aqui o script de criação das tabelas do banco de dados.
+O modelo físico foi implementado em **PostgreSQL 16** e está versionado em [`src/db/`](../src/db). O script principal cria os tipos enumerados, as 13 tabelas com suas restrições (PK, FK, UNIQUE, CHECK), os índices de apoio às consultas mais frequentes e dois triggers de manutenção:
 
-Veja um exemplo:
+- **`trg_nota_media`** — recalcula `estabelecimento.nota_media` a cada `INSERT/UPDATE/DELETE` em `avaliacao`;
+- **`trg_controle_estoque`** — devolve `quantidade_disponivel` ao anúncio sempre que um pedido transita para `CANCELADO`.
+
+| Arquivo | Conteúdo |
+|---|---|
+| [`src/db/schema.sql`](../src/db/schema.sql) | DDL completo (tipos, tabelas, índices, restrições e triggers). |
+| [`src/db/seed.sql`](../src/db/seed.sql) | Dados de teste cobrindo um pedido concluído com avaliação e um pedido cancelado pelo sistema. |
+
+Trecho ilustrativo da DDL — entidade `pedido`, com a coerência do cancelamento garantida no banco:
 
 ```sql
-CREATE TABLE employees (
-    emp_no      INT             NOT NULL,
-    birth_date  DATE            NOT NULL,
-    first_name  VARCHAR(14)     NOT NULL,
-    last_name   VARCHAR(16)     NOT NULL,
-    gender      ENUM ('M','F')  NOT NULL,    
-    hire_date   DATE            NOT NULL,
-    PRIMARY KEY (emp_no)
+CREATE TABLE pedido (
+    id                    BIGSERIAL              PRIMARY KEY,
+    id_cliente            BIGINT                 NOT NULL,
+    id_estabelecimento    BIGINT                 NOT NULL,
+    data_pedido           TIMESTAMP              NOT NULL DEFAULT NOW(),
+    valor_total           NUMERIC(10,2)          NOT NULL,
+    taxa_comissao         NUMERIC(5,2)           NOT NULL DEFAULT 0.00,
+    valor_comissao        NUMERIC(10,2)          NOT NULL DEFAULT 0.00,
+    codigo_retirada       VARCHAR(20)            NOT NULL,
+    status                status_pedido          NOT NULL DEFAULT 'RECEBIDO',
+    cancelado_por         origem_cancelamento,
+    motivo_cancelamento   TEXT,
+    data_cancelamento     TIMESTAMP,
+    CONSTRAINT uq_pedido_codigo_retirada UNIQUE (codigo_retirada),
+    CONSTRAINT fk_pedido_cliente
+        FOREIGN KEY (id_cliente) REFERENCES cliente (id_usuario) ON DELETE RESTRICT,
+    CONSTRAINT fk_pedido_estabelecimento
+        FOREIGN KEY (id_estabelecimento) REFERENCES estabelecimento (id) ON DELETE RESTRICT,
+    CONSTRAINT ck_pedido_valor CHECK (valor_total > 0),
+    CONSTRAINT ck_pedido_taxa_comissao CHECK (taxa_comissao >= 0 AND taxa_comissao <= 100),
+    CONSTRAINT ck_pedido_valor_comissao CHECK (valor_comissao >= 0),
+    CONSTRAINT ck_pedido_cancelamento CHECK (
+        (status = 'CANCELADO' AND cancelado_por IS NOT NULL AND data_cancelamento IS NOT NULL)
+        OR status != 'CANCELADO'
+    )
 );
-
-CREATE TABLE departments (
-    dept_no     CHAR(4)         NOT NULL,
-    dept_name   VARCHAR(40)     NOT NULL,
-    PRIMARY KEY (dept_no),
-    UNIQUE  KEY (dept_name)
-);
-
-CREATE TABLE dept_manager (
-   emp_no       INT             NOT NULL,
-   dept_no      CHAR(4)         NOT NULL,
-   from_date    DATE            NOT NULL,
-   to_date      DATE            NOT NULL,
-   FOREIGN KEY (emp_no)  REFERENCES employees (emp_no)    ON DELETE CASCADE,
-   FOREIGN KEY (dept_no) REFERENCES departments (dept_no) ON DELETE CASCADE,
-   PRIMARY KEY (emp_no,dept_no)
-); 
-
-CREATE TABLE dept_emp (
-    emp_no      INT             NOT NULL,
-    dept_no     CHAR(4)         NOT NULL,
-    from_date   DATE            NOT NULL,
-    to_date     DATE            NOT NULL,
-    FOREIGN KEY (emp_no)  REFERENCES employees   (emp_no)  ON DELETE CASCADE,
-    FOREIGN KEY (dept_no) REFERENCES departments (dept_no) ON DELETE CASCADE,
-    PRIMARY KEY (emp_no,dept_no)
-);
-
-CREATE TABLE titles (
-    emp_no      INT             NOT NULL,
-    title       VARCHAR(50)     NOT NULL,
-    from_date   DATE            NOT NULL,
-    to_date     DATE,
-    FOREIGN KEY (emp_no) REFERENCES employees (emp_no) ON DELETE CASCADE,
-    PRIMARY KEY (emp_no,title, from_date)
-); 
-
-CREATE TABLE salaries (
-    emp_no      INT             NOT NULL,
-    salary      INT             NOT NULL,
-    from_date   DATE            NOT NULL,
-    to_date     DATE            NOT NULL,
-    FOREIGN KEY (emp_no) REFERENCES employees (emp_no) ON DELETE CASCADE,
-    PRIMARY KEY (emp_no, from_date)
-); 
-
-CREATE OR REPLACE VIEW dept_emp_latest_date AS
-    SELECT emp_no, MAX(from_date) AS from_date, MAX(to_date) AS to_date
-    FROM dept_emp
-    GROUP BY emp_no;
-
--- Shows only the current department for each employee
-CREATE OR REPLACE VIEW current_dept_emp AS
-    SELECT l.emp_no, dept_no, l.from_date, l.to_date
-    FROM dept_emp d
-        INNER JOIN dept_emp_latest_date l
-        ON d.emp_no=l.emp_no AND d.from_date=l.from_date AND l.to_date = d.to_date;
 ```
-Esse script deverá ser incluído em um arquivo .sql na pasta [de scripts SQL](../src/db).
+
+Para executar o esquema localmente:
+
+```bash
+psql -U <usuario> -d foodloop -f src/db/schema.sql
+psql -U <usuario> -d foodloop -f src/db/seed.sql
+```
 
 
 ## Tecnologias
