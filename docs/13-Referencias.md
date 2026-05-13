@@ -62,6 +62,40 @@ Lucidchart. How to make a user flow diagram. Disponível em: https://www.lucidch
 TechTudo. Fluxograma online: seis sites para fazer gráfico sem instalar nada. Disponível em: https://www.techtudo.com.br/listas/2019/03/fluxograma-online-seis-sites-para-fazer-grafico-sem-instalar-nada.ghtml
 . Acesso em: 12 maio 2026.
 
+## Wireframes e Protótipos
+
+NIELSEN NORMAN GROUP. Prototypes vs. wireframes in UX projects. Disponível em: https://www.nngroup.com/videos/prototypes-vs-wireframes-ux-projects/
+. Acesso em: 12 maio 2026.
+
+FIGMA. Prototype & wireframe — resource library. Disponível em: https://www.figma.com/resource-library/prototyping/
+. Acesso em: 12 maio 2026.
+
+## Diagrama de Classes
+
+LUCIDCHART. O que é um diagrama de classe UML? Disponível em: https://www.lucidchart.com/pages/pt/o-que-e-diagrama-de-classe-uml
+. Acesso em: 12 maio 2026.
+
+## Modelo Conceitual e Relacional do Banco de Dados
+
+LUCIDCHART. Como fazer um diagrama entidade-relacionamento. Disponível em: https://www.lucidchart.com/pages/pt/como-fazer-um-diagrama-entidade-relacionamento
+. Acesso em: 12 maio 2026.
+
+WIKIPEDIA. Modelo entidade relacionamento. Disponível em: https://pt.wikipedia.org/wiki/Modelo_entidade_relacionamento
+. Acesso em: 12 maio 2026.
+
+WIKIPEDIA. Entity–relationship model (cobre as notações Peter Chen e Crow's Foot/Pé de Galinha). Disponível em: https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model
+. Acesso em: 12 maio 2026.
+
+## Modelo Físico (PostgreSQL)
+
+THE POSTGRESQL GLOBAL DEVELOPMENT GROUP. PostgreSQL 16 documentation. Disponível em: https://www.postgresql.org/docs/16/
+. Acesso em: 12 maio 2026.
+
+## Qualidade de Software
+
+ISO 25000. ISO/IEC 25010 — quality model. Disponível em: https://iso25000.com/index.php/normas-iso-25000/iso-25010
+. Acesso em: 12 maio 2026.
+
 **Links úteis**:
  - [Padrão PUC Minas de normalização ABNT](https://www.pucminas.br/biblioteca/DocumentoBiblioteca/ABNT-GUIA-COMPLETO-Elaborar-formatar-trabalho-cientifico.pdf)
  - [Formato ABNT](https://www.normastecnicas.com/abnt/)

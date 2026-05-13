@@ -47,6 +47,15 @@ Merges são realizados sempre via Pull Request, nunca diretamente na `main`. As 
 - Documentação: Guilherme Setragni Freitas
 - Documentação: Rafael Lucas Mota Oliveira
 
+#### Sprint 3
+- _Scrum master_: Gabriel Santos Arpini
+- Documentação (BPMN — processos AS-IS/TO-BE): Cristiano Tupynambá Reis
+- Documentação (Arquitetura da solução e diagrama de classes): Diogo Lamera dos Santos
+- Documentação (Jornada do usuário e ajustes em interface): Gabriel Xavier de Souza
+- Documentação (User flow, tecnologias e hospedagem): Gabriel Santos Arpini
+- Documentação (Modelo conceitual, relacional e físico do banco de dados): Guilherme Setragni Freitas
+- Documentação (Wireframes, telas do sistema e apresentação): Rafael Lucas Mota Oliveira
+
 ###  Quadro de tarefas
 
 > Apresente a divisão de tarefas entre os membros do grupo e o acompanhamento da execução, conforme o exemplo abaixo.
@@ -81,6 +90,24 @@ Atualizado em: 21/04/2026
 | Gabriel Xavier de Souza    | Processo 1 - TO BE                  | 08/04/2026   | 22/04/2026 | ✔️ | 22/04/2026 |
 | Cristiano Tupynamba Reis   | Processo 1 - AS IS                  | 08/04/2026   | 22/04/2026 | ✔️ | 21/04/2026 |
 | Guilherme Setragni Freitas | Modelagem da situação atual         | 08/04/2026   | 22/04/2026 | ✔️ | 22/04/2026 |
+
+#### Sprint 3
+
+Atualizado em: 12/05/2026
+
+| Responsável   | Tarefa/Requisito | Iniciado em    | Prazo      | Status | Terminado em    |
+| :----         |    :----         |      :----:    | :----:     | :----: | :----:          |
+| Cristiano Tupynambá Reis   | BPMN — Processo 1 e 2 (AS-IS e TO-BE)            | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Diogo Lamera dos Santos    | Arquitetura da solução                           | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Diogo Lamera dos Santos    | Diagrama de classes                              | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Gabriel Xavier de Souza    | Jornada do usuário (modelo AIDA)                 | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Gabriel Santos Arpini      | User flow e diagramas de fluxo (Mermaid)         | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Gabriel Santos Arpini      | Tecnologias e hospedagem                         | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Guilherme Setragni Freitas | Modelo conceitual (DER em Peter Chen)            | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Guilherme Setragni Freitas | Modelo relacional (notação Pé de Galinha)        | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Guilherme Setragni Freitas | Modelo físico (DDL PostgreSQL em src/db)         | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Rafael Lucas Mota Oliveira | Wireframes e telas do sistema                    | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
+| Rafael Lucas Mota Oliveira | Apresentação (slides) da Sprint 3                | 29/04/2026 | 13/05/2026 | ✔️ | 12/05/2026 |
 
 Legenda:
 - ✔️: terminado

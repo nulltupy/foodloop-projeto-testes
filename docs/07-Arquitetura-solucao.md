@@ -214,7 +214,7 @@ Usuario (abstrata)
 - **status_pagamento**: `PENDENTE`, `APROVADO`, `RECUSADO`
 - **origem_cancelamento**: `CLIENTE`, `COMERCIANTE`, `SISTEMA`
 
-![Diagrama Entidade-Relacionamento (Peter Chen)](images/modelo_conceitual.PNG "Modelo conceitual do FoodLoop em notação Peter Chen.")
+![Diagrama Entidade-Relacionamento do FoodLoop em notação Peter Chen](images/modelo_conceitual.PNG "Modelo conceitual do FoodLoop em notação Peter Chen.")
 
 > **Links úteis**:
 > - [Notação de Peter Chen para modelagem conceitual de banco de dados](https://www.youtube.com/watch?v=_y31cFi_ByY)
@@ -247,7 +247,7 @@ O modelo lógico em notação Pé de Galinha (Crow's Foot) traduz o DER conceitu
 | `notificacao` | `id` | → `usuario` | — |
 | `preferencia_notificacao` | `id` | → `usuario` | `id_usuario` único (1:1) |
 
-![Modelo relacional do FoodLoop em notação Pé de Galinha](images/ModeloRelacional.png)
+![Modelo relacional do FoodLoop em notação Pé de Galinha (Crow's Foot)](images/ModeloRelacional.png "Modelo relacional do FoodLoop derivado do DER.")
 
 ### Modelo físico
 

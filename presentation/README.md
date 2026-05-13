@@ -7,7 +7,9 @@
 
 [Sprint 1 — FoodLoop: Tecnologia e Sustentabilidade contra o Desperdício de Alimentos](sprint1_foodloop.pdf)
 
-[Sprint 2 — FoodLoop: Tecnologia e Sustentabilidade contra o Desperdício de Alimentos](presentation/Sprint2_Foodlooppitch.pdf)
+[Sprint 2 — FoodLoop: Tecnologia e Sustentabilidade contra o Desperdício de Alimentos](Sprint2_Foodlooppitch%20.pdf)
+
+[Sprint 3 — FoodLoop: Tecnologia e Sustentabilidade contra o Desperdício de Alimentos](presentation_sprint_3.pdf)
 
 > **Links úteis**:
 > - [10 dicas de design para slides](https://rockcontent.com/blog/design-para-slides/)
