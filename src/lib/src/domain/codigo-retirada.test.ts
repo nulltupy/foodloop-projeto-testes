@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { gerarCodigoRetirada } from './codigo-retirada.js';
 import { calcularComissao } from './comissao.js';
 
-const PERMITIDOS = /^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]+$/;
+const PERMITIDOS = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]+$/;
+const PROIBIDOS = /[ILO01]/;
 
 describe('gerarCodigoRetirada', () => {
   it('default tem 8 caracteres', () => {
@@ -13,8 +14,12 @@ describe('gerarCodigoRetirada', () => {
     expect(gerarCodigoRetirada({ length: 12 })).toHaveLength(12);
   });
 
-  it('nunca gera caracteres ambíguos (I, O, L, 0, 1)', () => {
-    for (let i = 0; i < 1000; i++) expect(PERMITIDOS.test(gerarCodigoRetirada())).toBe(true);
+  it('nunca gera caracteres ambíguos (I, L, O, 0, 1)', () => {
+    for (let i = 0; i < 1000; i++) {
+      const codigo = gerarCodigoRetirada();
+      expect(PERMITIDOS.test(codigo)).toBe(true);
+      expect(PROIBIDOS.test(codigo)).toBe(false);
+    }
   });
 
   it('é determinístico com rng injetado', () => {

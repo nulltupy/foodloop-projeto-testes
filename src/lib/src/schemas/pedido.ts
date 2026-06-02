@@ -39,7 +39,7 @@ export const CriarPedidoRequestSchema = z.object({
 export type CriarPedidoRequest = z.infer<typeof CriarPedidoRequestSchema>;
 
 export const AtualizarStatusRequestSchema = z.object({
-  novoStatus: StatusPedidoSchema,
-  codigoRetirada: z.string().length(8).optional(),
+  novo_status: StatusPedidoSchema,
+  codigo_retirada: z.string().length(8).optional(),
 });
 export type AtualizarStatusRequest = z.infer<typeof AtualizarStatusRequestSchema>;

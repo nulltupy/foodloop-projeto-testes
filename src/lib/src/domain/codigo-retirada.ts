@@ -1,5 +1,5 @@
-// Alfabeto sem ambiguidades visuais (sem I, O, 0, 1, L).
-const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+// Alfabeto sem ambiguidades visuais (sem I, L, O, 0, 1).
+const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 export interface GerarCodigoRetiradaOpts {
   length?: number;
