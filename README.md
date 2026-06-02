@@ -55,6 +55,28 @@ O link e o usuário/senha descritos acima são apenas exemplos de como tais info
 
 * <a href="src/README.md">Código</a>
 
+## Como rodar localmente
+
+Pré-requisitos: Node 20 LTS (`nvm use` lê o `.nvmrc`), npm 10+, Postgres 16 via Docker (quando o setup de back chegar).
+
+```bash
+# Clonar e entrar
+git clone git@github.com:ICEI-PUC-Minas-PBE-SI-TI/2026-1-p5-tias-foodloop.git
+cd 2026-1-p5-tias-foodloop
+git checkout web-first-replan
+
+# Instalar todos os workspaces de uma vez
+npm install
+
+# Verificações por workspace
+npm run -w src/lib build       # gera dist/ do pacote portável
+npm run typecheck              # roda em todos os workspaces
+npm run lint                   # idem
+npm run test                   # idem
+```
+
+Os pacotes vivem em `src/back`, `src/front` e `src/lib` (este último contém código compartilhado entre back e front via `@foodloop/lib`).
+
 # Apresentação
 
 * <a href="presentation/README.md">Apresentação do projeto</a>

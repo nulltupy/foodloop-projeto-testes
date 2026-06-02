@@ -1,0 +1,21 @@
+{
+  "name": "foodloop",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "workspaces": [
+    "src/back",
+    "src/front",
+    "src/lib"
+  ],
+  "scripts": {
+    "lint": "npm run lint -ws --if-present",
+    "test": "npm run test -ws --if-present",
+    "typecheck": "npm run typecheck -ws --if-present",
+    "build": "npm run -w src/lib build && npm run -w src/back build && npm run -w src/front build",
+    "dev": "echo 'Rode npm run -w src/back dev e npm run -w src/front dev em terminais separados'"
+  }
+}
