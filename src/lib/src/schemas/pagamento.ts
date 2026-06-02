@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-export const FormaPagamentoSchema = z.enum(['PIX', 'CARTAO_CREDITO', 'CARTAO_DEBITO']);
+export const FormaPagamentoSchema = z.enum(['PIX', 'CARTAO_CREDITO']);
 export type FormaPagamento = z.infer<typeof FormaPagamentoSchema>;
 
-export const StatusPagamentoSchema = z.enum(['PENDENTE', 'APROVADO', 'RECUSADO', 'ESTORNADO']);
+export const StatusPagamentoSchema = z.enum(['PENDENTE', 'APROVADO', 'RECUSADO']);
 export type StatusPagamento = z.infer<typeof StatusPagamentoSchema>;
 
 export const PagamentoSchema = z.object({

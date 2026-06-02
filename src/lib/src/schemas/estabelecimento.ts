@@ -6,7 +6,6 @@ export const EstabelecimentoSchema = z.object({
   nome_fantasia: z.string().min(2).max(120),
   descricao: z.string().max(500).nullable().optional(),
   horario_funcionamento: z.string().max(120).nullable().optional(),
-  categoria: z.string().min(2).max(40).nullable().optional(),
   nota_media: z.number().min(0).max(5).nullable().optional(),
   ativo: z.boolean(),
   endereco: EnderecoSchema,
@@ -17,7 +16,6 @@ export const CreateEstabelecimentoRequestSchema = z.object({
   nome_fantasia: z.string().min(2).max(120),
   descricao: z.string().max(500).optional(),
   horario_funcionamento: z.string().max(120).optional(),
-  categoria: z.string().min(2).max(40).optional(),
   endereco: CreateEnderecoRequestSchema,
 });
 export type CreateEstabelecimentoRequest = z.infer<typeof CreateEstabelecimentoRequestSchema>;

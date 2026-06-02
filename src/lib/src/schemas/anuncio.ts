@@ -20,7 +20,6 @@ export const AnuncioListItemSchema = AnuncioSchema.extend({
   produto_nome: z.string(),
   produto_imagem: z.string().url().nullable().optional(),
   preco_regular: z.number().positive(),
-  estabelecimento_id: z.number().int().positive(),
   nome_fantasia: z.string(),
   nota_media: z.number().min(0).max(5).nullable().optional(),
   distancia_km: z.number().nonnegative(),
