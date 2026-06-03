@@ -1,0 +1,16 @@
+{
+  "name": "@foodloop/front",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'Setup completo virá no card de front'",
+    "build": "echo 'Setup completo virá no card de front'",
+    "lint": "echo 'eslint virá no card de front'",
+    "typecheck": "echo 'tsc virá no card de front'",
+    "test": "echo 'vitest virá no card de front'"
+  },
+  "dependencies": {
+    "@foodloop/lib": "*"
+  }
+}
