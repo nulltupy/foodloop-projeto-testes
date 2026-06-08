@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: foodloop
+      POSTGRES_PASSWORD: foodloop
+      POSTGRES_DB: foodloop_dev
+    ports:
+      - '5433:5432'
+    volumes:
+      - foodloop_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U foodloop -d foodloop_dev']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  foodloop_pg: {}
