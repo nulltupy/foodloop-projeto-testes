@@ -12,16 +12,16 @@ Além disso, o projeto busca incentivar práticas de consumo mais conscientes e 
 
 ## Integrantes
 
-* Cristiano Tupynambá Reis
-* Diogo Lamera dos Santos
-* Gabriel Xavier de souza
-* Gabriel Santos Arpini
-* Guilherme Setragni
-* Rafael Lucas Mota Oliveira
+- Cristiano Tupynambá Reis
+- Diogo Lamera dos Santos
+- Gabriel Xavier de souza
+- Gabriel Santos Arpini
+- Guilherme Setragni
+- Rafael Lucas Mota Oliveira
 
 ## Professor
 
-* Amália Soares Vieira de Vasconcelos
+- Amália Soares Vieira de Vasconcelos
 
 ## Instruções de utilização
 
@@ -53,7 +53,7 @@ O link e o usuário/senha descritos acima são apenas exemplos de como tais info
 
 # Código
 
-* <a href="src/README.md">Código</a>
+- <a href="src/README.md">Código</a>
 
 ## Como rodar localmente
 
@@ -63,7 +63,6 @@ Pré-requisitos: Node 20 LTS (`nvm use` lê o `.nvmrc`), npm 10+, Postgres 16 vi
 # Clonar e entrar
 git clone git@github.com:ICEI-PUC-Minas-PBE-SI-TI/2026-1-p5-tias-foodloop.git
 cd 2026-1-p5-tias-foodloop
-git checkout web-first-replan
 
 # Instalar todos os workspaces de uma vez
 npm install
@@ -79,4 +78,4 @@ Os pacotes vivem em `src/back`, `src/front` e `src/lib` (este último contém c�
 
 # Apresentação
 
-* <a href="presentation/README.md">Apresentação do projeto</a>
+- <a href="presentation/README.md">Apresentação do projeto</a>
