@@ -19,8 +19,9 @@ export const UpdateUsuarioRequestSchema = z
       .string()
       .regex(/^\+?[1-9]\d{1,14}$/)
       .optional(),
+    foto_url: z.string().url().max(255).optional(),
   })
-  .refine((d) => d.nome !== undefined || d.telefone !== undefined, {
+  .refine((d) => d.nome !== undefined || d.telefone !== undefined || d.foto_url !== undefined, {
     message: 'Pelo menos um campo deve ser fornecido',
   });
 export type UpdateUsuarioRequest = z.infer<typeof UpdateUsuarioRequestSchema>;
