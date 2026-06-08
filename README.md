@@ -57,7 +57,7 @@ O link e o usuário/senha descritos acima são apenas exemplos de como tais info
 
 ## Como rodar localmente
 
-Pré-requisitos: Node 20 LTS (`nvm use` lê o `.nvmrc`), npm 10+, Postgres 16 via Docker (quando o setup de back chegar).
+Pré-requisitos: Node 20 LTS (`nvm use` lê o `.nvmrc`), npm 10+, Docker (para o Postgres local).
 
 ```bash
 # Clonar e entrar
@@ -75,6 +75,26 @@ npm run test                   # idem
 ```
 
 Os pacotes vivem em `src/back`, `src/front` e `src/lib` (este último contém código compartilhado entre back e front via `@foodloop/lib`).
+
+### Subir o back com Postgres local
+
+```bash
+# 1. Subir o Postgres local (porta 5433 do host)
+docker compose -f docker-compose.dev.yml up -d
+
+# 2. Configurar variáveis de ambiente do back
+cp src/back/.env.example src/back/.env
+
+# 3. Aplicar as migrations no banco
+npx --prefix src/back prisma migrate deploy
+
+# 4. Rodar o back em modo dev (PORT padrão 3010)
+npm run -w src/back dev
+
+# 5. Verificar
+curl http://localhost:3010/health
+# esperado: {"status":"ok", ...}
+```
 
 # Apresentação
 

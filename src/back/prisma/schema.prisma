@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model anuncio {
+  id                    BigInt          @id @default(autoincrement())
+  id_produto            BigInt
+  id_estabelecimento    BigInt
+  preco_promocional     Decimal         @db.Decimal(10, 2)
+  quantidade_inicial    Int
+  quantidade_disponivel Int
+  quantidade_sobra      Int             @default(0)
+  prazo_retirada        DateTime        @db.Timestamp(6)
+  data_publicacao       DateTime        @default(now()) @db.Timestamp(6)
+  status                status_anuncio  @default(ATIVO)
+  estabelecimento       estabelecimento @relation(fields: [id_estabelecimento], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_anuncio_estabelecimento")
+  produto               produto         @relation(fields: [id_produto], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_anuncio_produto")
+  item_pedido           item_pedido[]
+
+  @@index([id_estabelecimento], map: "idx_anuncio_estabelecimento")
+  @@index([status], map: "idx_anuncio_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model avaliacao {
+  id                 BigInt          @id @default(autoincrement())
+  id_pedido          BigInt          @unique(map: "uq_avaliacao_pedido")
+  id_estabelecimento BigInt
+  nota               Int             @db.SmallInt
+  comentario         String?         @db.VarChar(500)
+  data_avaliacao     DateTime        @default(now()) @db.Timestamp(6)
+  estabelecimento    estabelecimento @relation(fields: [id_estabelecimento], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_avaliacao_estabelecimento")
+  pedido             pedido          @relation(fields: [id_pedido], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_avaliacao_pedido")
+
+  @@index([id_estabelecimento], map: "idx_avaliacao_estabelecimento")
+}
+
+model cliente {
+  id_usuario      BigInt   @id
+  latitude_atual  Decimal? @db.Decimal(10, 7)
+  longitude_atual Decimal? @db.Decimal(10, 7)
+  usuario         usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_cliente_usuario")
+  pedido          pedido[]
+}
+
+model comerciante {
+  id_usuario      BigInt           @id
+  cnpj            String           @unique(map: "uq_comerciante_cnpj") @db.Char(18)
+  usuario         usuario          @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_comerciante_usuario")
+  estabelecimento estabelecimento?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model device_token {
+  id            BigInt   @id @default(autoincrement())
+  id_usuario    BigInt
+  token         String   @unique(map: "uq_device_token") @db.VarChar(255)
+  plataforma    String   @db.VarChar(10)
+  data_registro DateTime @default(now()) @db.Timestamp(6)
+  usuario       usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_device_token_usuario")
+
+  @@index([id_usuario], map: "idx_device_token_usuario")
+}
+
+model endereco {
+  id              BigInt           @id @default(autoincrement())
+  rua             String           @db.VarChar(120)
+  numero          String           @db.VarChar(10)
+  bairro          String           @db.VarChar(60)
+  cidade          String           @db.VarChar(60)
+  estado          String           @db.Char(2)
+  cep             String           @db.Char(9)
+  latitude        Decimal          @db.Decimal(10, 7)
+  longitude       Decimal          @db.Decimal(10, 7)
+  estabelecimento estabelecimento?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model estabelecimento {
+  id                    BigInt      @id @default(autoincrement())
+  id_comerciante        BigInt      @unique(map: "uq_estab_comerciante")
+  id_endereco           BigInt      @unique(map: "uq_estab_endereco")
+  nome_fantasia         String      @db.VarChar(120)
+  descricao             String?
+  horario_funcionamento String?     @db.VarChar(120)
+  nota_media            Decimal     @default(0.00) @db.Decimal(3, 2)
+  logo_url              String?     @db.VarChar(255)
+  ativo                 Boolean     @default(true)
+  anuncio               anuncio[]
+  avaliacao             avaliacao[]
+  comerciante           comerciante @relation(fields: [id_comerciante], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction, map: "fk_estab_comerciante")
+  endereco              endereco    @relation(fields: [id_endereco], references: [id], onUpdate: NoAction, map: "fk_estab_endereco")
+  pedido                pedido[]
+  produto               produto[]
+
+  @@index([id_comerciante], map: "idx_estab_comerciante")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model item_pedido {
+  id             BigInt  @id @default(autoincrement())
+  id_pedido      BigInt
+  id_anuncio     BigInt
+  quantidade     Int
+  preco_unitario Decimal @db.Decimal(10, 2)
+  subtotal       Decimal @default(dbgenerated("((quantidade)::numeric * preco_unitario)")) @db.Decimal(10, 2)
+  anuncio        anuncio @relation(fields: [id_anuncio], references: [id], onUpdate: NoAction, map: "fk_item_anuncio")
+  pedido         pedido  @relation(fields: [id_pedido], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_item_pedido")
+
+  @@index([id_pedido], map: "idx_item_pedido")
+}
+
+model notificacao {
+  id         BigInt   @id @default(autoincrement())
+  id_usuario BigInt
+  titulo     String   @db.VarChar(120)
+  corpo      String
+  deep_link  String?  @db.VarChar(255)
+  lida       Boolean  @default(false)
+  data_envio DateTime @default(now()) @db.Timestamp(6)
+  usuario    usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notificacao_usuario")
+
+  @@index([id_usuario, lida], map: "idx_notificacao_lida")
+  @@index([id_usuario], map: "idx_notificacao_usuario")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model pagamento {
+  id               BigInt           @id @default(autoincrement())
+  id_pedido        BigInt           @unique(map: "uq_pagamento_pedido")
+  valor            Decimal          @db.Decimal(10, 2)
+  forma_pagamento  forma_pagamento
+  data_pagamento   DateTime         @default(now()) @db.Timestamp(6)
+  codigo_transacao String?          @db.VarChar(60)
+  status_pagamento status_pagamento @default(PENDENTE)
+  pedido           pedido           @relation(fields: [id_pedido], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pagamento_pedido")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model pedido {
+  id                  BigInt               @id @default(autoincrement())
+  id_cliente          BigInt
+  id_estabelecimento  BigInt
+  data_pedido         DateTime             @default(now()) @db.Timestamp(6)
+  valor_total         Decimal              @db.Decimal(10, 2)
+  taxa_comissao       Decimal              @default(0.00) @db.Decimal(5, 2)
+  valor_comissao      Decimal              @default(0.00) @db.Decimal(10, 2)
+  codigo_retirada     String               @unique(map: "uq_pedido_codigo_retirada") @db.VarChar(20)
+  status              status_pedido        @default(RECEBIDO)
+  cancelado_por       origem_cancelamento?
+  motivo_cancelamento String?
+  data_cancelamento   DateTime?            @db.Timestamp(6)
+  avaliacao           avaliacao?
+  item_pedido         item_pedido[]
+  pagamento           pagamento?
+  cliente             cliente              @relation(fields: [id_cliente], references: [id_usuario], onUpdate: NoAction, map: "fk_pedido_cliente")
+  estabelecimento     estabelecimento      @relation(fields: [id_estabelecimento], references: [id], onUpdate: NoAction, map: "fk_pedido_estabelecimento")
+
+  @@index([id_cliente], map: "idx_pedido_cliente")
+  @@index([id_estabelecimento], map: "idx_pedido_estabelecimento")
+  @@index([status], map: "idx_pedido_status")
+}
+
+model preferencia_notificacao {
+  id                      BigInt  @id @default(autoincrement())
+  id_usuario              BigInt  @unique(map: "uq_pref_usuario")
+  novos_anuncios_proximos Boolean @default(true)
+  status_pedido           Boolean @default(true)
+  promocoes               Boolean @default(true)
+  usuario                 usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pref_usuario")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model produto {
+  id                 BigInt          @id @default(autoincrement())
+  id_estabelecimento BigInt
+  nome               String          @db.VarChar(120)
+  descricao          String?
+  preco_regular      Decimal         @db.Decimal(10, 2)
+  categoria          String?         @db.VarChar(60)
+  imagem             String?         @db.VarChar(255)
+  ativo              Boolean         @default(true)
+  anuncio            anuncio[]
+  estabelecimento    estabelecimento @relation(fields: [id_estabelecimento], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_produto_estabelecimento")
+
+  @@index([id_estabelecimento], map: "idx_produto_estabelecimento")
+}
+
+model usuario {
+  id                      BigInt                   @id @default(autoincrement())
+  nome                    String                   @db.VarChar(120)
+  email                   String                   @unique(map: "uq_usuario_email") @db.VarChar(120)
+  senha_hash              String                   @db.VarChar(255)
+  telefone                String?                  @db.VarChar(20)
+  tipo                    tipo_usuario
+  foto_url                String?                  @db.VarChar(255)
+  data_cadastro           DateTime                 @default(now()) @db.Timestamp(6)
+  ativo                   Boolean                  @default(true)
+  cliente                 cliente?
+  comerciante             comerciante?
+  device_token            device_token[]
+  notificacao             notificacao[]
+  preferencia_notificacao preferencia_notificacao?
+
+  @@index([email], map: "idx_usuario_email")
+  @@index([tipo], map: "idx_usuario_tipo")
+}
+
+enum forma_pagamento {
+  CARTAO_CREDITO
+  PIX
+}
+
+enum origem_cancelamento {
+  CLIENTE
+  COMERCIANTE
+  SISTEMA
+}
+
+enum status_anuncio {
+  ATIVO
+  ENCERRADO_COM_RESERVA
+  ENCERRADO_COM_SOBRA
+}
+
+enum status_pagamento {
+  PENDENTE
+  APROVADO
+  RECUSADO
+}
+
+enum status_pedido {
+  RECEBIDO
+  EM_PREPARO
+  PRONTO_PARA_RETIRADA
+  RETIRADO
+  CANCELADO
+}
+
+enum tipo_usuario {
+  cliente
+  comerciante
+}
