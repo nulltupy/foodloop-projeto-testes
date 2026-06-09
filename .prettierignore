@@ -6,3 +6,4 @@ package-lock.json
 *.min.js
 *.min.css
 docs/superpowers
+src/front/public/mockServiceWorker.js
