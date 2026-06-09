@@ -1,0 +1,35 @@
+# Blueprint do back em Render Web Service Free.
+#
+# Render lê este arquivo quando um Blueprint é criado pelo painel. autoDeploy:
+# false porque os deploys vão via hook do CI (.github/workflows/deploy-back.yml),
+# o que dá controle de quando o serviço acorda do free tier sleep.
+#
+# As 3 envVars com `sync: false` precisam ser preenchidas no painel do Render
+# após criar o serviço:
+#   - DATABASE_URL: URL do Neon (sa-east-1), com ?sslmode=require
+#   - JWT_SECRET: gerar com `openssl rand -base64 32`
+#   - FRONT_URL: URL do front no Cloudflare Pages (definir após o deploy do front)
+#
+# region: oregon é a única opção free do Render. O RTT BR↔US-East/West é a maior
+# fonte de latência no MVP (refletido no SLO de p95 ≤ 1200ms no login).
+services:
+  - type: web
+    name: foodloop-back
+    runtime: node
+    plan: free
+    region: oregon
+    autoDeploy: false
+    healthCheckPath: /health
+    buildCommand: npm ci && npm run -w src/lib build && npm run -w src/back build
+    startCommand: npm run -w src/back start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONT_URL
+        sync: false
