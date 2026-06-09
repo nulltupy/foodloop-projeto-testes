@@ -26,8 +26,3 @@ export async function disconnectDb(): Promise<void> {
   await prisma.$disconnect();
   logger.info('database connection closed');
 }
-
-// Garante que a conexão é fechada quando o processo termina.
-process.on('beforeExit', () => {
-  void disconnectDb();
-});

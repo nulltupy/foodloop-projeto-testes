@@ -78,8 +78,20 @@ curl -sI https://foodloop-front.onrender.com/rota-inexistente | head -3   # SPA 
 ### Instruções de utilização
 
 Cadastre um usuário via `POST /api/v1/auth/register` (ou pela tela de cadastro
-do front quando disponível) e use as credenciais retornadas para autenticar
-nos endpoints subsequentes.
+do front) e use as credenciais retornadas para autenticar nos endpoints
+subsequentes.
+
+#### Contas demo (após rodar `npm run -w src/back seed`)
+
+Senha de todos: `demo1234`.
+
+| Tipo        | Email                                                                                                                                                                                                                                        |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cliente     | `cliente1@demo.foodloop`, `cliente2@demo.foodloop`, `cliente3@demo.foodloop`                                                                                                                                                                 |
+| Comerciante | `comerciante1@demo.foodloop` (Couto Lanches), `comerciante2@demo.foodloop` (Padaria Pão Quente), `comerciante3@demo.foodloop` (Sabor Caseiro), `comerciante4@demo.foodloop` (Açaí da Praça), `comerciante5@demo.foodloop` (Bistrô do Bairro) |
+
+O seed apaga e recria todo o dado de demo a cada execução (`TRUNCATE … CASCADE`),
+então rodar é idempotente — usar com cuidado em ambientes compartilhados.
 
 # Documentação
 
