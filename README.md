@@ -133,7 +133,7 @@ Workflows em `.github/workflows/`:
 
 - Bucket R2 chamado `foodloop-backups` (referenciado em `db-backup.yml`). Precisa ser criado manualmente no painel do Cloudflare antes do primeiro `pg_dump` rodar.
 
-**Environment `production`** (Settings → Environments) deve ter: required reviewers, branch restriction para `main`, prevent self-review habilitado, wait timer de 5 min.
+**Environment `production`** (Settings → Environments). O script `setup-branch-protection.sh` configura automaticamente: branch restriction para `main`, prevent self-review e wait timer de 5 min. Falta apenas adicionar **required reviewers** manualmente (a API exige user IDs numéricos; mais simples pelo painel).
 
 ### Branch protection em `main`
 
