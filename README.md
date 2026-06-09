@@ -111,6 +111,26 @@ npm run -w src/front dev
 
 Detalhes do front (scripts, layout, stack) em [`src/front/README.md`](src/front/README.md).
 
+## CI/CD
+
+Workflows em `.github/workflows/`:
+
+| Arquivo           | Quando roda                                           | O que faz                                                                                                                                                    |
+| ----------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ci.yml`          | PR + push em `main`                                   | Detecta diffs por path; roda lint+test+build dos workspaces afetados em paralelo; converge em `ci-success` (único check obrigatório para branch protection). |
+| `deploy-back.yml` | Push em `main` afetando `src/back/**` ou `src/lib/**` | Aciona o deploy hook do Render. Pula se o secret `RENDER_BACK_DEPLOY_HOOK` ainda não estiver configurado.                                                    |
+| `keep-alive.yml`  | Cron a cada 10 min, 20-02 UTC (17h-23h BR)            | Pinga `/health` para combater cold start. Pula se `vars.BACK_HEALTH_URL` ainda não estiver setado.                                                           |
+| `db-backup.yml`   | Cron 04 UTC (01h BR)                                  | `pg_dump` da prod, upload para R2. Falha cedo se algum secret estiver faltando.                                                                              |
+| `db-migrate.yml`  | `workflow_dispatch` manual                            | Aplica `prisma migrate deploy` em prod. Exige digitar `MIGRATE` como input e passa por `environment: production` (required reviewers).                       |
+| `e2e.yml`         | `workflow_dispatch` manual                            | Stub até o card de Playwright entrar. `on.schedule` está comentado.                                                                                          |
+
+**Secrets/variables que o maintainer precisa configurar** (Settings → Secrets and variables → Actions):
+
+- Secrets: `RENDER_BACK_DEPLOY_HOOK`, `PROD_DATABASE_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`.
+- Variables: `BACK_HEALTH_URL`, `FRONT_BASE_URL`.
+
+**Environment `production`** (Settings → Environments) deve ter: required reviewers, branch restriction para `main`, prevent self-review habilitado, wait timer de 5 min.
+
 # Apresentação
 
 - <a href="presentation/README.md">Apresentação do projeto</a>
