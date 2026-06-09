@@ -1,18 +1,22 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { App } from './App';
+import { useAuthStore } from '../features/auth/store';
+
+beforeEach(() => {
+  useAuthStore.setState({ usuario: null, token: null });
+  localStorage.clear();
+});
 
 describe('App shell', () => {
-  it('renders the placeholder heading on /', () => {
+  it('redireciona para o login ao acessar / sem sessão', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <App />
       </MemoryRouter>,
     );
-    const heading = screen.getByRole('heading', { name: /foodloop/i });
-    expect(heading).toBeInTheDocument();
-    expect(heading.className).toMatch(/text-brand-700/);
+    expect(screen.getByRole('heading', { name: /entrar/i })).toBeInTheDocument();
   });
 
   it('imports @foodloop/lib without throwing', async () => {
