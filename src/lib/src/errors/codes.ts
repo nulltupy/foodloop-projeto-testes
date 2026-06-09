@@ -1,7 +1,7 @@
 // Códigos de erro padronizados; consumidos por back, front e MSW.
 export const ErrorCode = {
-  EMAIL_JA_REGISTRADO: 'EMAIL_JA_REGISTRADO',
-  CNPJ_JA_REGISTRADO: 'CNPJ_JA_REGISTRADO',
+  // Cadastro duplicado é único pra prevenir enumeração de email/CNPJ via diff de códigos.
+  CADASTRO_DUPLICADO: 'CADASTRO_DUPLICADO',
   CREDENCIAIS_INVALIDAS: 'CREDENCIAIS_INVALIDAS',
   TOKEN_INVALIDO: 'TOKEN_INVALIDO',
   PERMISSAO_NEGADA: 'PERMISSAO_NEGADA',

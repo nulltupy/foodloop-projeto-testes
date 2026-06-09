@@ -1,64 +1,46 @@
 import 'dotenv/config';
 
-import { randomUUID } from 'node:crypto';
-
-import cors from 'cors';
-import express from 'express';
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
-import pinoHttp from 'pino-http';
-
-import { connectDb, prisma } from './db/client.js';
-import { errorHandler } from './shared/errors.js';
+import { buildApp } from './app.js';
+import { connectDb, disconnectDb } from './db/client.js';
+import './shared/config/auth.js'; // validação de JWT_SECRET no boot
 import { logger } from './shared/logger.js';
-import { coldStartMiddleware } from './shared/middlewares/coldStart.js';
-
-const app = express();
-
-// Atrás de load balancer (Render, etc.): confiar no X-Forwarded-For do primeiro
-// proxy — sem isso o express-rate-limit vê só o IP do LB e throttla todos juntos.
-app.set('trust proxy', 1);
-
-app.use(helmet({ hsts: { maxAge: 31_536_000 } }));
-app.use(cors({ origin: process.env.FRONT_URL || 'http://localhost:5173' }));
-app.use(express.json({ limit: '1mb' }));
-app.use(
-  pinoHttp({
-    logger,
-    genReqId: () => randomUUID(),
-    redact: ['req.headers.authorization', 'req.body.senha', 'req.body.password'],
-  }),
-);
-app.use(coldStartMiddleware);
-
-// /health fica antes do rate limit para uptime monitors não consumirem o budget
-// de requisições reais.
-app.get('/health', async (_req, res) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    res.json({
-      status: 'ok',
-      uptime: process.uptime(),
-      version: process.env.npm_package_version ?? '0.0.0',
-    });
-  } catch {
-    res.status(503).json({ status: 'degraded' });
-  }
-});
-
-app.use(rateLimit({ windowMs: 60_000, limit: 60 }));
-
-// Roteadores das features são montados aqui (auth, estabelecimentos, anuncios, pedidos...).
-
-app.use(errorHandler);
 
 const port = Number(process.env.PORT ?? 3000);
 
 void connectDb()
   .then(() => {
-    app.listen(port, () => {
+    const app = buildApp();
+    const server = app.listen(port, () => {
       logger.info({ port }, 'FoodLoop back rodando');
     });
+
+    // Graceful shutdown: fechar o servidor HTTP (deixa requests em voo terminarem)
+    // antes de derrubar a conexão com o banco.
+    const shutdown = (signal: string) => {
+      logger.info({ signal }, 'shutdown iniciado');
+      server.close((err) => {
+        if (err) {
+          logger.error({ err }, 'erro ao fechar servidor HTTP');
+        }
+        void disconnectDb()
+          .catch((dbErr: unknown) => {
+            logger.error({ err: dbErr }, 'erro ao fechar conexão com o banco');
+          })
+          .finally(() => {
+            process.exit(err ? 1 : 0);
+          });
+      });
+
+      // Timeout duro: se em 10s não fechou, mata o processo. Render/K8s geralmente
+      // dão ~15s antes de SIGKILL, então 10s deixa margem pro orquestrador.
+      setTimeout(() => {
+        logger.warn('shutdown timeout — forçando saída');
+        process.exit(1);
+      }, 10_000).unref();
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
   })
   .catch((err: unknown) => {
     logger.error({ err }, 'falha ao iniciar back');
