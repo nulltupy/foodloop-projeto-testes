@@ -172,7 +172,7 @@ git commit -m "chore(front): tsconfig extending root base"
 - [ ] **Step 1: `vite.config.ts`**
 
 ```ts
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -187,7 +187,7 @@ export default defineConfig({
 });
 ```
 
-`strictPort: true` makes the dev server fail loudly if 5173 is taken instead of silently shifting to 5174 — easier to debug.
+`strictPort: true` makes the dev server fail loudly if 5173 is taken instead of silently shifting to 5174 — easier to debug. `defineConfig` comes from `vitest/config` (not `vite`) so the `test` field is recognised; the export type still satisfies `vite build`.
 
 - [ ] **Step 2: `tailwind.config.ts`**
 
