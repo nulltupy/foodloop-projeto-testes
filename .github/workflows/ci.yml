@@ -82,11 +82,13 @@ jobs:
         with: { node-version: '20', cache: 'npm' }
       - run: npm ci --workspaces --include-workspace-root
       - run: npm run -w src/lib build
+      # Generate Prisma client BEFORE typecheck/lint — src/back/src/db/client.ts
+      # imports from the generated client; without this, tsc errors TS2307.
+      - run: npm run -w src/back prisma:generate
       - run: npm run -w src/back lint
       - run: npm run -w src/back typecheck
-      - run: npm run -w src/back prisma:generate
       - run: npm run -w src/back prisma:migrate:deploy
-      - run: npm run -w src/back test -- --coverage --no-file-parallelism
+      - run: npm run -w src/back test -- --coverage
       - run: npm run -w src/back build
 
   front:
@@ -112,9 +114,37 @@ jobs:
       - name: Verifica que jobs necessários passaram
         run: |
           set -e
-          for r in "${{ needs.detect.result }}" "${{ needs.lib.result }}" "${{ needs.back.result }}" "${{ needs.front.result }}"; do
-            if [ "$r" = "failure" ] || [ "$r" = "cancelled" ]; then
-              echo "Algum job falhou: $r"; exit 1
+
+          if [ "${{ needs.detect.result }}" != "success" ]; then
+            echo "Job detect terminou em ${{ needs.detect.result }}"
+            exit 1
+          fi
+
+          WF="${{ needs.detect.outputs.workflows }}"
+
+          check() {
+            local name="$1" detect_out="$2" result="$3"
+            local needed=false
+            if [ "$detect_out" = "true" ] || [ "$WF" = "true" ]; then
+              needed=true
             fi
-          done
+            case "$result" in
+              success) ;;
+              skipped)
+                if [ "$needed" = "true" ]; then
+                  echo "Job $name era necessário (detect=$detect_out, workflows=$WF) mas foi pulado"
+                  exit 1
+                fi
+                ;;
+              *)
+                echo "Job $name terminou em $result"
+                exit 1
+                ;;
+            esac
+          }
+
+          check lib   "${{ needs.detect.outputs.lib }}"   "${{ needs.lib.result }}"
+          check back  "${{ needs.detect.outputs.back }}"  "${{ needs.back.result }}"
+          check front "${{ needs.detect.outputs.front }}" "${{ needs.front.result }}"
+
           echo "OK"
