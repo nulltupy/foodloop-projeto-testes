@@ -69,3 +69,8 @@ src/front/
 - **React 19, não 18.** Prisma 7 do back puxa `react@19` que sobe ao hoist do monorepo. Front também usa 19 para evitar duplicidade no jsdom dos testes.
 - **Tailwind v3.** Plan B do card mencionava v4; a v3 mantém a config previsível com `postcss-load-config`.
 - **Sem MSW ainda.** A flag `VITE_USE_MSW` já existe no `.env.example` mas o handler entra em card próprio.
+
+## Segurança — trade-offs conhecidos
+
+- **JWT em `localStorage`.** `src/lib/api.ts` lê e escreve o token em `localStorage['foodloop:token']`. Isso é exposto a XSS por design — `HttpOnly` cookies não são uma opção enquanto front e back vivem em domínios diferentes (Vercel + Render). Mitigação fica para o endurecimento de auth + CSP no pós-MVP.
+- **`vitest --ui` é proibido.** A versão `vitest@^2.1.2` carrega o advisory crítico GHSA-5xrq-8626-4rwp (servidor UI lê/executa arquivos arbitrários). O script `test` roda em modo `vitest run` (sem servidor), então não há exposição. Não use `--ui` localmente até subirmos para `vitest@^3.2.6`.
