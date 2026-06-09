@@ -323,7 +323,7 @@ Na fase de desejo, o usuário compara preços, avaliações, localização e pro
 
 Por fim, no pós-uso, o consumidor avalia a experiência, compartilha sua opinião e pode reutilizar a plataforma futuramente, fortalecendo a fidelização e incentivando práticas de consumo mais sustentáveis. Dessa forma, a jornada demonstra como o FoodLoop busca unir tecnologia, economia e redução do desperdício de alimentos em uma experiência simples e acessível para os usuários.
 
-![Exemplo Jornada de Usuario](images/JornadadoUsuario.jpg)
+![Exemplo Jornada de Usuario](images/jordanadeusuario.png)
 
 
 ## Interface do sistema
