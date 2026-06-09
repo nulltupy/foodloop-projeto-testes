@@ -23,15 +23,37 @@ Além disso, o projeto busca incentivar práticas de consumo mais conscientes e 
 
 - Amália Soares Vieira de Vasconcelos
 
-## Instruções de utilização
+## Deployments
 
-Assim que a primeira versão do sistema estiver disponível, deverá complementar com as instruções de utilização. Descreva como instalar eventuais dependências e como executar a aplicação.
+| Componente | URL                                                              |
+| ---------- | ---------------------------------------------------------------- |
+| Back (API) | _pendente provisionamento do Render Web Service_                 |
+| Health     | _pendente; ficará em `<back-url>/health` quando o serviço subir_ |
+| Front      | _pendente provisionamento do Cloudflare Pages_                   |
 
-Não deixe de informar o link onde a aplicação estará disponível para acesso (por exemplo: https://adota-pet.herokuapp.com/src/index.html).
+> O back vai pra Render Web Service Free na região `oregon` (única opção do tier
+> gratuito). O serviço hiberna após 15 minutos sem requisições — a primeira
+> chamada após hibernação tem cold start de ~30 s.
 
-Se houver usuário de teste, o login e a senha também deverão ser informados aqui (por exemplo: usuário - admin / senha - admin).
+### Deploy do back
 
-O link e o usuário/senha descritos acima são apenas exemplos de como tais informações deverão ser apresentadas.
+O deploy é declarativo via [`render.yaml`](./render.yaml) na raiz e disparado
+pelo CI (`.github/workflows/deploy-back.yml`) sempre que um commit em `main`
+toca `src/back/**` ou `src/lib/**`. O workflow chama o Deploy Hook do Render
+(secret `RENDER_BACK_DEPLOY_HOOK`); se o secret não estiver configurado, o
+workflow falha-soft e segue em frente.
+
+Para disparar um deploy manual:
+
+```bash
+curl -fsSL -X POST "$RENDER_BACK_DEPLOY_HOOK"
+```
+
+### Instruções de utilização
+
+Cadastre um usuário via `POST /api/v1/auth/register` (ou pela tela de cadastro
+do front quando disponível) e use as credenciais retornadas para autenticar
+nos endpoints subsequentes.
 
 # Documentação
 
