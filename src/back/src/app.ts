@@ -1,16 +1,23 @@
 import { randomUUID } from 'node:crypto';
 
+import { ErrorCode } from '@foodloop/lib';
 import cors from 'cors';
-import express, { type Express } from 'express';
+import express, { type Express, type RequestHandler } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 
 import { prisma } from './db/client.js';
-import { authRouter } from './modules/auth/controller.js';
-import { errorHandler } from './shared/errors.js';
+import { createAuthRouter } from './modules/auth/controller.js';
+import { errorHandler, HttpError } from './shared/errors.js';
 import { logger } from './shared/logger.js';
 import { coldStartMiddleware } from './shared/middlewares/coldStart.js';
+
+// Mesmo motivo do handler dentro do controller: 429 precisa ser JSON e atravessar
+// o errorHandler, senão clientes recebem text/html e o log perde requestId.
+const globalRateLimitHandler: RequestHandler = (_req, _res, next) => {
+  next(new HttpError(429, ErrorCode.RATE_LIMIT, 'Limite de requisições excedido.'));
+};
 
 export function buildApp(): Express {
   const app = express();
@@ -52,9 +59,17 @@ export function buildApp(): Express {
     }
   });
 
-  app.use(rateLimit({ windowMs: 60_000, limit: 60 }));
+  app.use(
+    rateLimit({
+      windowMs: 60_000,
+      limit: 60,
+      standardHeaders: true,
+      legacyHeaders: false,
+      handler: globalRateLimitHandler,
+    }),
+  );
 
-  app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1/auth', createAuthRouter());
 
   app.use(errorHandler);
 

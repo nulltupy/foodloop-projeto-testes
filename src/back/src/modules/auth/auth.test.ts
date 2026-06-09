@@ -1,7 +1,8 @@
 import { ErrorCode } from '@foodloop/lib';
 import bcrypt from 'bcryptjs';
+import type { Express } from 'express';
 import request from 'supertest';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { buildApp } from '../../app.js';
 import { prisma } from '../../db/client.js';
@@ -113,5 +114,119 @@ describe('POST /api/v1/auth/register', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe(ErrorCode.VALIDACAO);
+  });
+});
+
+describe('POST /api/v1/auth/login', () => {
+  // App fresco por teste: cada buildApp() cria limiters novos, então o teste de
+  // 429 não polui os outros e nenhum teste sofre com contagem residual.
+  let appLogin: Express;
+  beforeEach(() => {
+    appLogin = buildApp();
+  });
+
+  it('login válido retorna 200 com token decodificável', async () => {
+    await request(appLogin).post('/api/v1/auth/register').send(clienteValido).expect(201);
+
+    const res = await request(appLogin)
+      .post('/api/v1/auth/login')
+      .send({ email: clienteValido.email, senha: clienteValido.senha });
+
+    expect(res.status).toBe(200);
+    expect(res.body.usuario).toMatchObject({
+      nome: clienteValido.nome,
+      email: clienteValido.email,
+      tipo: 'cliente',
+    });
+    const decoded = verifyAccessToken(res.body.token);
+    expect(decoded.sub).toBe(String(res.body.usuario.id));
+    expect(decoded.tipo).toBe('cliente');
+    expect(decoded.exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
+  });
+
+  it('senha errada retorna 401 CREDENCIAIS_INVALIDAS', async () => {
+    await request(appLogin).post('/api/v1/auth/register').send(clienteValido).expect(201);
+
+    const res = await request(appLogin)
+      .post('/api/v1/auth/login')
+      .send({ email: clienteValido.email, senha: 'senha-errada-123' });
+
+    expect(res.status).toBe(401);
+    expect(res.body.error.code).toBe(ErrorCode.CREDENCIAIS_INVALIDAS);
+    expect(res.body.error.message).toBe('Email ou senha inválidos');
+    expect(typeof res.body.error.requestId).toBe('string');
+  });
+
+  it('email inexistente retorna 401 CREDENCIAIS_INVALIDAS com mesma forma', async () => {
+    // Sem cadastrar nada antes: o usuário não existe.
+    const inexistente = await request(appLogin)
+      .post('/api/v1/auth/login')
+      .send({ email: 'nao-existe@teste.com', senha: 'senha-forte-123' });
+
+    expect(inexistente.status).toBe(401);
+    expect(inexistente.body.error.code).toBe(ErrorCode.CREDENCIAIS_INVALIDAS);
+    expect(inexistente.body.error.message).toBe('Email ou senha inválidos');
+    expect(typeof inexistente.body.error.requestId).toBe('string');
+
+    // Compara contra senha-errada num usuário existente: o shape (modulo
+    // requestId) deve ser idêntico — qualquer diff vira oráculo de enumeração.
+    await request(appLogin).post('/api/v1/auth/register').send(clienteValido).expect(201);
+    const senhaErrada = await request(appLogin)
+      .post('/api/v1/auth/login')
+      .send({ email: clienteValido.email, senha: 'senha-errada-123' });
+
+    expect(senhaErrada.status).toBe(inexistente.status);
+
+    // Comparação estrutural: chaves de `error` idênticas E payload byte-equal
+    // após zerar o requestId (único campo que legitimamente difere).
+    const normalize = (b: { error: Record<string, unknown> }) => ({
+      ...b,
+      error: { ...b.error, requestId: '<rid>' },
+    });
+    expect(Object.keys(senhaErrada.body.error).sort()).toEqual(Object.keys(inexistente.body.error).sort());
+    expect(normalize(senhaErrada.body)).toEqual(normalize(inexistente.body));
+  });
+
+  it('6ª tentativa em 1 min do mesmo IP retorna 429 com headers ratelimit', async () => {
+    await request(appLogin).post('/api/v1/auth/register').send(clienteValido).expect(201);
+
+    const tentativaInvalida = () =>
+      request(appLogin)
+        .post('/api/v1/auth/login')
+        .send({ email: clienteValido.email, senha: 'senha-errada-123' });
+
+    for (let i = 0; i < 5; i++) {
+      const r = await tentativaInvalida();
+      expect(r.status).toBe(401);
+    }
+    const sexta = await tentativaInvalida();
+    expect(sexta.status).toBe(429);
+    expect(sexta.body.error.code).toBe(ErrorCode.RATE_LIMIT);
+    expect(typeof sexta.body.error.requestId).toBe('string');
+    // standardHeaders: true expõe ratelimit-* + retry-after; clientes educados
+    // dependem desses headers pra back off em vez de retry imediato.
+    expect(sexta.headers['ratelimit-limit']).toBe('5');
+    expect(sexta.headers['retry-after']).toBeDefined();
+  });
+
+  it('payload inválido (sem senha) retorna 400 VALIDACAO', async () => {
+    const res = await request(appLogin).post('/api/v1/auth/login').send({ email: clienteValido.email });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe(ErrorCode.VALIDACAO);
+    expect(res.body.error.details?.fields).toContain('senha');
+    expect(typeof res.body.error.requestId).toBe('string');
+  });
+
+  it('nunca devolve senha nem senha_hash na resposta de sucesso', async () => {
+    await request(appLogin).post('/api/v1/auth/register').send(clienteValido).expect(201);
+    const res = await request(appLogin)
+      .post('/api/v1/auth/login')
+      .send({ email: clienteValido.email, senha: clienteValido.senha })
+      .expect(200);
+
+    const body = JSON.stringify(res.body);
+    expect(body).not.toContain('senha_hash');
+    expect(body).not.toContain(clienteValido.senha);
   });
 });
