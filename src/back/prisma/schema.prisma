@@ -1,6 +1,9 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider             = "prisma-client"
+  output               = "../src/generated/prisma"
+  // Sem isso, Prisma 7 emite imports extensionless (`from './enums'`) que
+  // o tsx aceita em dev mas o Node ESM strict rejeita em prod.
+  importFileExtension  = "js"
 }
 
 datasource db {
