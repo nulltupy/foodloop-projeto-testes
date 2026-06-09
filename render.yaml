@@ -8,7 +8,7 @@
 # após criar o serviço:
 #   - DATABASE_URL: URL do Neon (sa-east-1), com ?sslmode=require
 #   - JWT_SECRET: gerar com `openssl rand -base64 32`
-#   - FRONT_URL: URL do front no Cloudflare Pages (definir após o deploy do front)
+#   - FRONT_URL: URL do front (https://foodloop-front.onrender.com) — definir após o primeiro deploy do front
 #
 # region: oregon é a única opção free do Render. O RTT BR↔US-East/West é a maior
 # fonte de latência no MVP (refletido no SLO de p95 ≤ 1200ms no login).
@@ -37,3 +37,40 @@ services:
         sync: false
       - key: FRONT_URL
         sync: false
+
+  # Static site do front. Static sites são globalmente distribuídos (CDN) e não
+  # têm cold start nem campo `region:`. As envVars VITE_* são lidas pelo Vite no
+  # buildCommand e inlinadas no bundle — não são segredos (qualquer visitante vê
+  # o VITE_API_URL no JS).
+  - type: web
+    name: foodloop-front
+    runtime: static
+    plan: free
+    branch: main
+    # autoDeployTrigger:commit substitui o `autoDeploy: true` (deprecated). Cada
+    # commit no `branch` dispara build, restrito pelo `buildFilter` abaixo para
+    # evitar rebuild em mudanças que não afetam o front.
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - src/front/**
+        - src/lib/**
+        - render.yaml
+        - package.json
+        - package-lock.json
+    # --include=dev força devDependencies (vite, tsc, @vitejs/plugin-react).
+    # Mesmo motivo do back: Render roda npm ci com NODE_ENV=production por padrão.
+    buildCommand: npm ci --include=dev && npm run -w src/lib build && npm run -w src/front build
+    staticPublishPath: ./src/front/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://foodloop-back.onrender.com
+      - key: VITE_USE_MSW
+        value: 'false'
+    # SPA fallback: qualquer rota não-arquivo cai em /index.html para o React
+    # Router resolver client-side. Render só aplica a regra quando NÃO existe
+    # um asset no path — então /assets/foo.js continua sendo servido direto.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -25,15 +25,16 @@ Além disso, o projeto busca incentivar práticas de consumo mais conscientes e 
 
 ## Deployments
 
-| Componente | URL                                            |
-| ---------- | ---------------------------------------------- |
-| Back (API) | https://foodloop-back.onrender.com             |
-| Health     | https://foodloop-back.onrender.com/health      |
-| Front      | _pendente provisionamento do Cloudflare Pages_ |
+| Componente | URL                                       |
+| ---------- | ----------------------------------------- |
+| Back (API) | https://foodloop-back.onrender.com        |
+| Health     | https://foodloop-back.onrender.com/health |
+| Front      | https://foodloop-front.onrender.com       |
 
-> O back vai pra Render Web Service Free na região `oregon` (única opção do tier
-> gratuito). O serviço hiberna após 15 minutos sem requisições — a primeira
-> chamada após hibernação tem cold start de ~30 s.
+> O back roda no Render Free em `oregon` (única opção do tier gratuito) e
+> hiberna após 15 min sem requisições — a primeira chamada após hibernação
+> tem cold start de ~30 s. O front é Static Site distribuído via CDN global
+> e não tem cold start (sem servidor).
 
 ### Deploy do back
 
@@ -47,6 +48,31 @@ Para disparar um deploy manual:
 
 ```bash
 curl -fsSL -X POST "$RENDER_BACK_DEPLOY_HOOK"
+```
+
+### Deploy do front
+
+O front é um Render Static Site declarado no mesmo [`render.yaml`](./render.yaml).
+Reaproveita a integração GitHub já autorizada pela organização — sem novo app,
+sem token de API, sem secret no GitHub Actions. Build e publicação rodam direto
+no Render (`autoDeployTrigger: commit` + `buildFilter`); cada commit em `main`
+que toque `src/front/**`, `src/lib/**`, `render.yaml`, `package.json` ou
+`package-lock.json` dispara um redeploy automático.
+
+Setup único (na primeira vez que o Blueprint subir):
+
+1. Render dashboard → Blueprints → `foodloop` → **Sync** (lê o `render.yaml` da
+   `main` e cria o serviço `foodloop-front`). Se o Blueprint ainda não existir,
+   criar via New → Blueprint apontando para este repo.
+2. Aguardar o primeiro build em `foodloop-front` → Logs (~2–3 min).
+3. Atualizar a env `FRONT_URL` em `foodloop-back` → Environment para
+   `https://foodloop-front.onrender.com` e salvar (o back redeploya sozinho).
+
+Smoke test:
+
+```bash
+curl -sI https://foodloop-front.onrender.com | head -3
+curl -sI https://foodloop-front.onrender.com/rota-inexistente | head -3   # SPA fallback → 200
 ```
 
 ### Instruções de utilização
