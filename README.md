@@ -25,11 +25,11 @@ Além disso, o projeto busca incentivar práticas de consumo mais conscientes e 
 
 ## Deployments
 
-| Componente | URL                                                              |
-| ---------- | ---------------------------------------------------------------- |
-| Back (API) | _pendente provisionamento do Render Web Service_                 |
-| Health     | _pendente; ficará em `<back-url>/health` quando o serviço subir_ |
-| Front      | _pendente provisionamento do Cloudflare Pages_                   |
+| Componente | URL                                            |
+| ---------- | ---------------------------------------------- |
+| Back (API) | https://foodloop-back.onrender.com             |
+| Health     | https://foodloop-back.onrender.com/health      |
+| Front      | _pendente provisionamento do Cloudflare Pages_ |
 
 > O back vai pra Render Web Service Free na região `oregon` (única opção do tier
 > gratuito). O serviço hiberna após 15 minutos sem requisições — a primeira
