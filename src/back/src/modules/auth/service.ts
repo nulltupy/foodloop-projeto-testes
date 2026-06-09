@@ -1,4 +1,4 @@
-import { type AuthResponse, ErrorCode, type RegisterRequest } from '@foodloop/lib';
+import { type AuthResponse, ErrorCode, type LoginRequest, type RegisterRequest } from '@foodloop/lib';
 import bcrypt from 'bcryptjs';
 
 import { prisma } from '../../db/client.js';
@@ -53,6 +53,34 @@ export async function registrar(input: RegisterRequest): Promise<AuthResponse> {
       throw new HttpError(409, ErrorCode.CADASTRO_DUPLICADO, 'Cadastro duplicado');
     }
     throw err;
+  }
+
+  const token = signAccessToken({ sub: usuario.id.toString(), tipo: usuario.tipo });
+
+  return {
+    usuario: {
+      id: Number(usuario.id),
+      nome: usuario.nome,
+      email: usuario.email,
+      tipo: usuario.tipo,
+    },
+    token,
+  };
+}
+
+export async function autenticar(input: LoginRequest): Promise<AuthResponse> {
+  // select explícito para limitar blast radius: novas colunas em `usuario` não
+  // entram automaticamente em logs/erros que possam derivar daqui.
+  const usuario = await prisma.usuario.findUnique({
+    where: { email: input.email },
+    select: { id: true, nome: true, email: true, tipo: true, senha_hash: true },
+  });
+  // Uma única ramificação de falha: email inexistente e senha errada compartilham
+  // mesmo status, mesmo code e mesma mensagem. Diferenciá-los abre user enumeration.
+  // TODO: paridade de timing (dummy bcrypt.compare no path !usuario) está deferida
+  // — mesma decisão do cadastro, pra não regredir contra um alvo ainda não atingido.
+  if (!usuario || !(await bcrypt.compare(input.senha, usuario.senha_hash))) {
+    throw new HttpError(401, ErrorCode.CREDENCIAIS_INVALIDAS, 'Email ou senha inválidos');
   }
 
   const token = signAccessToken({ sub: usuario.id.toString(), tipo: usuario.tipo });
