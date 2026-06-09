@@ -14,6 +14,10 @@ Processo de gestão de sobras ao final do expediente — destinação dos salgad
 Processo de avaliação do estabelecimento pelo cliente — como a reputação é construída hoje, via Google.
 
 
+![Modelo BPMN do PROCESSO 1](../docs/images/Processo1AS-IS.png)
+
+![Modelo BPMN do Processo 2](../docs/images/Processo2AS-IS.png)
+
 ## Descrição geral da proposta (Modelagem TO BE)
 
 A partir dos gargalos identificados nos modelos AS-IS — a dependência exclusiva do canal presencial para venda, a inexistência de mecanismo de escoamento para os produtos excedentes no fim do expediente e a ausência de vínculo entre a experiência de compra e a avaliação do estabelecimento — a proposta do FoodLoop consiste em uma plataforma mobile que digitaliza e integra essas três dimensões.
@@ -44,6 +48,10 @@ A proposta alinha-se ao objetivo extensionista de redução do desperdício de a
 - Transação digital com retirada agendada;
 - Avaliação e reputação interna dos estabelecimentos;
 - Geração de indicadores de desperdício evitado e de receita incremental proveniente de anúncios.
+
+  ![Diagrama TO-BE do Processo 1](/docs/images/Processo1TO-BE.png)
+
+  ![Diagrama TO-BE do Processo 2](/docs/images/Processo2TO-BE.png)
 
 
 ## Modelagem dos processos
