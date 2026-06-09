@@ -6,7 +6,9 @@
 
 **Architecture:** Workspace package `@foodloop/front` (already declared in root `package.json` workspaces). React 18 + React Router v6 + TanStack Query + Zustand for state, axios via `@foodloop/lib`'s `createApiClient`, Tailwind v3 for styling, Vitest + Testing Library for tests. No MSW, no auth screens, no PWA — those land in later cards.
 
-**Tech Stack:** Vite 5, React 18, TypeScript 5, react-router-dom 6, @tanstack/react-query 5, zustand 4, axios (transitive via `@foodloop/lib`), react-hook-form + @hookform/resolvers + zod, Tailwind 3, Vitest + @testing-library/react + jsdom.
+**Tech Stack:** Vite 5, React 19, TypeScript 5, react-router-dom 6, @tanstack/react-query 5, zustand 4, axios (transitive via `@foodloop/lib`), react-hook-form + @hookform/resolvers + zod, Tailwind 3, Vitest + @testing-library/react + jsdom.
+
+> **Why React 19 and not 18?** Prisma 7's `@prisma/studio-core` (a transitive of the back workspace) pulls in `react@19` at the monorepo root. npm hoists it, so `@testing-library/react` resolves to the hoisted 19 even if the front pins 18 — causing a runtime "React from older version" crash in jsdom. Aligning the front on 19 is the path of least resistance.
 
 ## Reality checks vs. card text
 
@@ -82,8 +84,8 @@ Write `src/front/package.json`:
     "@foodloop/lib": "*",
     "@hookform/resolvers": "^3.9.0",
     "@tanstack/react-query": "^5.59.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-hook-form": "^7.53.0",
     "react-router-dom": "^6.27.0",
     "zod": "^3.23.0",
@@ -93,8 +95,8 @@ Write `src/front/package.json`:
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
     "jsdom": "^25.0.1",
