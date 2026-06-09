@@ -96,6 +96,21 @@ curl http://localhost:3010/health
 # esperado: {"status":"ok", ...}
 ```
 
+### Subir o front
+
+```bash
+# 1. Build inicial do pacote portável (gera dist/ que o front consome)
+npm run -w src/lib build
+
+# 2. (Opcional) sobrescrever a URL do back
+cp src/front/.env.example src/front/.env
+
+# 3. Dev server em http://localhost:5173
+npm run -w src/front dev
+```
+
+Detalhes do front (scripts, layout, stack) em [`src/front/README.md`](src/front/README.md).
+
 # Apresentação
 
 - <a href="presentation/README.md">Apresentação do projeto</a>
