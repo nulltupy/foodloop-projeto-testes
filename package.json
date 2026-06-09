@@ -20,7 +20,7 @@
     "typecheck": "npm run typecheck -ws --if-present",
     "build": "npm run -w src/lib build && npm run -w src/back build && npm run -w src/front build",
     "dev": "echo 'Rode npm run -w src/back dev e npm run -w src/front dev em terminais separados'",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs}": [

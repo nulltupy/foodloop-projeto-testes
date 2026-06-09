@@ -20,7 +20,11 @@ services:
     region: oregon
     autoDeploy: false
     healthCheckPath: /health
-    buildCommand: npm ci && npm run -w src/lib build && npm run -w src/back build
+    # --include=dev força a instalação de devDependencies (tsc, prisma CLI),
+    # necessárias pra build. Sem isso, NODE_ENV=production faz npm pular devDeps
+    # e o build quebra. O `node_modules` final fica maior, mas o free tier não
+    # cobra por isso e o startCommand só usa o `dist/` compilado.
+    buildCommand: npm ci --include=dev && npm run -w src/lib build && npm run -w src/back build
     startCommand: npm run -w src/back start
     envVars:
       - key: NODE_ENV
