@@ -3,9 +3,16 @@ import { TipoUsuarioSchema } from './comum.js';
 
 export const RegisterRequestSchema = z
   .object({
-    nome: z.string().min(2).max(120),
-    email: z.string().email().toLowerCase(),
-    senha: z.string().min(8).max(128),
+    nome: z.string().trim().min(2).max(120),
+    email: z.string().trim().toLowerCase().email(),
+    // 72 = limite real do bcrypt em bytes (UTF-8). Caracteres acentuados ocupam
+    // 2 bytes — checar bytes, não chars, senão truncamos silenciosamente.
+    senha: z
+      .string()
+      .min(8)
+      .refine((s) => new TextEncoder().encode(s).length <= 72, {
+        message: 'Senha excede 72 bytes (limite do bcrypt)',
+      }),
     telefone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Telefone em formato E.164'),
     tipo: TipoUsuarioSchema,
     cnpj: z
