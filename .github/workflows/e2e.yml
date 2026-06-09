@@ -1,0 +1,37 @@
+name: E2E
+on:
+  # Re-enable schedule when the real Playwright script lands so the nightly run
+  # exercises the deployed front:
+  # schedule: [{ cron: '0 6 * * *' }]    # 03h BR
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - name: Stub until Playwright lands
+        run: |
+          echo "Playwright + 'npm run e2e' script will be added by a later card."
+          echo "Workflow stays in the repo so workflow_dispatch is wired ahead of time."
+          exit 0
+      # Reactivate the cache + the real run when the front gets an e2e script:
+      # - name: Cache Playwright
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.cache/ms-playwright
+      #     key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      # - run: npx playwright install --with-deps chromium
+      # - name: Run e2e
+      #   env:
+      #     BASE_URL: ${{ vars.FRONT_BASE_URL }}
+      #   run: npm run e2e
+      # - uses: actions/upload-artifact@v4
+      #   if: always()
+      #   with: { name: playwright-report, path: playwright-report/ }

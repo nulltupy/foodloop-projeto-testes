@@ -1,0 +1,42 @@
+name: DB Backup
+on:
+  schedule: [{ cron: '0 4 * * *' }] # 01h BR
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install postgresql-client (aws CLI is preinstalled)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: Guard — require secrets
+        env:
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        run: |
+          for v in PROD_DATABASE_URL R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT; do
+            if [ -z "${!v}" ]; then echo "$v not set; aborting backup"; exit 1; fi
+          done
+      - name: pg_dump
+        env:
+          DB_URL: ${{ secrets.PROD_DATABASE_URL }}
+        run: pg_dump "$DB_URL" --no-owner --format=c -f backup.dump
+      - name: Upload to R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        run: |
+          aws s3 cp backup.dump \
+            "s3://foodloop-backups/$(date -u +%Y-%m-%d)/foodloop.dump" \
+            --endpoint-url "$R2_ENDPOINT"

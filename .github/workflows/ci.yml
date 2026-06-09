@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      back: ${{ steps.filter.outputs.back }}
+      front: ${{ steps.filter.outputs.front }}
+      lib: ${{ steps.filter.outputs.lib }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            lib:
+              - 'src/lib/**'
+              - 'package-lock.json'
+              - 'package.json'
+            back:
+              - 'src/back/**'
+              - 'src/lib/**'
+              - 'package-lock.json'
+            front:
+              - 'src/front/**'
+              - 'src/lib/**'
+              - 'package-lock.json'
+            workflows:
+              - '.github/workflows/**'
+
+  lib:
+    needs: detect
+    if: needs.detect.outputs.lib == 'true' || needs.detect.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci --workspaces --include-workspace-root
+      - run: npm run -w src/lib lint
+      - run: npm run -w src/lib test -- --coverage
+      - run: npm run -w src/lib build
+
+  back:
+    needs: detect
+    if: needs.detect.outputs.back == 'true' || needs.detect.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: foodloop
+          POSTGRES_PASSWORD: foodloop
+          POSTGRES_DB: foodloop_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U foodloop -d foodloop_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://foodloop:foodloop@localhost:5432/foodloop_test
+      NODE_ENV: test
+      JWT_SECRET: test-secret-do-not-use-in-prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci --workspaces --include-workspace-root
+      - run: npm run -w src/lib build
+      - run: npm run -w src/back lint
+      - run: npm run -w src/back typecheck
+      - run: npm run -w src/back prisma:generate
+      - run: npm run -w src/back prisma:migrate:deploy
+      - run: npm run -w src/back test -- --coverage --no-file-parallelism
+      - run: npm run -w src/back build
+
+  front:
+    needs: detect
+    if: needs.detect.outputs.front == 'true' || needs.detect.outputs.workflows == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci --workspaces --include-workspace-root
+      - run: npm run -w src/lib build
+      - run: npm run -w src/front lint
+      - run: npm run -w src/front typecheck
+      - run: npm run -w src/front test -- --coverage
+      - run: npm run -w src/front build
+
+  ci-success:
+    needs: [detect, lib, back, front]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verifica que jobs necessários passaram
+        run: |
+          set -e
+          for r in "${{ needs.detect.result }}" "${{ needs.lib.result }}" "${{ needs.back.result }}" "${{ needs.front.result }}"; do
+            if [ "$r" = "failure" ] || [ "$r" = "cancelled" ]; then
+              echo "Algum job falhou: $r"; exit 1
+            fi
+          done
+          echo "OK"

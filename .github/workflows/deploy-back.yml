@@ -1,0 +1,22 @@
+name: Deploy Back
+on:
+  push:
+    branches: [main]
+    paths: ['src/back/**', 'src/lib/**']
+
+permissions: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          HOOK: ${{ secrets.RENDER_BACK_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "Deploy hook not configured yet — skipping. Set the secret when the back deploy service is provisioned."
+            exit 0
+          fi
+          curl -fsSL -X POST "$HOOK"
