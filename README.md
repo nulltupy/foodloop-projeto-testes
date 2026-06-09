@@ -115,14 +115,14 @@ Detalhes do front (scripts, layout, stack) em [`src/front/README.md`](src/front/
 
 Workflows em `.github/workflows/`:
 
-| Arquivo           | Quando roda                                           | O que faz                                                                                                                                                                                                                                 |
-| ----------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ci.yml`          | PR + push em `main`                                   | Detecta diffs por path; roda lint+test+build dos workspaces afetados em paralelo; converge em `ci-success` — o check designado para ser o único `required check` em branch protection (a regra em si será configurada em um card futuro). |
-| `deploy-back.yml` | Push em `main` afetando `src/back/**` ou `src/lib/**` | Aciona o deploy hook do Render. Pula se o secret `RENDER_BACK_DEPLOY_HOOK` ainda não estiver configurado.                                                                                                                                 |
-| `keep-alive.yml`  | Cron a cada 10 min, 20-02 UTC (17h-23h BR)            | Pinga `/health` para combater cold start. Pula se `vars.BACK_HEALTH_URL` ainda não estiver setado.                                                                                                                                        |
-| `db-backup.yml`   | Cron 04 UTC (01h BR)                                  | `pg_dump` da prod, upload para R2. Falha cedo se algum secret estiver faltando.                                                                                                                                                           |
-| `db-migrate.yml`  | `workflow_dispatch` manual                            | Aplica `prisma migrate deploy` em prod. Exige digitar `MIGRATE` como input e passa por `environment: production` (required reviewers).                                                                                                    |
-| `e2e.yml`         | `workflow_dispatch` manual                            | Stub até o card de Playwright entrar. `on.schedule` está comentado.                                                                                                                                                                       |
+| Arquivo           | Quando roda                                           | O que faz                                                                                                                                                 |
+| ----------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`          | PR + push em `main`                                   | Detecta diffs por path; roda lint+test+build dos workspaces afetados em paralelo; converge em `ci-success` — único `required check` em branch protection. |
+| `deploy-back.yml` | Push em `main` afetando `src/back/**` ou `src/lib/**` | Aciona o deploy hook do Render. Pula se o secret `RENDER_BACK_DEPLOY_HOOK` ainda não estiver configurado.                                                 |
+| `keep-alive.yml`  | Cron a cada 10 min, 20-02 UTC (17h-23h BR)            | Pinga `/health` para combater cold start. Pula se `vars.BACK_HEALTH_URL` ainda não estiver setado.                                                        |
+| `db-backup.yml`   | Cron 04 UTC (01h BR)                                  | `pg_dump` da prod, upload para R2. Falha cedo se algum secret estiver faltando.                                                                           |
+| `db-migrate.yml`  | `workflow_dispatch` manual                            | Aplica `prisma migrate deploy` em prod. Exige digitar `MIGRATE` como input e passa por `environment: production` (required reviewers).                    |
+| `e2e.yml`         | `workflow_dispatch` manual                            | Stub até o card de Playwright entrar. `on.schedule` está comentado.                                                                                       |
 
 **Secrets/variables que o maintainer precisa configurar** (Settings → Secrets and variables → Actions):
 
@@ -133,7 +133,25 @@ Workflows em `.github/workflows/`:
 
 - Bucket R2 chamado `foodloop-backups` (referenciado em `db-backup.yml`). Precisa ser criado manualmente no painel do Cloudflare antes do primeiro `pg_dump` rodar.
 
-**Environment `production`** (Settings → Environments) deve ter: required reviewers, branch restriction para `main`, prevent self-review habilitado, wait timer de 5 min.
+**Environment `production`** (Settings → Environments). O script `setup-branch-protection.sh` configura automaticamente: branch restriction para `main`, prevent self-review e wait timer de 5 min. Falta apenas adicionar **required reviewers** manualmente (a API exige user IDs numéricos; mais simples pelo painel).
+
+### Branch protection em `main`
+
+Regras aplicadas (script idempotente em [`.github/scripts/setup-branch-protection.sh`](.github/scripts/setup-branch-protection.sh)):
+
+- PR obrigatório com 1 approval; aprovações são descartadas em novo push.
+- `ci-success` precisa estar verde para mergear.
+- Branch precisa estar atualizada com `main` antes do merge.
+- Todas as conversas no PR têm que estar resolvidas.
+- Histórico linear (apenas squash merge habilitado no repo); merge commits e rebase merges desabilitados.
+- Force push e deletion bloqueados.
+- Branch da feature é deletada automaticamente após o merge.
+
+Reaplicar (precisa de token admin via `gh auth login`):
+
+```bash
+bash .github/scripts/setup-branch-protection.sh
+```
 
 # Apresentação
 
