@@ -9,6 +9,7 @@ import pinoHttp from 'pino-http';
 
 import { prisma } from './db/client.js';
 import { createAuthRouter } from './modules/auth/controller.js';
+import { createUsuariosRouter } from './modules/usuarios/controller.js';
 import { errorHandler, HttpError } from './shared/errors.js';
 import { logger } from './shared/logger.js';
 import { coldStartMiddleware } from './shared/middlewares/coldStart.js';
@@ -70,6 +71,7 @@ export function buildApp(): Express {
   );
 
   app.use('/api/v1/auth', createAuthRouter());
+  app.use('/api/v1/usuarios', createUsuariosRouter());
 
   app.use(errorHandler);
 
