@@ -57,9 +57,11 @@ src/front/
 └── src/
     ├── main.tsx          # React root + providers (Router, Query)
     ├── index.css         # @tailwind directives
-    ├── app/App.tsx       # rotas (placeholder em `/`)
+    ├── app/
+    │   ├── App.tsx       # rotas (placeholder em `/`)
+    │   └── App.test.tsx  # smoke: render do `/` + import do @foodloop/lib
     ├── lib/api.ts        # createApiClient + setApiClient do @foodloop/lib
-    └── test/             # vitest setup + smoke tests
+    └── test/setup.ts     # @testing-library/jest-dom matchers (vitest setupFiles)
 ```
 
 `src/lib/api.ts` é importado por efeito colateral em `main.tsx` antes do `<App />` para garantir que o cliente HTTP esteja registrado quando os componentes montarem.
