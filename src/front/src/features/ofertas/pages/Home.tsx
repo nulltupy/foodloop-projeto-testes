@@ -5,7 +5,9 @@ import { api } from '@foodloop/lib';
 import type { AnuncioListItem, ListarAnunciosQuery } from '@foodloop/lib';
 import { useGeoCoords } from '../hooks/useGeoCoords';
 
-const CENTRO_SP = { latitude: -23.55, longitude: -46.63 };
+// Centro de Betim/MG — fallback fixo enquanto não existe input de CEP +
+// proxy de geocoding. Os dados do seed de demonstração estão todos em Betim.
+const CENTRO_BETIM = { latitude: -19.954, longitude: -44.199 };
 const RAIOS = [1, 3, 5, 10];
 const CATEGORIAS = ['Padaria', 'Lanche', 'Refeição', 'Doce', 'Bebida', 'Hortifruti'];
 
@@ -67,14 +69,14 @@ export function Home() {
       {erro && !coords && (
         <div className="mt-4 rounded-lg border border-surface-200 bg-white p-4">
           <p className="text-sm text-ink-700">
-            Não conseguimos acessar sua localização. Use o centro de São Paulo para ver ofertas.
+            Não conseguimos acessar sua localização. Use o centro de Betim/MG para ver ofertas.
           </p>
           <button
             type="button"
-            onClick={() => definirManual(CENTRO_SP)}
+            onClick={() => definirManual(CENTRO_BETIM)}
             className="mt-3 min-h-11 rounded-lg bg-brand-500 px-4 font-medium text-white"
           >
-            Usar centro de São Paulo
+            Usar centro de Betim
           </button>
         </div>
       )}
