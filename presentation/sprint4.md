@@ -150,27 +150,30 @@ style: |
   }
   section.product {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
+    grid-template-columns: 0.7fr 1.3fr;
+    gap: 40px;
     align-items: center;
   }
-  section.product .text h2 { font-size: 40px; margin-bottom: 16px; }
+  section.product .text h2 { font-size: 34px; margin-bottom: 16px; }
+  section.product .text ul { font-size: 22px; }
   section.product .shot {
     background: #fff;
     border: 1px solid var(--line);
-    border-radius: 18px;
+    border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 24px 60px -20px rgba(15,22,17,0.18);
-    aspect-ratio: 9 / 16;
-    max-height: 580px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 8px;
   }
   section.product .shot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-width: 100%;
+    max-height: 820px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
   }
   section.product .shot .placeholder {
     color: var(--muted);
