@@ -182,6 +182,7 @@ Workflows em `.github/workflows/`:
 | `keep-alive.yml`  | Cron a cada 10 min, 20-02 UTC (17h-23h BR)            | Pinga `/health` para combater cold start. Pula se `vars.BACK_HEALTH_URL` ainda não estiver setado.                                                        |
 | `db-backup.yml`   | Cron 04 UTC (01h BR)                                  | `pg_dump` da prod, upload para R2. Falha cedo se algum secret estiver faltando.                                                                           |
 | `db-migrate.yml`  | `workflow_dispatch` manual                            | Aplica `prisma migrate deploy` em prod. Exige digitar `MIGRATE` como input e passa por `environment: production` (required reviewers).                    |
+| `seed-prod.yml`   | `workflow_dispatch` manual                            | Roda `npm run -w src/back seed` contra `PROD_DATABASE_URL`. Exige digitar `SEED` como input. Apaga e recria todos os dados de demo (TRUNCATE CASCADE).    |
 | `e2e.yml`         | `workflow_dispatch` manual                            | Stub até o card de Playwright entrar. `on.schedule` está comentado.                                                                                       |
 
 **Secrets/variables que o maintainer precisa configurar** (Settings → Secrets and variables → Actions):
