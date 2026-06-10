@@ -13,6 +13,7 @@ import { createAuthRouter } from './modules/auth/controller.js';
 import { createEstabelecimentosRouter } from './modules/estabelecimentos/controller.js';
 import { createPedidosRouter } from './modules/pedidos/controller.js';
 import { createUsuariosRouter } from './modules/usuarios/controller.js';
+import { createProdutosRouter } from './modules/produtos/controller.js';
 import { errorHandler, HttpError } from './shared/errors.js';
 import { logger } from './shared/logger.js';
 import { coldStartMiddleware } from './shared/middlewares/coldStart.js';
@@ -76,6 +77,7 @@ export function buildApp(): Express {
   app.use('/api/v1/auth', createAuthRouter());
   app.use('/api/v1/usuarios', createUsuariosRouter());
   app.use('/api/v1/anuncios', createAnunciosRouter());
+  app.use('/api/v1/produtos', createProdutosRouter());
   app.use('/api/v1/estabelecimentos', createEstabelecimentosRouter());
   app.use('/api/v1/pedidos', createPedidosRouter());
 

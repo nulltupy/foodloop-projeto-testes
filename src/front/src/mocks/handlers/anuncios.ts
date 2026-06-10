@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { ErrorCode, ListarAnunciosQuerySchema } from '@foodloop/lib';
+import { CreateAnuncioRequestSchema, ErrorCode, ListarAnunciosQuerySchema } from '@foodloop/lib';
 import type { Anuncio, AnuncioListItem } from '@foodloop/lib';
 import { db, distanciaKm, usuarioPorAuth } from '../db';
 
@@ -36,6 +36,35 @@ export const anunciosHandlers = [
     }
     const meus = db.anuncios.filter((a) => a.id_estabelecimento === usuario.id_estabelecimento);
     return HttpResponse.json(meus);
+  }),
+
+  // Criação pelo comerciante (paridade com POST /api/v1/anuncios do back).
+  http.post('/api/v1/anuncios', async ({ request }) => {
+    const usuario = usuarioPorAuth(request.headers.get('Authorization'));
+    if (!usuario || usuario.tipo !== 'comerciante' || !usuario.id_estabelecimento) {
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Acesso restrito ao comerciante', 403);
+    }
+    const parsed = CreateAnuncioRequestSchema.safeParse(await request.json());
+    if (!parsed.success) return erro(ErrorCode.VALIDACAO, 'Dados inválidos', 400);
+
+    const produto = db.produtos.find((p) => p.id === parsed.data.id_produto);
+    if (!produto) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Produto não encontrado', 404);
+    if (produto.id_estabelecimento !== usuario.id_estabelecimento) {
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Produto não é seu', 403);
+    }
+
+    const novo: Anuncio = {
+      id: (db.anuncios.at(-1)?.id ?? 0) + 1,
+      id_produto: parsed.data.id_produto,
+      id_estabelecimento: usuario.id_estabelecimento,
+      preco_promocional: parsed.data.preco_promocional,
+      quantidade_inicial: parsed.data.quantidade_inicial,
+      quantidade_disponivel: parsed.data.quantidade_inicial,
+      prazo_retirada: parsed.data.prazo_retirada,
+      status: 'ATIVO',
+    };
+    db.anuncios.push(novo);
+    return HttpResponse.json(novo, { status: 201 });
   }),
 
   // Listagem geo (cliente).

@@ -19,6 +19,11 @@ export async function listarMeus(): Promise<Produto[]> {
   return ProdutoListSchema.parse(r.data);
 }
 
+export async function listarPublicos(): Promise<Produto[]> {
+  const r = await getApiClient().get('/api/v1/produtos/publicos');
+  return ProdutoListSchema.parse(r.data);
+}
+
 export async function atualizar(id: number, data: UpdateProdutoRequest): Promise<Produto> {
   const r = await getApiClient().patch(`/api/v1/produtos/${id}`, data);
   return ProdutoSchema.parse(r.data);

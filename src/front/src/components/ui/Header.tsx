@@ -50,6 +50,19 @@ export function Header() {
             >
               <p className="font-medium text-ink-900">{usuario.nome}</p>
               <p className="truncate text-sm text-ink-500">{usuario.email}</p>
+
+              {usuario.tipo === 'comerciante' && (
+                <nav className="mt-3 flex flex-col gap-1 border-t border-surface-200 pt-3">
+                  <Link
+                    to="/comerciante"
+                    onClick={() => setAberto(false)}
+                    className="rounded-md px-2 py-2 text-sm text-ink-700 hover:bg-surface-100"
+                  >
+                    Meus anúncios
+                  </Link>
+                </nav>
+              )}
+
               <button
                 type="button"
                 onClick={sair}

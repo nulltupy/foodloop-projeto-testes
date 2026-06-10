@@ -1,5 +1,8 @@
+import { type Anuncio, type CreateAnuncioRequest, ErrorCode } from '@foodloop/lib';
+
 import { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
+import { HttpError } from '../../shared/errors.js';
 
 export const TAMANHO_PAGINA = 20;
 
@@ -128,9 +131,16 @@ async function contarProximos(params: ListarParams): Promise<number> {
   return Number(result[0]?.total ?? 0n);
 }
 
-export async function getById(id: number) {
-  const a = await prisma.anuncio.findUnique({ where: { id: BigInt(id) } });
-  if (!a) return null;
+function shapeAnuncio(a: {
+  id: bigint;
+  id_produto: bigint;
+  id_estabelecimento: bigint;
+  preco_promocional: Prisma.Decimal;
+  quantidade_inicial: number;
+  quantidade_disponivel: number;
+  prazo_retirada: Date;
+  status: 'ATIVO' | 'ENCERRADO_COM_SOBRA' | 'ENCERRADO_COM_RESERVA';
+}): Anuncio {
   return {
     id: Number(a.id),
     id_produto: Number(a.id_produto),
@@ -141,4 +151,57 @@ export async function getById(id: number) {
     prazo_retirada: a.prazo_retirada.toISOString(),
     status: a.status,
   };
+}
+
+export async function listarMeus(userId: number): Promise<Anuncio[]> {
+  const estab = await prisma.estabelecimento.findFirst({
+    where: { id_comerciante: BigInt(userId) },
+    select: { id: true },
+  });
+  if (!estab) return [];
+  const lista = await prisma.anuncio.findMany({
+    where: { id_estabelecimento: estab.id },
+    orderBy: { id: 'desc' },
+  });
+  return lista.map(shapeAnuncio);
+}
+
+export async function criar(input: CreateAnuncioRequest, userId: number): Promise<Anuncio> {
+  const estab = await prisma.estabelecimento.findFirst({
+    where: { id_comerciante: BigInt(userId) },
+    select: { id: true },
+  });
+  if (!estab) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Estabelecimento não encontrado');
+  }
+
+  const produto = await prisma.produto.findUnique({
+    where: { id: BigInt(input.id_produto) },
+    select: { id_estabelecimento: true },
+  });
+  if (!produto) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Produto não encontrado');
+  }
+  if (produto.id_estabelecimento !== estab.id) {
+    throw new HttpError(403, ErrorCode.PERMISSAO_NEGADA, 'Produto não pertence ao seu estabelecimento');
+  }
+
+  const novo = await prisma.anuncio.create({
+    data: {
+      id_produto: BigInt(input.id_produto),
+      id_estabelecimento: estab.id,
+      preco_promocional: input.preco_promocional,
+      quantidade_inicial: input.quantidade_inicial,
+      quantidade_disponivel: input.quantidade_inicial,
+      prazo_retirada: new Date(input.prazo_retirada),
+      status: 'ATIVO',
+    },
+  });
+  return shapeAnuncio(novo);
+}
+
+export async function getById(id: number) {
+  const a = await prisma.anuncio.findUnique({ where: { id: BigInt(id) } });
+  if (!a) return null;
+  return shapeAnuncio(a);
 }

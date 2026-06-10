@@ -1,7 +1,8 @@
-import { ErrorCode, ListarAnunciosQuerySchema } from '@foodloop/lib';
+import { CreateAnuncioRequestSchema, ErrorCode, ListarAnunciosQuerySchema } from '@foodloop/lib';
 import { Router } from 'express';
 
 import { HttpError } from '../../shared/errors.js';
+import { requireAuth, requireRole } from '../../shared/middlewares/auth.js';
 
 import * as service from './service.js';
 
@@ -17,6 +18,29 @@ export function createAnunciosRouter(): Router {
       }
       const resposta = await service.listarProximos(parsed.data);
       res.json(resposta);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  // Antes de '/:id' pra "meus" não ser capturado como id.
+  router.get('/meus', requireAuth, requireRole('comerciante'), async (req, res, next) => {
+    try {
+      res.json(await service.listarMeus(req.usuario!.id));
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.post('/', requireAuth, requireRole('comerciante'), async (req, res, next) => {
+    try {
+      const parsed = CreateAnuncioRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const fields = Object.keys(parsed.error.flatten().fieldErrors);
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Payload inválido', { fields });
+      }
+      const novo = await service.criar(parsed.data, req.usuario!.id);
+      res.status(201).json(novo);
     } catch (e) {
       next(e);
     }
