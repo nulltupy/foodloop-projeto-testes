@@ -127,3 +127,18 @@ async function contarProximos(params: ListarParams): Promise<number> {
 
   return Number(result[0]?.total ?? 0n);
 }
+
+export async function getById(id: number) {
+  const a = await prisma.anuncio.findUnique({ where: { id: BigInt(id) } });
+  if (!a) return null;
+  return {
+    id: Number(a.id),
+    id_produto: Number(a.id_produto),
+    id_estabelecimento: Number(a.id_estabelecimento),
+    preco_promocional: Number(a.preco_promocional),
+    quantidade_inicial: a.quantidade_inicial,
+    quantidade_disponivel: a.quantidade_disponivel,
+    prazo_retirada: a.prazo_retirada.toISOString(),
+    status: a.status,
+  };
+}

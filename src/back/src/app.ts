@@ -10,6 +10,7 @@ import pinoHttp from 'pino-http';
 import { prisma } from './db/client.js';
 import { createAnunciosRouter } from './modules/anuncios/controller.js';
 import { createAuthRouter } from './modules/auth/controller.js';
+import { createEstabelecimentosRouter } from './modules/estabelecimentos/controller.js';
 import { createUsuariosRouter } from './modules/usuarios/controller.js';
 import { errorHandler, HttpError } from './shared/errors.js';
 import { logger } from './shared/logger.js';
@@ -74,6 +75,7 @@ export function buildApp(): Express {
   app.use('/api/v1/auth', createAuthRouter());
   app.use('/api/v1/usuarios', createUsuariosRouter());
   app.use('/api/v1/anuncios', createAnunciosRouter());
+  app.use('/api/v1/estabelecimentos', createEstabelecimentosRouter());
 
   app.use(errorHandler);
 

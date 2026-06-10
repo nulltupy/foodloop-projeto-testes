@@ -22,5 +22,21 @@ export function createAnunciosRouter(): Router {
     }
   });
 
+  router.get('/:id', async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
+      }
+      const anuncio = await service.getById(id);
+      if (!anuncio) {
+        throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Anúncio não encontrado');
+      }
+      res.json(anuncio);
+    } catch (e) {
+      next(e);
+    }
+  });
+
   return router;
 }
