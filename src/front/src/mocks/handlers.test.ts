@@ -65,10 +65,11 @@ describe('MSW handlers', () => {
     it('lista filtrada por geo retorna itens ordenados por distância', async () => {
       const r = await getJson('/api/v1/anuncios?lat=-23.55&lng=-46.63&raio_km=50');
       expect(r.status).toBe(200);
-      expect(Array.isArray(r.body)).toBe(true);
-      expect(r.body.length).toBeGreaterThan(0);
+      expect(Array.isArray(r.body.data)).toBe(true);
+      expect(r.body.data.length).toBeGreaterThan(0);
+      expect(r.body.meta).toMatchObject({ pagina: 1, total: expect.any(Number) });
 
-      const distancias: number[] = r.body.map((x: { distancia_km: number }) => x.distancia_km);
+      const distancias: number[] = r.body.data.map((x: { distancia_km: number }) => x.distancia_km);
       const ordenado = [...distancias].sort((a, b) => a - b);
       expect(distancias).toEqual(ordenado);
       for (const d of distancias) expect(d).toBeLessThanOrEqual(50);
@@ -94,7 +95,7 @@ describe('MSW handlers', () => {
       const token: string = login.body.token;
 
       const lista = await getJson('/api/v1/anuncios?lat=-23.55&lng=-46.63&raio_km=50');
-      const anuncio = lista.body[0];
+      const anuncio = lista.body.data[0];
 
       const criado = await postJson(
         '/api/v1/pedidos',

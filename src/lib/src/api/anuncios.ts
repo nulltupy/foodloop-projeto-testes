@@ -10,12 +10,17 @@ import {
 } from '../schemas/anuncio.js';
 import { z } from 'zod';
 
-const AnuncioListSchema = z.array(AnuncioListItemSchema);
+// Resposta da listagem geo vem envelopada em { data, meta } por causa da
+// paginação. Só os itens interessam pra UI da home — o meta é descartado.
+const AnuncioListResponseSchema = z.object({
+  data: z.array(AnuncioListItemSchema),
+  meta: z.object({ pagina: z.number(), tamanho: z.number(), total: z.number() }),
+});
 const AnuncioMineListSchema = z.array(AnuncioSchema);
 
 export async function listar(query: ListarAnunciosQuery): Promise<AnuncioListItem[]> {
   const r = await getApiClient().get('/api/v1/anuncios', { params: query });
-  return AnuncioListSchema.parse(r.data);
+  return AnuncioListResponseSchema.parse(r.data).data;
 }
 
 export async function listarMeus(): Promise<Anuncio[]> {

@@ -65,7 +65,11 @@ export const anunciosHandlers = [
     itens.sort((a, b) => a.distancia_km - b.distancia_km);
 
     const inicio = (q.pagina - 1) * PAGINA_TAMANHO;
-    return HttpResponse.json(itens.slice(inicio, inicio + PAGINA_TAMANHO));
+    const slice = itens.slice(inicio, inicio + PAGINA_TAMANHO);
+    return HttpResponse.json({
+      data: slice,
+      meta: { pagina: q.pagina, tamanho: PAGINA_TAMANHO, total: itens.length },
+    });
   }),
 
   // Detalhe (bare Anuncio, conforme AnuncioSchema).
