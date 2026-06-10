@@ -1,42 +1,30 @@
 # Plano de testes de software
 
-<span style="color:red">Pré-requisitos: <a href="02-Especificacao.md"> Especificação do projeto</a></span>, <a href="05-Projeto-interface.md"> Projeto de interface</a>
+Este plano cobre o MVP do FoodLoop: cadastro e login, acesso protegido, listagem de ofertas, detalhe da oferta, reserva, confirmação do pedido e regras compartilhadas entre front-end e back-end.
 
-O plano de testes de software é gerado a partir da especificação do sistema e consiste em casos de teste que deverão ser executados quando a implementação estiver parcial ou totalmente pronta. Apresente os cenários de teste utilizados na realização dos testes da sua aplicação. Escolha cenários de teste que demonstrem os requisitos sendo satisfeitos.
+Usuários avaliados: consumidor e comerciante. Ferramentas: Vitest, Supertest, Testing Library, MSW e navegador web.
 
-Enumere quais cenários de testes foram selecionados para teste. Neste tópico, o grupo deve detalhar quais funcionalidades foram avaliadas, o grupo de usuários que foi escolhido para participar do teste e as ferramentas utilizadas.
+## Casos de teste
 
-Não deixe de enumerar os casos de teste de forma sequencial e garantir que o(s) requisito(s) associado(s) a cada um deles esteja(m) correto(s) — de acordo com o que foi definido na <a href="02-Especificacao.md">Especificação do projeto</a>.
+| Teste                    | Requisitos             | Procedimento                                                                       | Critério de êxito                                                                                                |
+| ------------------------ | ---------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 1. Cadastro de usuário   | RF-001, RNF-002        | Preencher cadastro de consumidor e comerciante; tentar cadastrar e-mail duplicado. | Conta válida é criada; dados inválidos exibem erro claro; senha não aparece nas respostas.                       |
+| 2. Login e sessão        | RF-001, RNF-002        | Entrar com credenciais válidas e inválidas; sair da conta.                         | Login válido cria sessão; credenciais inválidas são recusadas; logout limpa a sessão.                            |
+| 3. Acesso protegido      | RF-001                 | Acessar rotas sem login, como consumidor e como comerciante.                       | Usuário sem sessão volta ao login; perfil errado é bloqueado; perfil correto acessa a rota.                      |
+| 4. Listagem de ofertas   | RF-003, RNF-004        | Abrir a tela inicial, listar ofertas próximas e aplicar filtros.                   | Ofertas disponíveis aparecem ordenadas por distância; filtro sem resultado mostra mensagem útil.                 |
+| 5. Detalhe da oferta     | RF-002, RF-003         | Abrir uma oferta, conferir informações e simular oferta esgotada.                  | Dados da oferta aparecem corretamente; reserva fica indisponível quando não há estoque.                          |
+| 6. Reserva e confirmação | RF-004, RF-011         | Adicionar item ao checkout, confirmar pedido e abrir a tela de confirmação.        | Total é calculado; pedido é criado; código de retirada e status são exibidos.                                    |
+| 7. Perfil do usuário     | RF-001                 | Consultar e atualizar dados permitidos do usuário autenticado.                     | Dados são retornados sem senha; campos permitidos são atualizados; campos bloqueados são ignorados ou recusados. |
+| 8. Regras compartilhadas | RF-001, RF-004, RF-011 | Validar schemas de cadastro/login e geração do código de retirada.                 | Dados fora do contrato são rejeitados; código gerado tem tamanho e caracteres adequados.                         |
 
-Por exemplo:
+## Execução
 
-| **Caso de teste**  | **CT-001 – Cadastrar perfil**  |
-|:---: |:---: |
-| Requisito associado | RF-00X - A aplicação deve apresentar, na página principal, a funcionalidade de cadastro de usuários para que estes consigam criar e gerenciar seu perfil. |
-| Objetivo do teste | Verificar se o usuário consegue se cadastrar na aplicação. |
-| Passos | - Acessar o navegador <br> - Informar o endereço do site https://adota-pet.herokuapp.com/src/index.html <br> - Clicar em "Criar conta" <br> - Preencher os campos obrigatórios (e-mail, nome, sobrenome, celular, CPF, senha, confirmação de senha) <br> - Aceitar os termos de uso <br> - Clicar em "Registrar" |
-| Critério de êxito | - O cadastro foi realizado com sucesso. |
-| Responsável pela elaboração do caso de teste | Nome do integrante da equipe. |
+Os testes automatizados devem ser executados com:
 
-<br>
+```bash
+npm run -w src/lib test
+npm run -w src/back test
+npm run -w src/front test
+```
 
-| **Caso de teste**  | **CT-002 – Efetuar login**  |
-|:---: |:---: |
-| Requisito associado | RF-00Y - A aplicação deve possuir opção de fazer login, sendo o login o endereço de e-mail. |
-| Objetivo do teste | Verificar se o usuário consegue realizar login. |
-| Passos | - Acessar o navegador <br> - Informar o endereço do site https://adota-pet.herokuapp.com/src/index.html <br> - Clicar no botão "Entrar" <br> - Preencher o campo de e-mail <br> - Preencher o campo de senha <br> - Clicar em "Login" |
-| Critério de êxito | - O login foi realizado com sucesso. |
-| Responsável pela elaboração do caso de teste | Nome do integrante da equipe. |
-
-
-## Ferramentas de testes (opcional)
-
-Comente sobre as ferramentas de testes utilizadas.
- 
-> **Links úteis**:
-> - [IBM - criação e geração de planos de teste](https://www.ibm.com/developerworks/br/local/rational/criacao_geracao_planos_testes_software/index.html)
-> - [Práticas e técnicas de testes ágeis](http://assiste.serpro.gov.br/serproagil/Apresenta/slides.pdf)
-> - [Teste de software: conceitos e tipos de testes](https://blog.onedaytesting.com.br/teste-de-software/)
-> - [Criação e geração de planos de teste de software](https://www.ibm.com/developerworks/br/local/rational/criacao_geracao_planos_testes_software/index.html)
-> - [Ferramentas de teste para JavaScript](https://geekflare.com/javascript-unit-testing/)
-> - [UX Tools](https://uxdesign.cc/ux-user-research-and-user-testing-tools-2d339d379dc7)
+Para evidência visual, gravar um screencast curto do fluxo principal: cadastro/login, listagem de ofertas, reserva e confirmação do pedido.

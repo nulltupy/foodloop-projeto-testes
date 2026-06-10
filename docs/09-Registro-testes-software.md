@@ -1,34 +1,24 @@
 # Registro de testes de software
 
-<span style="color:red">Pré-requisitos: <a href="05-Projeto-interface.md"> Projeto de interface</a></span>, <a href="08-Plano-testes-software.md"> Plano de testes de software</a>
+Registro baseado no plano de testes de software e nos testes automatizados do repositório.
 
-Relatório com as evidências dos testes de software realizados no sistema pela equipe, baseado em um plano de testes predefinido.
+## Evidências
 
-Para cada caso de teste definido no <a href="08-Plano-testes-software.md"> Plano de testes de software</a>, realize o registro das evidências dos testes feitos na aplicação pela equipe, que comprovem que o critério de êxito foi alcançado (ou não!). Para isso, utilize uma ferramenta de captura de tela que mostre cada um dos casos de teste definidos. Observação: cada caso de teste deverá possuir um vídeo do tipo _screencast_ para caracterizar uma evidência do referido caso.
+| Teste                 | Requisitos             | Evidência                                                                                                                                                                  | Status                                         |
+| --------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Cadastro de usuário   | RF-001, RNF-002        | `src/back/src/modules/auth/auth.test.ts`; `src/front/src/features/auth/pages/Cadastro.test.tsx`; `src/lib/src/schemas/auth.test.ts`                                        | Coberto por teste automatizado.                |
+| Login e sessão        | RF-001, RNF-002        | `src/back/src/modules/auth/auth.test.ts`; `src/front/src/features/auth/pages/Login.test.tsx`; `src/front/src/features/auth/store.test.ts`                                  | Coberto por teste automatizado.                |
+| Acesso protegido      | RF-001                 | `src/back/src/shared/middlewares/auth.test.ts`; `src/front/src/features/auth/components/RotaProtegida.test.tsx`                                                            | Coberto por teste automatizado.                |
+| Listagem de ofertas   | RF-003, RNF-004        | `src/front/src/features/ofertas/pages/Home.test.tsx`; `src/front/src/mocks/handlers.test.ts`                                                                               | Coberto por teste automatizado.                |
+| Detalhe da oferta     | RF-002, RF-003         | `src/front/src/features/ofertas/pages/OfertaDetalhe.test.tsx`; `src/front/src/mocks/handlers.test.ts`                                                                      | Coberto por teste automatizado.                |
+| Reserva e confirmação | RF-004, RF-011         | `src/front/src/features/checkout/pages/Checkout.test.tsx`; `src/front/src/features/pedidos/pages/PedidoConfirmacao.test.tsx`; `src/lib/src/domain/codigo-retirada.test.ts` | Coberto por teste automatizado.                |
+| Perfil do usuário     | RF-001                 | `src/back/src/modules/usuarios/service.test.ts`                                                                                                                            | Coberto por teste automatizado.                |
+| Regras compartilhadas | RF-001, RF-004, RF-011 | `src/lib/src/schemas/auth.test.ts`; `src/lib/src/domain/codigo-retirada.test.ts`                                                                                           | Executado com sucesso no pacote compartilhado. |
 
-| **Caso de teste** 	| **CT-001 – Cadastrar perfil** 	|
-|:---:	|:---:	|
-| Requisito associado | RF-00X - A aplicação deve apresentar, na página principal, a funcionalidade de cadastro de usuários para que esses consigam criar e gerenciar seu perfil. |
- 
- Responsável pelo registro da evidência: nome do integrante da equipe.
+## Resultado da execução local
 
- https://github.com/user-attachments/assets/77072a41-a48e-4130-be67-cc6a21941b06 
-
-| **Caso de teste** 	| **CT-002 – Realizar login** 	|
-|:---:	|:---:	|
-| Requisito associado | RF-00Y - A aplicação deve permitir que um usuário previamente cadastrado faça login. |
-
- Responsável pelo registro da evidência: nome do integrante da equipe.
-
- https://github.com/user-attachments/assets/77072a41-a48e-4130-be67-cc6a21941b06 
-
-
-> **Links úteis**:
-> - [Screencast: entenda o que é e como gravar vídeos com ele](https://rockcontent.com/br/blog/screencast/) 
+Em 09/06/2026, os testes do pacote compartilhado passaram: 2 arquivos, 9 testes. A execução completa local ficou pendente porque o banco de teste do back-end não estava preparado e o front-end não carregou uma dependência local do Vite.
 
 ## Avaliação
 
-Discorra sobre os resultados do teste, ressaltando os pontos fortes e fracos identificados na solução. Comente como o grupo pretende abordar esses pontos nas próximas iterações. Apresente as falhas detectadas e as melhorias geradas a partir dos resultados obtidos nos testes.
-
-> **Links úteis**:
-> - [Ferramentas de Teste para JavaScript](https://geekflare.com/javascript-unit-testing/)
+Os testes cobrem os fluxos centrais do MVP e as regras críticas de autenticação, listagem, reserva e confirmação. As próximas evidências devem ser um screencast do fluxo principal no navegador e uma nova execução completa após preparar o banco local e reinstalar as dependências do front-end.
