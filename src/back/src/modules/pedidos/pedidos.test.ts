@@ -172,3 +172,56 @@ describe('POST /api/v1/pedidos — código de retirada canônico', () => {
     expect(res.body.codigo_retirada).toMatch(ALFABETO_CANONICO);
   });
 });
+
+async function novoClienteToken(): Promise<string> {
+  const n = ++contador;
+  const senhaHash = await bcrypt.hash('senha-teste-123', 4);
+  const u = await prisma.usuario.create({
+    data: {
+      nome: `Cli Over ${n}`,
+      email: `cli-over${n}@test.foodloop`,
+      senha_hash: senhaHash,
+      tipo: 'cliente',
+    },
+  });
+  await prisma.cliente.create({ data: { id_usuario: u.id } });
+  return signAccessToken({ sub: u.id.toString(), tipo: 'cliente' });
+}
+
+function postPedido(token: string, idAnuncio: number, quantidade = 1) {
+  return request(app)
+    .post('/api/v1/pedidos')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ itens: [{ id_anuncio: idAnuncio, quantidade }] });
+}
+
+describe('POST /api/v1/pedidos — reserva de estoque', () => {
+  it('decrementa o estoque ao criar (201)', async () => {
+    const { anuncio } = await criarAnuncioParaTeste({ quantidadeDisponivel: 3 });
+    const res = await postPedido(await novoClienteToken(), Number(anuncio.id));
+    expect(res.status).toBe(201);
+    const a = await prisma.anuncio.findUniqueOrThrow({ where: { id: anuncio.id } });
+    expect(a.quantidade_disponivel).toBe(2);
+  });
+
+  it('rejeita quantidade acima do disponível (409 ANUNCIO_ESGOTADO)', async () => {
+    const { anuncio } = await criarAnuncioParaTeste({ quantidadeDisponivel: 1 });
+    const res = await postPedido(await novoClienteToken(), Number(anuncio.id), 2);
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe(ErrorCode.ANUNCIO_ESGOTADO);
+  });
+
+  it('não faz oversell em corrida pela última unidade', async () => {
+    const { anuncio } = await criarAnuncioParaTeste({ quantidadeDisponivel: 1 });
+    const [t1, t2] = [await novoClienteToken(), await novoClienteToken()];
+    const id = Number(anuncio.id);
+
+    const [r1, r2] = await Promise.all([postPedido(t1, id), postPedido(t2, id)]);
+
+    expect([r1.status, r2.status].sort()).toEqual([201, 409]); // um ganha, um esgota
+    const a = await prisma.anuncio.findUniqueOrThrow({ where: { id: anuncio.id } });
+    expect(a.quantidade_disponivel).toBe(0);
+    const total = await prisma.pedido.count({ where: { id_estabelecimento: a.id_estabelecimento } });
+    expect(total).toBe(1); // exatamente 1 pedido criado
+  });
+});

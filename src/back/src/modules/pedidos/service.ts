@@ -20,7 +20,8 @@ export async function criar(params: CriarParams) {
   return prisma.$transaction(async (tx) => {
     const item = params.itens[0]!;
 
-    // Lock pessimista via update with returning para evitar oversell.
+    // findUnique só pra erros amigáveis (404 / não ativo) e pegar preço + estab.
+    // A reserva de estoque NÃO se baseia nesta leitura — ver decremento atômico abaixo.
     const anuncio = await tx.anuncio.findUnique({ where: { id: BigInt(item.id_anuncio) } });
     if (!anuncio) {
       throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Anúncio não encontrado');
@@ -28,14 +29,17 @@ export async function criar(params: CriarParams) {
     if (anuncio.status !== 'ATIVO') {
       throw new HttpError(409, ErrorCode.ANUNCIO_NAO_ATIVO, 'Anúncio não disponível');
     }
-    if (anuncio.quantidade_disponivel < item.quantidade) {
+
+    // Decremento atômico: o UPDATE ... WHERE quantidade_disponivel >= qty é avaliado
+    // sob lock de linha no Postgres, então corridas pela última unidade não dão
+    // oversell — quem perde recebe count 0.
+    const reserva = await tx.anuncio.updateMany({
+      where: { id: anuncio.id, status: 'ATIVO', quantidade_disponivel: { gte: item.quantidade } },
+      data: { quantidade_disponivel: { decrement: item.quantidade } },
+    });
+    if (reserva.count === 0) {
       throw new HttpError(409, ErrorCode.ANUNCIO_ESGOTADO, 'Quantidade insuficiente');
     }
-
-    await tx.anuncio.update({
-      where: { id: anuncio.id },
-      data: { quantidade_disponivel: anuncio.quantidade_disponivel - item.quantidade },
-    });
 
     const precoUnitario = Number(anuncio.preco_promocional);
     const subtotal = precoUnitario * item.quantidade;
