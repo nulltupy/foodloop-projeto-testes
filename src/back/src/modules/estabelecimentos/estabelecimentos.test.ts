@@ -8,6 +8,7 @@ import { prisma } from '../../db/client.js';
 import { HttpError } from '../../shared/errors.js';
 import { signAccessToken } from '../../shared/jwt.js';
 
+import { criarAnuncioParaTeste } from '../anuncios/test-helpers.js';
 import { geocodingEndereco } from '../geocoding/service.js';
 
 // Geocoding mockado: testa o CRUD sem rede nem o limiter (1,1s) do Nominatim.
@@ -203,5 +204,120 @@ describe('PATCH /api/v1/estabelecimentos/me', () => {
     expect(res.status).toBe(200);
     expect(res.body.endereco.latitude).toBe(-19.8);
     expect(res.body.endereco.rua).toBe('Rua Nova');
+  });
+});
+
+let cnt = 500;
+async function comercioComPedidoAberto() {
+  const n = ++cnt;
+  const { estabelecimento, anuncio, comercianteUser } = await criarAnuncioParaTeste();
+  const senhaHash = await bcrypt.hash('senha-teste-123', 4);
+  const cliente = await prisma.usuario.create({
+    data: {
+      nome: `Cli Fechar ${n}`,
+      email: `cli-fechar${n}@test.foodloop`,
+      senha_hash: senhaHash,
+      tipo: 'cliente',
+    },
+  });
+  await prisma.cliente.create({ data: { id_usuario: cliente.id } });
+  await prisma.pedido.create({
+    data: {
+      id_cliente: cliente.id,
+      id_estabelecimento: estabelecimento.id,
+      valor_total: 15,
+      codigo_retirada: `FECHA${String(n).padStart(3, '0')}`,
+      status: 'RECEBIDO',
+      item_pedido: { create: { id_anuncio: anuncio.id, quantidade: 1, preco_unitario: 15 } },
+    },
+  });
+  return {
+    estabId: estabelecimento.id,
+    anuncioId: anuncio.id,
+    comercianteToken: signAccessToken({ sub: comercianteUser.id.toString(), tipo: 'comerciante' }),
+    clienteToken: signAccessToken({ sub: cliente.id.toString(), tipo: 'cliente' }),
+  };
+}
+
+describe('POST /api/v1/estabelecimentos/me/fechar', () => {
+  it('inativa, encerra anúncios e cancela pedidos abertos (com restock via trigger)', async () => {
+    const { estabId, anuncioId, comercianteToken } = await comercioComPedidoAberto();
+    const estoqueAntes = (await prisma.anuncio.findUniqueOrThrow({ where: { id: anuncioId } }))
+      .quantidade_disponivel;
+
+    const res = await request(app)
+      .post('/api/v1/estabelecimentos/me/fechar')
+      .set('Authorization', `Bearer ${comercianteToken}`)
+      .send({ motivo: 'feriado' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.ativo).toBe(false);
+    const anuncio = await prisma.anuncio.findUniqueOrThrow({ where: { id: anuncioId } });
+    expect(anuncio.status).toBe('ENCERRADO_COM_SOBRA');
+    expect(anuncio.quantidade_disponivel).toBe(estoqueAntes + 1); // restock do pedido cancelado
+    const pedidos = await prisma.pedido.findMany({ where: { id_estabelecimento: estabId } });
+    expect(pedidos.every((p) => p.status === 'CANCELADO' && p.cancelado_por === 'COMERCIANTE')).toBe(true);
+  });
+
+  it('loja fechada rejeita novo pedido (409)', async () => {
+    // Anúncio ATIVO sob estabelecimento inativo isola a guarda de estab.ativo no criar.
+    const { estabelecimento, anuncio, comercianteUser } = await criarAnuncioParaTeste();
+    await prisma.estabelecimento.update({ where: { id: estabelecimento.id }, data: { ativo: false } });
+    void comercianteUser;
+    const n = ++cnt;
+    const senhaHash = await bcrypt.hash('senha-teste-123', 4);
+    const cliente = await prisma.usuario.create({
+      data: { nome: `Cli X ${n}`, email: `cli-x${n}@test.foodloop`, senha_hash: senhaHash, tipo: 'cliente' },
+    });
+    await prisma.cliente.create({ data: { id_usuario: cliente.id } });
+    const token = signAccessToken({ sub: cliente.id.toString(), tipo: 'cliente' });
+
+    const res = await request(app)
+      .post('/api/v1/pedidos')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ itens: [{ id_anuncio: Number(anuncio.id), quantidade: 1 }] });
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe(ErrorCode.ANUNCIO_NAO_ATIVO);
+  });
+
+  it('reabrir volta ativo=true', async () => {
+    const { comercianteToken } = await comercioComPedidoAberto();
+    await request(app)
+      .post('/api/v1/estabelecimentos/me/fechar')
+      .set('Authorization', `Bearer ${comercianteToken}`);
+    const res = await request(app)
+      .post('/api/v1/estabelecimentos/me/abrir')
+      .set('Authorization', `Bearer ${comercianteToken}`);
+    expect(res.status).toBe(200);
+    expect(res.body.ativo).toBe(true);
+  });
+
+  it('comerciante sem estabelecimento → 404', async () => {
+    const n = ++cnt;
+    const senhaHash = await bcrypt.hash('senha-teste-123', 4);
+    const u = await prisma.usuario.create({
+      data: {
+        nome: `Com Sem ${n}`,
+        email: `com-sem${n}@test.foodloop`,
+        senha_hash: senhaHash,
+        tipo: 'comerciante',
+      },
+    });
+    await prisma.comerciante.create({
+      data: { id_usuario: u.id, cnpj: `${String(n % 100).padStart(2, '0')}.111.222/0001-44` },
+    });
+    const token = signAccessToken({ sub: u.id.toString(), tipo: 'comerciante' });
+    const res = await request(app)
+      .post('/api/v1/estabelecimentos/me/fechar')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(404);
+  });
+
+  it('bloqueia não-comerciante (403)', async () => {
+    const { clienteToken } = await comercioComPedidoAberto();
+    const res = await request(app)
+      .post('/api/v1/estabelecimentos/me/fechar')
+      .set('Authorization', `Bearer ${clienteToken}`);
+    expect(res.status).toBe(403);
   });
 });

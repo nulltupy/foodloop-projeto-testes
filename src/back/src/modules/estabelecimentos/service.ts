@@ -2,12 +2,14 @@ import {
   type CreateEstabelecimentoRequest,
   type Estabelecimento,
   ErrorCode,
+  type StatusPedido,
   type UpdateEstabelecimentoRequest,
 } from '@foodloop/lib';
 
 import { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
 import { geocodingEndereco } from '../geocoding/service.js';
+import * as notificacoes from '../notificacoes/service.js';
 import { HttpError } from '../../shared/errors.js';
 
 // Inclui o endereço — formato de retorno comum a getById/getMeu/criar/atualizar.
@@ -154,6 +156,68 @@ export async function atualizar(
       },
       include: comEndereco,
     });
+  });
+  return shape(atualizado);
+}
+
+// Pedidos ainda em aberto (não-terminais) que o fechamento precisa cancelar.
+const PEDIDOS_ABERTOS: StatusPedido[] = ['RECEBIDO', 'EM_PREPARO', 'PRONTO_PARA_RETIRADA'];
+
+async function meuEstabId(comercianteId: number): Promise<bigint> {
+  const estab = await prisma.estabelecimento.findFirst({
+    where: { id_comerciante: BigInt(comercianteId) },
+    select: { id: true },
+  });
+  if (!estab) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Estabelecimento não encontrado');
+  }
+  return estab.id;
+}
+
+// Fecha a loja: inativa o estabelecimento, encerra os anúncios ativos e cancela
+// os pedidos em aberto. O estoque dos pedidos cancelados é devolvido pelo trigger
+// trg_controle_estoque (um UPDATE por linha dispara o trigger por linha).
+export async function fechar(comercianteId: number, motivo?: string): Promise<Estabelecimento> {
+  const id = await meuEstabId(comercianteId);
+  // Captura os pedidos que serão cancelados antes do update, pra poder notificar os clientes.
+  const abertos = await prisma.pedido.findMany({
+    where: { id_estabelecimento: id, status: { in: PEDIDOS_ABERTOS } },
+    select: { id: true, id_cliente: true },
+  });
+  await prisma.$transaction([
+    prisma.estabelecimento.update({ where: { id }, data: { ativo: false } }),
+    prisma.anuncio.updateMany({
+      where: { id_estabelecimento: id, status: 'ATIVO' },
+      data: { status: 'ENCERRADO_COM_SOBRA' },
+    }),
+    prisma.pedido.updateMany({
+      where: { id_estabelecimento: id, status: { in: PEDIDOS_ABERTOS } },
+      data: {
+        status: 'CANCELADO',
+        cancelado_por: 'COMERCIANTE',
+        motivo_cancelamento: motivo ?? 'Estabelecimento fechado',
+        data_cancelamento: new Date(),
+      },
+    }),
+  ]);
+  // Notifica cada cliente cujo pedido foi cancelado pelo fechamento (notificar é best-effort).
+  for (const p of abertos) {
+    await notificacoes.notificarCancelamento(
+      { id: Number(p.id), id_cliente: Number(p.id_cliente), id_estabelecimento: Number(id) },
+      'COMERCIANTE',
+    );
+  }
+  const atualizado = await prisma.estabelecimento.findUniqueOrThrow({ where: { id }, include: comEndereco });
+  return shape(atualizado);
+}
+
+// Reabre a loja. Anúncios/pedidos encerrados não voltam — o comerciante recria os anúncios.
+export async function abrir(comercianteId: number): Promise<Estabelecimento> {
+  const id = await meuEstabId(comercianteId);
+  const atualizado = await prisma.estabelecimento.update({
+    where: { id },
+    data: { ativo: true },
+    include: comEndereco,
   });
   return shape(atualizado);
 }

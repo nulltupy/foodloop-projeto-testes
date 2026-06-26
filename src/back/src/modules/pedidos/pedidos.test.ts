@@ -46,10 +46,17 @@ async function seedPedido(status: StatusPedido = 'RECEBIDO') {
 
   return {
     pedidoId: Number(pedido.id),
+    anuncioId: anuncio.id,
     codigo,
     comercianteToken: signAccessToken({ sub: comercianteUser.id.toString(), tipo: 'comerciante' }),
     clienteToken: signAccessToken({ sub: clienteUser.id.toString(), tipo: 'cliente' }),
   };
+}
+
+function cancelar(pedidoId: number, token: string | null, body: unknown = {}) {
+  const req = request(app).post(`/api/v1/pedidos/${pedidoId}/cancelar`);
+  if (token) req.set('Authorization', `Bearer ${token}`);
+  return req.send(body as object);
 }
 
 function patchStatus(pedidoId: number, token: string | null, body: unknown) {
@@ -223,5 +230,73 @@ describe('POST /api/v1/pedidos — reserva de estoque', () => {
     expect(a.quantidade_disponivel).toBe(0);
     const total = await prisma.pedido.count({ where: { id_estabelecimento: a.id_estabelecimento } });
     expect(total).toBe(1); // exatamente 1 pedido criado
+  });
+});
+
+describe('POST /api/v1/pedidos/:id/cancelar', () => {
+  it('cliente cancela RECEBIDO: 200, devolve estoque, cancelado_por CLIENTE', async () => {
+    const { pedidoId, anuncioId, clienteToken } = await seedPedido('RECEBIDO');
+    const antes = (await prisma.anuncio.findUniqueOrThrow({ where: { id: anuncioId } }))
+      .quantidade_disponivel;
+
+    const res = await cancelar(pedidoId, clienteToken, { motivo: 'mudei de ideia' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('CANCELADO');
+    const a = await prisma.anuncio.findUniqueOrThrow({ where: { id: anuncioId } });
+    expect(a.quantidade_disponivel).toBe(antes + 1); // estoque devolvido
+    const p = await prisma.pedido.findUniqueOrThrow({ where: { id: BigInt(pedidoId) } });
+    expect(p.cancelado_por).toBe('CLIENTE');
+    expect(p.motivo_cancelamento).toBe('mudei de ideia');
+  });
+
+  it('comerciante cancela EM_PREPARO: 200, cancelado_por COMERCIANTE', async () => {
+    const { pedidoId, comercianteToken } = await seedPedido('EM_PREPARO');
+    const res = await cancelar(pedidoId, comercianteToken);
+    expect(res.status).toBe(200);
+    const p = await prisma.pedido.findUniqueOrThrow({ where: { id: BigInt(pedidoId) } });
+    expect(p.cancelado_por).toBe('COMERCIANTE');
+  });
+
+  it('cliente NÃO cancela depois que entrou em preparo (409)', async () => {
+    const { pedidoId, clienteToken } = await seedPedido('EM_PREPARO');
+    const res = await cancelar(pedidoId, clienteToken);
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe(ErrorCode.PEDIDO_NAO_CANCELAVEL);
+  });
+
+  it('não cancela pedido RETIRADO (409)', async () => {
+    const { pedidoId, comercianteToken } = await seedPedido('RETIRADO');
+    const res = await cancelar(pedidoId, comercianteToken);
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe(ErrorCode.PEDIDO_NAO_CANCELAVEL);
+  });
+
+  it('não cancela duas vezes (409 na segunda)', async () => {
+    const { pedidoId, comercianteToken } = await seedPedido('RECEBIDO');
+    expect((await cancelar(pedidoId, comercianteToken)).status).toBe(200);
+    const segunda = await cancelar(pedidoId, comercianteToken);
+    expect(segunda.status).toBe(409);
+    expect(segunda.body.error.code).toBe(ErrorCode.PEDIDO_NAO_CANCELAVEL);
+  });
+
+  it('bloqueia terceiro que não é dono nem o comerciante (403)', async () => {
+    const { pedidoId } = await seedPedido('RECEBIDO');
+    const intruso = await seedPedido('RECEBIDO'); // outro cliente
+    const res = await cancelar(pedidoId, intruso.clienteToken);
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe(ErrorCode.PERMISSAO_NEGADA);
+  });
+
+  it('exige autenticação (401)', async () => {
+    const { pedidoId } = await seedPedido('RECEBIDO');
+    const res = await cancelar(pedidoId, null);
+    expect(res.status).toBe(401);
+  });
+
+  it('404 para pedido inexistente', async () => {
+    const { comercianteToken } = await seedPedido('RECEBIDO');
+    const res = await cancelar(999_999, comercianteToken);
+    expect(res.status).toBe(404);
   });
 });

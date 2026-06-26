@@ -66,6 +66,7 @@ export async function listarProximos(params: ListarParams) {
       JOIN estabelecimento e ON e.id = a.id_estabelecimento
       JOIN endereco en ON en.id = e.id_endereco
       WHERE a.status = 'ATIVO'
+        AND e.ativo = TRUE
         AND a.quantidade_disponivel > 0
         AND a.prazo_retirada > NOW()
         ${precoFiltro}
@@ -120,6 +121,7 @@ async function contarProximos(params: ListarParams): Promise<number> {
       JOIN estabelecimento e ON e.id = a.id_estabelecimento
       JOIN endereco en ON en.id = e.id_endereco
       WHERE a.status = 'ATIVO'
+        AND e.ativo = TRUE
         AND a.quantidade_disponivel > 0
         AND a.prazo_retirada > NOW()
         ${precoFiltro}
@@ -169,10 +171,13 @@ export async function listarMeus(userId: number): Promise<Anuncio[]> {
 export async function criar(input: CreateAnuncioRequest, userId: number): Promise<Anuncio> {
   const estab = await prisma.estabelecimento.findFirst({
     where: { id_comerciante: BigInt(userId) },
-    select: { id: true },
+    select: { id: true, ativo: true },
   });
   if (!estab) {
     throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Estabelecimento não encontrado');
+  }
+  if (!estab.ativo) {
+    throw new HttpError(409, ErrorCode.ANUNCIO_NAO_ATIVO, 'Estabelecimento fechado');
   }
 
   const produto = await prisma.produto.findUnique({

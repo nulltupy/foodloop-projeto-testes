@@ -12,6 +12,7 @@ import { createAnunciosRouter } from './modules/anuncios/controller.js';
 import { createAuthRouter } from './modules/auth/controller.js';
 import { createEstabelecimentosRouter } from './modules/estabelecimentos/controller.js';
 import { createGeocodingRouter } from './modules/geocoding/controller.js';
+import { createNotificacoesRouter } from './modules/notificacoes/controller.js';
 import { createPedidosRouter } from './modules/pedidos/controller.js';
 import { createUsuariosRouter } from './modules/usuarios/controller.js';
 import { createProdutosRouter } from './modules/produtos/controller.js';
@@ -81,6 +82,7 @@ export function buildApp(): Express {
   app.use('/api/v1/produtos', createProdutosRouter());
   app.use('/api/v1/estabelecimentos', createEstabelecimentosRouter());
   app.use('/api/v1/geocoding', createGeocodingRouter());
+  app.use('/api/v1/notificacoes', createNotificacoesRouter());
   app.use('/api/v1/pedidos', createPedidosRouter());
 
   app.use(errorHandler);

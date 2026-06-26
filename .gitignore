@@ -16,3 +16,6 @@ src/back/src/generated/
 
 # Claude Code working area (worktrees, plans, session state)
 .claude/
+
+# Impeccable local hook/session cache (machine-local, absolute paths)
+.impeccable/

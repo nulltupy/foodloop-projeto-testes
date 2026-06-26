@@ -43,3 +43,8 @@ export const AtualizarStatusRequestSchema = z.object({
   codigo_retirada: z.string().length(8).optional(),
 });
 export type AtualizarStatusRequest = z.infer<typeof AtualizarStatusRequestSchema>;
+
+export const CancelarPedidoRequestSchema = z.object({
+  motivo: z.string().max(255).optional(),
+});
+export type CancelarPedidoRequest = z.infer<typeof CancelarPedidoRequestSchema>;

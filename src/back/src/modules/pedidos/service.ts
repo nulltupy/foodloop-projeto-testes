@@ -1,8 +1,9 @@
-import { ErrorCode, gerarCodigoRetirada, type StatusPedido } from '@foodloop/lib';
+import { ErrorCode, gerarCodigoRetirada, type StatusPedido, type TipoUsuario } from '@foodloop/lib';
 
 import type { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
 import { HttpError } from '../../shared/errors.js';
+import * as notificacoes from '../notificacoes/service.js';
 
 interface CriarParams {
   id_cliente: number;
@@ -17,17 +18,23 @@ const TRANSICOES_OK: Partial<Record<StatusPedido, StatusPedido[]>> = {
 };
 
 export async function criar(params: CriarParams) {
-  return prisma.$transaction(async (tx) => {
+  const resultado = await prisma.$transaction(async (tx) => {
     const item = params.itens[0]!;
 
     // findUnique só pra erros amigáveis (404 / não ativo) e pegar preço + estab.
     // A reserva de estoque NÃO se baseia nesta leitura — ver decremento atômico abaixo.
-    const anuncio = await tx.anuncio.findUnique({ where: { id: BigInt(item.id_anuncio) } });
+    const anuncio = await tx.anuncio.findUnique({
+      where: { id: BigInt(item.id_anuncio) },
+      include: { estabelecimento: { select: { ativo: true } } },
+    });
     if (!anuncio) {
       throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Anúncio não encontrado');
     }
     if (anuncio.status !== 'ATIVO') {
       throw new HttpError(409, ErrorCode.ANUNCIO_NAO_ATIVO, 'Anúncio não disponível');
+    }
+    if (!anuncio.estabelecimento.ativo) {
+      throw new HttpError(409, ErrorCode.ANUNCIO_NAO_ATIVO, 'Estabelecimento fechado');
     }
 
     // Decremento atômico: o UPDATE ... WHERE quantidade_disponivel >= qty é avaliado
@@ -79,6 +86,8 @@ export async function criar(params: CriarParams) {
 
     return montar(pedido);
   });
+  await notificacoes.notificarNovoPedido(resultado.id_estabelecimento, resultado.id);
+  return resultado;
 }
 
 export async function getById(id: number) {
@@ -128,7 +137,83 @@ export async function avancarStatus(
     data: { status: novoStatus },
     include: { item_pedido: true },
   });
-  return montar(atualizado);
+  const resultado = montar(atualizado);
+  await notificacoes.notificarStatusPedido(resultado.id_cliente, resultado.id, novoStatus);
+  return resultado;
+}
+
+// Estados a partir dos quais o pedido ainda pode ser cancelado.
+const CANCELAVEL: StatusPedido[] = ['RECEBIDO', 'EM_PREPARO', 'PRONTO_PARA_RETIRADA'];
+
+export async function cancelar(
+  usuario: { id: number; tipo: TipoUsuario },
+  pedidoId: number,
+  motivo?: string,
+) {
+  const resultado = await prisma.$transaction(async (tx) => {
+    const pedido = await tx.pedido.findUnique({
+      where: { id: BigInt(pedidoId) },
+      include: { estabelecimento: true },
+    });
+    if (!pedido) {
+      throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Pedido não encontrado');
+    }
+
+    const ehDono = pedido.id_cliente === BigInt(usuario.id);
+    const ehComerciante = pedido.estabelecimento.id_comerciante === BigInt(usuario.id);
+    if (!ehDono && !ehComerciante) {
+      throw new HttpError(403, ErrorCode.PERMISSAO_NEGADA, 'Pedido de outro usuário');
+    }
+
+    if (!CANCELAVEL.includes(pedido.status)) {
+      throw new HttpError(
+        409,
+        ErrorCode.PEDIDO_NAO_CANCELAVEL,
+        `Pedido ${pedido.status} não pode ser cancelado`,
+      );
+    }
+    // Cliente só cancela antes do preparo começar; o comerciante pode em qualquer
+    // estado não-terminal.
+    if (ehDono && !ehComerciante && pedido.status !== 'RECEBIDO') {
+      throw new HttpError(
+        409,
+        ErrorCode.PEDIDO_NAO_CANCELAVEL,
+        'Pedido já em preparo; fale com o estabelecimento',
+      );
+    }
+
+    const canceladoPor: 'COMERCIANTE' | 'CLIENTE' = ehComerciante ? 'COMERCIANTE' : 'CLIENTE';
+    // Transição atômica: o WHERE re-checa o status sob lock de linha, então dois
+    // cancelamentos concorrentes não geram dois 200 (o perdedor recebe count 0).
+    // O estoque é devolvido pelo trigger trg_controle_estoque ao virar CANCELADO.
+    const estadosPermitidos: StatusPedido[] = ehComerciante ? CANCELAVEL : ['RECEBIDO'];
+    const reserva = await tx.pedido.updateMany({
+      where: { id: pedido.id, status: { in: estadosPermitidos } },
+      data: {
+        status: 'CANCELADO',
+        cancelado_por: canceladoPor,
+        motivo_cancelamento: motivo ?? null,
+        data_cancelamento: new Date(),
+      },
+    });
+    if (reserva.count === 0) {
+      throw new HttpError(409, ErrorCode.PEDIDO_NAO_CANCELAVEL, 'Pedido não pode mais ser cancelado');
+    }
+    const cancelado = await tx.pedido.findUniqueOrThrow({
+      where: { id: pedido.id },
+      include: { item_pedido: true },
+    });
+    return { pedido: montar(cancelado), canceladoPor };
+  });
+  await notificacoes.notificarCancelamento(
+    {
+      id: resultado.pedido.id,
+      id_cliente: resultado.pedido.id_cliente,
+      id_estabelecimento: resultado.pedido.id_estabelecimento,
+    },
+    resultado.canceladoPor,
+  );
+  return resultado.pedido;
 }
 
 interface PedidoWithItens {

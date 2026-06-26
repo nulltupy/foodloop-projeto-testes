@@ -22,3 +22,8 @@ export type CreateEstabelecimentoRequest = z.infer<typeof CreateEstabelecimentoR
 
 export const UpdateEstabelecimentoRequestSchema = CreateEstabelecimentoRequestSchema.partial();
 export type UpdateEstabelecimentoRequest = z.infer<typeof UpdateEstabelecimentoRequestSchema>;
+
+export const FecharEstabelecimentoRequestSchema = z.object({
+  motivo: z.string().max(255).optional(),
+});
+export type FecharEstabelecimentoRequest = z.infer<typeof FecharEstabelecimentoRequestSchema>;

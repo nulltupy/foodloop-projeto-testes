@@ -1,6 +1,7 @@
 import {
   CreateEstabelecimentoRequestSchema,
   ErrorCode,
+  FecharEstabelecimentoRequestSchema,
   UpdateEstabelecimentoRequestSchema,
 } from '@foodloop/lib';
 import { Router } from 'express';
@@ -49,6 +50,26 @@ export function createEstabelecimentosRouter(): Router {
       }
       const atualizado = await service.atualizar(req.usuario!.id, parsed.data);
       res.json(atualizado);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/me/fechar', requireAuth, requireRole('comerciante'), async (req, res, next) => {
+    try {
+      const parsed = FecharEstabelecimentoRequestSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Payload inválido');
+      }
+      res.json(await service.fechar(req.usuario!.id, parsed.data.motivo));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/me/abrir', requireAuth, requireRole('comerciante'), async (req, res, next) => {
+    try {
+      res.json(await service.abrir(req.usuario!.id));
     } catch (err) {
       next(err);
     }

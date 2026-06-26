@@ -1,5 +1,6 @@
 import {
   AtualizarStatusRequestSchema,
+  CancelarPedidoRequestSchema,
   CriarPedidoRequestSchema,
   ErrorCode,
   StatusPedidoSchema,
@@ -97,6 +98,24 @@ export function createPedidosRouter(): Router {
         parsed.data.codigo_retirada,
       );
       res.json(atualizado);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  // Cliente ou comerciante; a autorização específica é resolvida no service.
+  router.post('/:id/cancelar', requireAuth, async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
+      }
+      const parsed = CancelarPedidoRequestSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Payload inválido');
+      }
+      const cancelado = await service.cancelar(req.usuario!, id, parsed.data.motivo);
+      res.json(cancelado);
     } catch (e) {
       next(e);
     }

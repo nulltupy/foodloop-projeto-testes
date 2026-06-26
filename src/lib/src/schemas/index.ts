@@ -7,3 +7,4 @@ export * from './produto.js';
 export * from './anuncio.js';
 export * from './pedido.js';
 export * from './pagamento.js';
+export * from './notificacao.js';
