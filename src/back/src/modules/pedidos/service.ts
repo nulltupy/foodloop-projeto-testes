@@ -1,5 +1,6 @@
 import { ErrorCode, gerarCodigoRetirada, type StatusPedido } from '@foodloop/lib';
 
+import type { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
 import { HttpError } from '../../shared/errors.js';
 
@@ -159,5 +160,109 @@ function montar(p: PedidoWithItens) {
       preco_unitario: Number(i.preco_unitario),
       subtotal: Number(i.subtotal),
     })),
+  };
+}
+
+interface ListaFiltros {
+  status?: StatusPedido;
+  pagina: number;
+  limit: number;
+}
+
+const includeCliente = {
+  estabelecimento: true,
+  item_pedido: { include: { anuncio: { include: { produto: true } } } },
+} as const;
+
+const includeComerciante = {
+  cliente: { include: { usuario: true } },
+  item_pedido: { include: { anuncio: { include: { produto: true } } } },
+} as const;
+
+type PedidoCliente = Prisma.pedidoGetPayload<{ include: typeof includeCliente }>;
+type PedidoComerciante = Prisma.pedidoGetPayload<{ include: typeof includeComerciante }>;
+
+function shapeItens(itens: PedidoCliente['item_pedido']) {
+  return itens.map((i) => ({
+    id: Number(i.id),
+    produto_nome: i.anuncio.produto.nome,
+    quantidade: i.quantidade,
+    preco_unitario: Number(i.preco_unitario),
+    subtotal: Number(i.subtotal),
+  }));
+}
+
+// Visão do cliente: inclui o código de retirada (é dele, mostra na retirada).
+function shapeCliente(p: PedidoCliente) {
+  return {
+    id: Number(p.id),
+    status: p.status,
+    valor_total: Number(p.valor_total),
+    data_pedido: p.data_pedido.toISOString(),
+    codigo_retirada: p.codigo_retirada,
+    estabelecimento: {
+      id: Number(p.estabelecimento.id),
+      nome_fantasia: p.estabelecimento.nome_fantasia,
+    },
+    itens: shapeItens(p.item_pedido),
+  };
+}
+
+// Visão do comerciante: SEM código de retirada (segredo do cliente; o comerciante
+// valida digitando o que o cliente apresenta). Inclui o nome do cliente.
+function shapeComerciante(p: PedidoComerciante) {
+  return {
+    id: Number(p.id),
+    status: p.status,
+    valor_total: Number(p.valor_total),
+    data_pedido: p.data_pedido.toISOString(),
+    cliente: { nome: p.cliente.usuario.nome },
+    itens: shapeItens(p.item_pedido),
+  };
+}
+
+export async function listarDoCliente(clienteId: number, filtros: ListaFiltros) {
+  const where: Prisma.pedidoWhereInput = {
+    id_cliente: BigInt(clienteId),
+    ...(filtros.status ? { status: filtros.status } : {}),
+  };
+  const [data, total] = await Promise.all([
+    prisma.pedido.findMany({
+      where,
+      include: includeCliente,
+      orderBy: { data_pedido: 'desc' },
+      skip: (filtros.pagina - 1) * filtros.limit,
+      take: filtros.limit,
+    }),
+    prisma.pedido.count({ where }),
+  ]);
+  return { data: data.map(shapeCliente), meta: { pagina: filtros.pagina, tamanho: filtros.limit, total } };
+}
+
+export async function listarDoComerciante(comercianteUserId: number, filtros: ListaFiltros) {
+  const estab = await prisma.estabelecimento.findFirst({
+    where: { id_comerciante: BigInt(comercianteUserId) },
+    select: { id: true },
+  });
+  if (!estab) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Estabelecimento não encontrado');
+  }
+  const where: Prisma.pedidoWhereInput = {
+    id_estabelecimento: estab.id,
+    ...(filtros.status ? { status: filtros.status } : {}),
+  };
+  const [data, total] = await Promise.all([
+    prisma.pedido.findMany({
+      where,
+      include: includeComerciante,
+      orderBy: { data_pedido: 'desc' },
+      skip: (filtros.pagina - 1) * filtros.limit,
+      take: filtros.limit,
+    }),
+    prisma.pedido.count({ where }),
+  ]);
+  return {
+    data: data.map(shapeComerciante),
+    meta: { pagina: filtros.pagina, tamanho: filtros.limit, total },
   };
 }

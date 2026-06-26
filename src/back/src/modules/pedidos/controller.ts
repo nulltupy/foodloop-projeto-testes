@@ -1,10 +1,22 @@
-import { AtualizarStatusRequestSchema, CriarPedidoRequestSchema, ErrorCode } from '@foodloop/lib';
+import {
+  AtualizarStatusRequestSchema,
+  CriarPedidoRequestSchema,
+  ErrorCode,
+  StatusPedidoSchema,
+} from '@foodloop/lib';
 import { Router } from 'express';
+import { z } from 'zod';
 
 import { requireAuth, requireRole } from '../../shared/middlewares/auth.js';
 import { HttpError } from '../../shared/errors.js';
 
 import * as service from './service.js';
+
+const QuerySchema = z.object({
+  status: StatusPedidoSchema.optional(),
+  pagina: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(50).default(20),
+});
 
 export function createPedidosRouter(): Router {
   const router = Router();
@@ -21,6 +33,31 @@ export function createPedidosRouter(): Router {
         itens: parsed.data.itens,
       });
       res.status(201).json(pedido);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  // Antes de '/:id' pra "meus"/"comerciante" não serem capturados como id.
+  router.get('/meus', requireAuth, requireRole('cliente'), async (req, res, next) => {
+    try {
+      const parsed = QuerySchema.safeParse(req.query);
+      if (!parsed.success) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Query inválida');
+      }
+      res.json(await service.listarDoCliente(req.usuario!.id, parsed.data));
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/comerciante', requireAuth, requireRole('comerciante'), async (req, res, next) => {
+    try {
+      const parsed = QuerySchema.safeParse(req.query);
+      if (!parsed.success) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Query inválida');
+      }
+      res.json(await service.listarDoComerciante(req.usuario!.id, parsed.data));
     } catch (e) {
       next(e);
     }
