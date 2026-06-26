@@ -58,7 +58,7 @@ src/front/
     ├── main.tsx          # React root + providers (Router, Query)
     ├── index.css         # @tailwind directives
     ├── app/
-    │   ├── App.tsx       # rotas (placeholder em `/`)
+    │   ├── App.tsx       # rotas da app (cliente + comerciante)
     │   └── App.test.tsx  # smoke: render do `/` + import do @foodloop/lib
     ├── lib/api.ts        # createApiClient + setApiClient do @foodloop/lib
     └── test/setup.ts     # @testing-library/jest-dom matchers (vitest setupFiles)
@@ -70,7 +70,7 @@ src/front/
 
 - **React 19, não 18.** Prisma 7 do back puxa `react@19` que sobe ao hoist do monorepo. Front também usa 19 para evitar duplicidade no jsdom dos testes.
 - **Tailwind v3.** Plan B do card mencionava v4; a v3 mantém a config previsível com `postcss-load-config`.
-- **Sem MSW ainda.** A flag `VITE_USE_MSW` já existe no `.env.example` mas o handler entra em card próprio.
+- **MSW opcional.** Por padrão o front fala com a API real (`VITE_USE_MSW=false`). Defina `VITE_USE_MSW=true` para rodar contra os handlers do Mock Service Worker em `src/mocks/` (sem precisar do back).
 
 ## Segurança — trade-offs conhecidos
 

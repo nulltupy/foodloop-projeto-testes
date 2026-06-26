@@ -51,6 +51,18 @@ export function Header() {
               <p className="font-medium text-ink-900">{usuario.nome}</p>
               <p className="truncate text-sm text-ink-500">{usuario.email}</p>
 
+              {usuario.tipo === 'cliente' && (
+                <nav className="mt-3 flex flex-col gap-1 border-t border-surface-200 pt-3">
+                  <Link
+                    to="/pedidos"
+                    onClick={() => setAberto(false)}
+                    className="rounded-md px-2 py-2 text-sm text-ink-700 hover:bg-surface-100"
+                  >
+                    Meus pedidos
+                  </Link>
+                </nav>
+              )}
+
               {usuario.tipo === 'comerciante' && (
                 <nav className="mt-3 flex flex-col gap-1 border-t border-surface-200 pt-3">
                   <Link
@@ -59,6 +71,20 @@ export function Header() {
                     className="rounded-md px-2 py-2 text-sm text-ink-700 hover:bg-surface-100"
                   >
                     Meus anúncios
+                  </Link>
+                  <Link
+                    to="/comerciante/pedidos"
+                    onClick={() => setAberto(false)}
+                    className="rounded-md px-2 py-2 text-sm text-ink-700 hover:bg-surface-100"
+                  >
+                    Pedidos
+                  </Link>
+                  <Link
+                    to="/comerciante/loja"
+                    onClick={() => setAberto(false)}
+                    className="rounded-md px-2 py-2 text-sm text-ink-700 hover:bg-surface-100"
+                  >
+                    Minha loja
                   </Link>
                 </nav>
               )}

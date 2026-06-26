@@ -5,11 +5,36 @@ import {
   ErrorCode,
   gerarCodigoRetirada,
 } from '@foodloop/lib';
-import type { ItemPedido, Pedido } from '@foodloop/lib';
+import type {
+  ItemPedido,
+  ItemPedidoResumo,
+  Pedido,
+  PedidoClienteListItem,
+  PedidoComercianteListItem,
+} from '@foodloop/lib';
 import { db, usuarioPorAuth } from '../db';
 
 function erro(code: string, message: string, status: number) {
   return HttpResponse.json({ error: { code, message } }, { status });
+}
+
+// Resolve o nome do produto a partir do anúncio do item, para as listagens.
+function resumirItens(itens: ItemPedido[]): ItemPedidoResumo[] {
+  return itens.map((item) => {
+    const anuncio = db.anuncios.find((a) => a.id === item.id_anuncio);
+    const produto = anuncio ? db.produtos.find((p) => p.id === anuncio.id_produto) : undefined;
+    return {
+      id: item.id,
+      produto_nome: produto?.nome ?? 'Produto',
+      quantidade: item.quantidade,
+      preco_unitario: item.preco_unitario,
+      subtotal: item.subtotal,
+    };
+  });
+}
+
+function envelopar<T>(data: T[]) {
+  return { data, meta: { pagina: 1, tamanho: 20, total: data.length } };
 }
 
 export const pedidosHandlers = [
@@ -58,7 +83,21 @@ export const pedidosHandlers = [
   http.get('/api/v1/pedidos/meus', ({ request }) => {
     const usuario = usuarioPorAuth(request.headers.get('Authorization'));
     if (!usuario) return erro(ErrorCode.TOKEN_INVALIDO, 'Token inválido', 401);
-    return HttpResponse.json(db.pedidos.filter((p) => p.id_cliente === usuario.id));
+    const itens: PedidoClienteListItem[] = db.pedidos
+      .filter((p) => p.id_cliente === usuario.id)
+      .map((p) => {
+        const est = db.estabelecimentos.find((e) => e.id === p.id_estabelecimento);
+        return {
+          id: p.id,
+          status: p.status,
+          valor_total: p.valor_total,
+          data_pedido: p.data_pedido,
+          codigo_retirada: p.codigo_retirada,
+          estabelecimento: { id: p.id_estabelecimento, nome_fantasia: est?.nome_fantasia ?? 'Loja' },
+          itens: resumirItens(p.itens),
+        };
+      });
+    return HttpResponse.json(envelopar(itens));
   }),
 
   http.get('/api/v1/pedidos/comerciante', ({ request }) => {
@@ -66,7 +105,20 @@ export const pedidosHandlers = [
     if (!usuario || usuario.tipo !== 'comerciante') {
       return erro(ErrorCode.PERMISSAO_NEGADA, 'Acesso restrito ao comerciante', 403);
     }
-    return HttpResponse.json(db.pedidos.filter((p) => p.id_estabelecimento === usuario.id_estabelecimento));
+    const itens: PedidoComercianteListItem[] = db.pedidos
+      .filter((p) => p.id_estabelecimento === usuario.id_estabelecimento)
+      .map((p) => {
+        const cliente = db.usuarios.find((u) => u.id === p.id_cliente);
+        return {
+          id: p.id,
+          status: p.status,
+          valor_total: p.valor_total,
+          data_pedido: p.data_pedido,
+          cliente: { nome: cliente?.nome ?? 'Cliente' },
+          itens: resumirItens(p.itens),
+        };
+      });
+    return HttpResponse.json(envelopar(itens));
   }),
 
   http.get('/api/v1/pedidos/:id', ({ params }) => {
@@ -84,7 +136,22 @@ export const pedidosHandlers = [
     if (!pedido) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Pedido não encontrado', 404);
     const parsed = AtualizarStatusRequestSchema.safeParse(await request.json());
     if (!parsed.success) return erro(ErrorCode.VALIDACAO, 'Status inválido', 400);
+    if (parsed.data.novo_status === 'RETIRADO' && parsed.data.codigo_retirada !== pedido.codigo_retirada) {
+      return erro(ErrorCode.CODIGO_RETIRADA_INVALIDO, 'Código de retirada inválido', 400);
+    }
     pedido.status = parsed.data.novo_status;
+    return HttpResponse.json(pedido);
+  }),
+
+  http.post('/api/v1/pedidos/:id/cancelar', ({ params, request }) => {
+    const usuario = usuarioPorAuth(request.headers.get('Authorization'));
+    if (!usuario) return erro(ErrorCode.TOKEN_INVALIDO, 'Token inválido', 401);
+    const pedido = db.pedidos.find((p) => p.id === Number(params.id));
+    if (!pedido) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Pedido não encontrado', 404);
+    if (pedido.status === 'RETIRADO' || pedido.status === 'CANCELADO') {
+      return erro(ErrorCode.PEDIDO_NAO_CANCELAVEL, 'Pedido não pode ser cancelado', 409);
+    }
+    pedido.status = 'CANCELADO';
     return HttpResponse.json(pedido);
   }),
 ];

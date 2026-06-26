@@ -1,23 +1,15 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
-import type { StatusPedido } from '@foodloop/lib';
-
-function moeda(valor: number): string {
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
-const ROTULO_STATUS: Record<StatusPedido, string> = {
-  RECEBIDO: 'Recebido',
-  EM_PREPARO: 'Em preparo',
-  PRONTO_PARA_RETIRADA: 'Pronto para retirada',
-  RETIRADO: 'Retirado',
-  CANCELADO: 'Cancelado',
-};
+import { ROTULO_STATUS } from '../status';
+import { moeda } from '../../../lib/format';
+import { mensagemErro } from '../../../lib/erros';
 
 export function PedidoConfirmacao() {
   const { id } = useParams();
   const pedidoId = Number(id);
+  const qc = useQueryClient();
 
   const pedidoQ = useQuery({
     queryKey: ['pedido', pedidoId],
@@ -26,6 +18,18 @@ export function PedidoConfirmacao() {
     refetchInterval: 5000,
   });
   const pedido = pedidoQ.data;
+
+  const [confirmandoCancel, setConfirmandoCancel] = useState(false);
+  const [erroCancel, setErroCancel] = useState<string | null>(null);
+  const cancelar = useMutation({
+    mutationFn: () => api.pedidos.cancelar(pedidoId),
+    onSuccess: () => {
+      setConfirmandoCancel(false);
+      void qc.invalidateQueries({ queryKey: ['pedido', pedidoId] });
+      void qc.invalidateQueries({ queryKey: ['pedidos-meus'] });
+    },
+    onError: (e) => setErroCancel(mensagemErro(e, 'Não foi possível cancelar o pedido')),
+  });
 
   const estabQ = useQuery({
     queryKey: ['estabelecimento', pedido?.id_estabelecimento],
@@ -96,6 +100,50 @@ export function PedidoConfirmacao() {
         <span>Total</span>
         <span>{moeda(pedido.valor_total)}</span>
       </div>
+
+      {erroCancel && (
+        <div role="alert" className="mt-4 rounded-md bg-danger-500/10 px-3 py-2 text-sm text-danger-600">
+          {erroCancel}
+        </div>
+      )}
+
+      {/* Cliente só pode cancelar enquanto o pedido foi apenas recebido. */}
+      {pedido.status === 'RECEBIDO' &&
+        (confirmandoCancel ? (
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <span className="text-sm font-medium text-danger-600">Cancelar este pedido?</span>
+            <button
+              type="button"
+              onClick={() => cancelar.mutate()}
+              disabled={cancelar.isPending}
+              className="min-h-11 rounded-lg bg-danger-500 px-4 text-sm font-medium text-white disabled:opacity-60"
+            >
+              Sim, cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmandoCancel(false)}
+              className="min-h-11 rounded-lg border border-surface-300 px-4 text-sm font-medium text-ink-700"
+            >
+              Não
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setErroCancel(null);
+              setConfirmandoCancel(true);
+            }}
+            className="mt-4 min-h-11 w-full rounded-lg border border-danger-500 px-4 font-medium text-danger-600"
+          >
+            Cancelar pedido
+          </button>
+        ))}
+
+      <Link to="/pedidos" className="mt-6 inline-block font-medium text-brand-700">
+        Ver todos os meus pedidos
+      </Link>
     </main>
   );
 }

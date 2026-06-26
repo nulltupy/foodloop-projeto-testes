@@ -34,6 +34,9 @@ const FORM_VAZIO: Formulario = {
   prazoHoras: 24,
 };
 
+// Formulário enxuto para anunciar um produto já cadastrado.
+const ANUNCIO_VAZIO = { desconto: 50, quantidade: '5', prazoHoras: 24 };
+
 function paraRequest(f: Formulario): CreateProdutoRequest {
   return {
     nome: f.nome.trim(),
@@ -90,6 +93,9 @@ export function PainelProdutos() {
   const [form, setForm] = useState<Formulario>(FORM_VAZIO);
   const [erro, setErro] = useState<string | null>(null);
   const [excluindo, setExcluindo] = useState<number | null>(null);
+  const [anunciando, setAnunciando] = useState<Produto | null>(null);
+  const [anuncioForm, setAnuncioForm] = useState(ANUNCIO_VAZIO);
+  const [erroAnuncio, setErroAnuncio] = useState<string | null>(null);
 
   function invalidar() {
     void qc.invalidateQueries({ queryKey: ['produtos-meus'] });
@@ -142,6 +148,28 @@ export function PainelProdutos() {
     onError: () => {
       setExcluindo(null);
       setErro('Erro ao excluir produto');
+    },
+  });
+
+  // Publica uma oferta para um produto que já existe e está sem anúncio ativo.
+  const anunciar = useMutation({
+    mutationFn: (args: { produto: Produto; desconto: number; quantidade: string; prazoHoras: number }) => {
+      const prazo = new Date(Date.now() + args.prazoHoras * 60 * 60 * 1000).toISOString();
+      return api.anuncios.criar({
+        id_produto: args.produto.id,
+        preco_promocional: precoComDesconto(String(args.produto.preco_regular), args.desconto)!,
+        quantidade_inicial: Number(args.quantidade),
+        prazo_retirada: prazo,
+      });
+    },
+    onSuccess: () => {
+      setAnunciando(null);
+      setAnuncioForm(ANUNCIO_VAZIO);
+      setErroAnuncio(null);
+      invalidar();
+    },
+    onError: (e: unknown) => {
+      setErroAnuncio(e instanceof Error ? e.message : 'Erro ao publicar anúncio');
     },
   });
 
@@ -363,64 +391,178 @@ export function PainelProdutos() {
           {lista.data?.map((p) => {
             const anuncio = anuncioAtivoDe(p.id);
             return (
-              <li
-                key={p.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-surface-200 bg-white p-3"
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-ink-900">{p.nome}</p>
-                  <p className="truncate text-sm text-ink-500">
-                    {moeda(p.preco_regular)} · {p.categoria}
-                    {!p.ativo && ' · inativo'}
-                  </p>
-                  {anuncio ? (
-                    <p className="truncate text-sm font-medium text-brand-700">
-                      Anunciado: {moeda(anuncio.preco_promocional)} · {anuncio.quantidade_disponivel}{' '}
-                      disponíveis · retirada até {formatarPrazo(anuncio.prazo_retirada)}
+              <li key={p.id} className="rounded-lg border border-surface-200 bg-white p-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-ink-900">{p.nome}</p>
+                    <p className="truncate text-sm text-ink-500">
+                      {moeda(p.preco_regular)} · {p.categoria}
+                      {!p.ativo && ' · inativo'}
                     </p>
+                    {anuncio ? (
+                      <p className="truncate text-sm font-medium text-brand-700">
+                        Anunciado: {moeda(anuncio.preco_promocional)} · {anuncio.quantidade_disponivel}{' '}
+                        disponíveis · retirada até {formatarPrazo(anuncio.prazo_retirada)}
+                      </p>
+                    ) : (
+                      p.ativo && <p className="truncate text-sm text-ink-500">Sem anúncio ativo</p>
+                    )}
+                  </div>
+
+                  {excluindo === p.id ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-danger-700">
+                        Excluir &ldquo;{p.nome}&rdquo;?
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => desativar.mutate(p.id)}
+                        disabled={desativar.isPending}
+                        className="min-h-11 rounded-lg bg-danger-500 px-3 text-sm font-medium text-white disabled:opacity-60"
+                      >
+                        Sim, excluir
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setExcluindo(null)}
+                        className="min-h-11 rounded-lg border border-surface-300 px-3 text-sm font-medium text-ink-700"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
                   ) : (
-                    p.ativo && <p className="truncate text-sm text-ink-500">Sem anúncio ativo</p>
+                    <div className="flex flex-wrap gap-2">
+                      {p.ativo && !anuncio && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAnunciando(anunciando?.id === p.id ? null : p);
+                            setAnuncioForm(ANUNCIO_VAZIO);
+                            setErroAnuncio(null);
+                          }}
+                          className="min-h-11 rounded-lg bg-brand-700 px-3 text-sm font-medium text-white"
+                        >
+                          Anunciar
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => iniciarEdicao(p)}
+                        className="min-h-11 rounded-lg border border-surface-300 px-3 text-sm font-medium text-ink-700"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setExcluindo(p.id)}
+                        className="min-h-11 rounded-lg border border-danger-500 px-3 text-sm font-medium text-danger-700"
+                      >
+                        Excluir
+                      </button>
+                    </div>
                   )}
                 </div>
 
-                {excluindo === p.id ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-danger-700">
-                      Excluir &ldquo;{p.nome}&rdquo;?
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => desativar.mutate(p.id)}
-                      disabled={desativar.isPending}
-                      className="min-h-11 rounded-lg bg-danger-500 px-3 text-sm font-medium text-white disabled:opacity-60"
-                    >
-                      Sim, excluir
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setExcluindo(null)}
-                      className="min-h-11 rounded-lg border border-surface-300 px-3 text-sm font-medium text-ink-700"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => iniciarEdicao(p)}
-                      className="min-h-11 rounded-lg border border-surface-300 px-3 text-sm font-medium text-ink-700"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setExcluindo(p.id)}
-                      className="min-h-11 rounded-lg border border-danger-500 px-3 text-sm font-medium text-danger-700"
-                    >
-                      Excluir
-                    </button>
-                  </div>
+                {anunciando?.id === p.id && (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const quantidade = Number(anuncioForm.quantidade);
+                      if (!Number.isInteger(quantidade) || quantidade < 1) {
+                        setErroAnuncio('Quantidade precisa ser um número inteiro maior que zero');
+                        return;
+                      }
+                      setErroAnuncio(null);
+                      anunciar.mutate({ produto: p, ...anuncioForm });
+                    }}
+                    className="mt-3 rounded-md border border-surface-200 bg-surface-50 p-3"
+                  >
+                    <div className="grid grid-cols-3 gap-3">
+                      <label className="text-sm">
+                        Desconto
+                        <select
+                          value={anuncioForm.desconto}
+                          onChange={(e) =>
+                            setAnuncioForm({ ...anuncioForm, desconto: Number(e.target.value) })
+                          }
+                          className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
+                        >
+                          {DESCONTOS.map((d) => (
+                            <option key={d} value={d}>
+                              {d}%
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label className="text-sm">
+                        Quantidade
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          value={anuncioForm.quantidade}
+                          onChange={(e) => setAnuncioForm({ ...anuncioForm, quantidade: e.target.value })}
+                          className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
+                          required
+                        />
+                      </label>
+
+                      <label className="text-sm">
+                        Retirada até
+                        <select
+                          value={anuncioForm.prazoHoras}
+                          onChange={(e) =>
+                            setAnuncioForm({ ...anuncioForm, prazoHoras: Number(e.target.value) })
+                          }
+                          className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
+                        >
+                          {PRAZOS.map((pr) => (
+                            <option key={pr.horas} value={pr.horas}>
+                              {pr.rotulo}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <p className="mt-2 text-sm text-ink-700">
+                      Cliente paga{' '}
+                      <span className="font-semibold text-brand-700">
+                        {moeda(precoComDesconto(String(p.preco_regular), anuncioForm.desconto)!)}
+                      </span>{' '}
+                      <span className="text-ink-500 line-through">{moeda(p.preco_regular)}</span>
+                    </p>
+
+                    {erroAnuncio && (
+                      <div
+                        role="alert"
+                        className="mt-2 rounded-md bg-danger-500/10 px-3 py-2 text-sm text-danger-600"
+                      >
+                        {erroAnuncio}
+                      </div>
+                    )}
+
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="submit"
+                        disabled={anunciar.isPending}
+                        className="min-h-11 flex-1 rounded-lg bg-brand-700 px-4 font-medium text-white disabled:opacity-60"
+                      >
+                        Publicar oferta
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAnunciando(null);
+                          setErroAnuncio(null);
+                        }}
+                        className="min-h-11 rounded-lg border border-surface-300 px-4 font-medium text-ink-700"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
                 )}
               </li>
             );

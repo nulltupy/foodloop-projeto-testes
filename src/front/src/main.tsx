@@ -17,7 +17,7 @@ async function iniciarMocks(): Promise<void> {
   await worker.start({ onUnhandledRequest: 'bypass' });
 }
 
-void iniciarMocks().then(() => {
+function renderApp(): void {
   const root = document.getElementById('root');
   if (!root) throw new Error('Elemento #root ausente em index.html');
 
@@ -30,4 +30,12 @@ void iniciarMocks().then(() => {
       </QueryClientProvider>
     </React.StrictMode>,
   );
-});
+}
+
+// Renderiza independentemente do MSW: se a inicialização dos mocks falhar, o app
+// ainda sobe (apontando para a API real) em vez de ficar com a tela em branco.
+void iniciarMocks()
+  .catch((erro) => {
+    console.error('Falha ao iniciar o Mock Service Worker; seguindo sem mocks.', erro);
+  })
+  .finally(renderApp);

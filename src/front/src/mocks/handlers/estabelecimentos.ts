@@ -1,5 +1,9 @@
 import { http, HttpResponse } from 'msw';
-import { CreateEstabelecimentoRequestSchema, ErrorCode } from '@foodloop/lib';
+import {
+  CreateEstabelecimentoRequestSchema,
+  ErrorCode,
+  UpdateEstabelecimentoRequestSchema,
+} from '@foodloop/lib';
 import type { Endereco } from '@foodloop/lib';
 import { db, usuarioPorAuth } from '../db';
 
@@ -56,5 +60,46 @@ export const estabelecimentosHandlers = [
     db.estabelecimentos.push(novo);
     usuario.id_estabelecimento = id;
     return HttpResponse.json(novo, { status: 201 });
+  }),
+
+  http.patch('/api/v1/estabelecimentos/me', async ({ request }) => {
+    const usuario = usuarioPorAuth(request.headers.get('Authorization'));
+    if (!usuario || usuario.tipo !== 'comerciante') {
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Acesso restrito ao comerciante', 403);
+    }
+    const estab = db.estabelecimentos.find((e) => e.id === usuario.id_estabelecimento);
+    if (!estab) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Sem estabelecimento', 404);
+    const parsed = UpdateEstabelecimentoRequestSchema.safeParse(await request.json());
+    if (!parsed.success) return erro(ErrorCode.VALIDACAO, 'Dados inválidos', 400);
+    const d = parsed.data;
+    if (d.nome_fantasia !== undefined) estab.nome_fantasia = d.nome_fantasia;
+    if (d.descricao !== undefined) estab.descricao = d.descricao ?? null;
+    if (d.horario_funcionamento !== undefined) {
+      estab.horario_funcionamento = d.horario_funcionamento ?? null;
+    }
+    if (d.endereco) estab.endereco = { ...estab.endereco, ...d.endereco };
+    return HttpResponse.json(estab);
+  }),
+
+  http.post('/api/v1/estabelecimentos/me/fechar', ({ request }) => {
+    const usuario = usuarioPorAuth(request.headers.get('Authorization'));
+    if (!usuario || usuario.tipo !== 'comerciante') {
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Acesso restrito ao comerciante', 403);
+    }
+    const estab = db.estabelecimentos.find((e) => e.id === usuario.id_estabelecimento);
+    if (!estab) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Sem estabelecimento', 404);
+    estab.ativo = false;
+    return HttpResponse.json(estab);
+  }),
+
+  http.post('/api/v1/estabelecimentos/me/abrir', ({ request }) => {
+    const usuario = usuarioPorAuth(request.headers.get('Authorization'));
+    if (!usuario || usuario.tipo !== 'comerciante') {
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Acesso restrito ao comerciante', 403);
+    }
+    const estab = db.estabelecimentos.find((e) => e.id === usuario.id_estabelecimento);
+    if (!estab) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Sem estabelecimento', 404);
+    estab.ativo = true;
+    return HttpResponse.json(estab);
   }),
 ];
