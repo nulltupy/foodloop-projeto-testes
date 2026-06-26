@@ -1,4 +1,4 @@
-import { ErrorCode } from '@foodloop/lib';
+import { ErrorCode, gerarCodigoRetirada, type StatusPedido } from '@foodloop/lib';
 
 import { prisma } from '../../db/client.js';
 import { HttpError } from '../../shared/errors.js';
@@ -8,15 +8,12 @@ interface CriarParams {
   itens: { id_anuncio: number; quantidade: number }[];
 }
 
-const ALFABETO = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-
-function gerarCodigoRetirada(): string {
-  let out = '';
-  for (let i = 0; i < 8; i++) {
-    out += ALFABETO[Math.floor(Math.random() * ALFABETO.length)];
-  }
-  return out;
-}
+// Avanço linear do ciclo do pedido. Cancelamento (* → CANCELADO) é pós-MVP.
+const TRANSICOES_OK: Partial<Record<StatusPedido, StatusPedido[]>> = {
+  RECEBIDO: ['EM_PREPARO'],
+  EM_PREPARO: ['PRONTO_PARA_RETIRADA'],
+  PRONTO_PARA_RETIRADA: ['RETIRADO'],
+};
 
 export async function criar(params: CriarParams) {
   return prisma.$transaction(async (tx) => {
@@ -86,6 +83,47 @@ export async function getById(id: number) {
   });
   if (!p) return null;
   return montar(p);
+}
+
+export async function avancarStatus(
+  comercianteId: number,
+  pedidoId: number,
+  novoStatus: StatusPedido,
+  codigoRetirada?: string,
+) {
+  const pedido = await prisma.pedido.findUnique({
+    where: { id: BigInt(pedidoId) },
+    include: { estabelecimento: true },
+  });
+  if (!pedido) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Pedido não encontrado');
+  }
+  // estabelecimento.id_comerciante já é o id do usuário comerciante — não precisa
+  // joinar comerciante.
+  if (pedido.estabelecimento.id_comerciante !== BigInt(comercianteId)) {
+    throw new HttpError(403, ErrorCode.PERMISSAO_NEGADA, 'Pedido de outro estabelecimento');
+  }
+
+  if (!TRANSICOES_OK[pedido.status]?.includes(novoStatus)) {
+    throw new HttpError(409, ErrorCode.VALIDACAO, `Transição inválida: ${pedido.status} → ${novoStatus}`);
+  }
+
+  // Retirada só se confirma com o código que o cliente apresenta.
+  if (novoStatus === 'RETIRADO') {
+    if (!codigoRetirada) {
+      throw new HttpError(400, ErrorCode.VALIDACAO, 'Código de retirada obrigatório');
+    }
+    if (codigoRetirada !== pedido.codigo_retirada) {
+      throw new HttpError(400, ErrorCode.CODIGO_RETIRADA_INVALIDO, 'Código de retirada incorreto');
+    }
+  }
+
+  const atualizado = await prisma.pedido.update({
+    where: { id: pedido.id },
+    data: { status: novoStatus },
+    include: { item_pedido: true },
+  });
+  return montar(atualizado);
 }
 
 interface PedidoWithItens {

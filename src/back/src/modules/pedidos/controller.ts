@@ -1,4 +1,4 @@
-import { CriarPedidoRequestSchema, ErrorCode } from '@foodloop/lib';
+import { AtualizarStatusRequestSchema, CriarPedidoRequestSchema, ErrorCode } from '@foodloop/lib';
 import { Router } from 'express';
 
 import { requireAuth, requireRole } from '../../shared/middlewares/auth.js';
@@ -37,6 +37,29 @@ export function createPedidosRouter(): Router {
         throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Pedido não encontrado');
       }
       res.json(pedido);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.patch('/:id/status', requireAuth, requireRole('comerciante'), async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
+      }
+      const parsed = AtualizarStatusRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const fields = Object.keys(parsed.error.flatten().fieldErrors);
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Payload inválido', { fields });
+      }
+      const atualizado = await service.avancarStatus(
+        req.usuario!.id,
+        id,
+        parsed.data.novo_status,
+        parsed.data.codigo_retirada,
+      );
+      res.json(atualizado);
     } catch (e) {
       next(e);
     }
