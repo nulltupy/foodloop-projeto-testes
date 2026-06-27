@@ -2,7 +2,15 @@
 // pedidos. Os dados seguem os schemas de @foodloop/lib para que os handlers
 // devolvam payloads conformes ao contrato. Seed determinístico com faker.
 import { faker } from '@faker-js/faker';
-import type { Anuncio, Endereco, Estabelecimento, Pedido, Produto, TipoUsuario } from '@foodloop/lib';
+import type {
+  Anuncio,
+  Endereco,
+  Estabelecimento,
+  Notificacao,
+  Pedido,
+  Produto,
+  TipoUsuario,
+} from '@foodloop/lib';
 
 // Usuário interno do mock: inclui a senha (em texto) só para casar no login.
 export interface UsuarioMock {
@@ -14,7 +22,11 @@ export interface UsuarioMock {
   tipo: TipoUsuario;
   cnpj?: string;
   id_estabelecimento?: number;
+  foto_url?: string | null;
 }
+
+// Notificação do mock com o dono, para filtrar por usuário autenticado.
+export type NotificacaoMock = Notificacao & { id_usuario: number };
 
 export interface MockDb {
   usuarios: UsuarioMock[];
@@ -22,6 +34,7 @@ export interface MockDb {
   produtos: Produto[];
   anuncios: Anuncio[];
   pedidos: Pedido[];
+  notificacoes: NotificacaoMock[];
   // token -> id do usuário autenticado
   sessoes: Map<string, number>;
   proximoId: { usuario: number; pedido: number };
@@ -130,12 +143,35 @@ function semear(): MockDb {
     },
   ];
 
+  // Notificações de exemplo para o cliente demo (id 1).
+  const notificacoes: NotificacaoMock[] = [
+    {
+      id: 1,
+      id_usuario: 1,
+      titulo: 'Bem-vindo ao FoodLoop',
+      corpo: 'Aproveite as ofertas perto de você.',
+      deep_link: null,
+      lida: false,
+      data_envio: new Date().toISOString(),
+    },
+    {
+      id: 2,
+      id_usuario: 1,
+      titulo: 'Atualização do pedido',
+      corpo: 'Seu pedido está pronto para retirada.',
+      deep_link: '/pedidos/1',
+      lida: false,
+      data_envio: new Date().toISOString(),
+    },
+  ];
+
   return {
     usuarios,
     estabelecimentos,
     produtos,
     anuncios,
     pedidos: [],
+    notificacoes,
     sessoes: new Map(),
     proximoId: { usuario: 3, pedido: 1 },
   };

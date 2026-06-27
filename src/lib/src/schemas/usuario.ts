@@ -1,13 +1,15 @@
 import { z } from 'zod';
 import { TipoUsuarioSchema } from './comum.js';
 
-// Usuário público (nunca inclui senha_hash).
+// Usuário público (nunca inclui senha_hash). Espelha GET /usuarios/me: telefone
+// pode ser nulo e há foto_url opcional.
 export const UsuarioSchema = z.object({
   id: z.number().int().positive(),
   nome: z.string().min(2).max(120),
   email: z.string().email(),
-  telefone: z.string(),
+  telefone: z.string().nullable(),
   tipo: TipoUsuarioSchema,
+  foto_url: z.string().nullable().optional(),
   data_cadastro: z.string().datetime().optional(),
 });
 export type Usuario = z.infer<typeof UsuarioSchema>;

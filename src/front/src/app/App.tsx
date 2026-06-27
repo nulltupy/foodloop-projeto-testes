@@ -12,6 +12,7 @@ import { MeusPedidos } from '../features/pedidos/pages/MeusPedidos';
 import { PainelProdutos } from '../features/comerciante/pages/PainelProdutos';
 import { PainelPedidos } from '../features/comerciante/pages/PainelPedidos';
 import { PainelLoja } from '../features/comerciante/pages/PainelLoja';
+import { Perfil } from '../features/perfil/pages/Perfil';
 
 export function App() {
   return (
@@ -21,13 +22,14 @@ export function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro/cliente" element={<CadastroCliente />} />
         <Route path="/cadastro/comerciante" element={<CadastroComerciante />} />
-        {/* Rotas do cliente autenticado. */}
+        {/* Rotas autenticadas (qualquer tipo de usuário). */}
         <Route element={<RotaProtegida />}>
           <Route path="/" element={<Home />} />
           <Route path="/oferta/:id" element={<OfertaDetalhe />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/pedidos" element={<MeusPedidos />} />
           <Route path="/pedidos/:id" element={<PedidoConfirmacao />} />
+          <Route path="/perfil" element={<Perfil />} />
         </Route>
 
         {/* Rotas exclusivas do comerciante. */}

@@ -88,9 +88,43 @@ function FormularioLoja({
 }) {
   const [form, setForm] = useState<FormLoja>(inicial);
   const [erro, setErro] = useState<string | null>(null);
+  const [cepStatus, setCepStatus] = useState<'idle' | 'buscando' | 'nao_encontrado'>('idle');
 
   function set<K extends keyof FormLoja>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  // Autocompleta o endereço a partir do CEP (ViaCEP). O back ainda geocodifica
+  // as coordenadas no envio; aqui é só conveniência de preenchimento.
+  async function buscarCep(cepRaw: string) {
+    const digitos = cepRaw.replace(/\D/g, '');
+    if (digitos.length !== 8) return;
+    setCepStatus('buscando');
+    try {
+      const r = await fetch(`https://viacep.com.br/ws/${digitos}/json/`);
+      const d = (await r.json()) as {
+        logradouro?: string;
+        bairro?: string;
+        localidade?: string;
+        uf?: string;
+        erro?: boolean;
+      };
+      if (d.erro) {
+        setCepStatus('nao_encontrado');
+        return;
+      }
+      setForm((f) => ({
+        ...f,
+        rua: d.logradouro || f.rua,
+        bairro: d.bairro || f.bairro,
+        cidade: d.localidade || f.cidade,
+        estado: d.uf || f.estado,
+      }));
+      setCepStatus('idle');
+    } catch {
+      // Falha silenciosa: o usuário preenche o endereço manualmente.
+      setCepStatus('idle');
+    }
   }
 
   function onSubmit(e: React.FormEvent) {
@@ -144,7 +178,8 @@ function FormularioLoja({
       <fieldset className="rounded-md border border-surface-200 bg-surface-50 p-3">
         <legend className="px-1 text-sm font-medium text-ink-900">Endereço</legend>
         <p className="px-1 text-xs text-ink-500">
-          A localização no mapa é calculada automaticamente a partir do endereço.
+          Digite o CEP para preencher o endereço automaticamente. A localização no mapa é calculada a partir
+          dele.
         </p>
 
         <div className="mt-2 grid grid-cols-[2fr_1fr] gap-3">
@@ -212,12 +247,20 @@ function FormularioLoja({
             <input
               type="text"
               value={form.cep}
-              onChange={(e) => set('cep', e.target.value)}
+              onChange={(e) => {
+                set('cep', e.target.value);
+                if (cepStatus !== 'idle') setCepStatus('idle');
+              }}
+              onBlur={(e) => void buscarCep(e.target.value)}
               className={campo}
               placeholder="00000-000"
               maxLength={9}
               required
             />
+            {cepStatus === 'buscando' && <span className="text-xs text-ink-500">Buscando…</span>}
+            {cepStatus === 'nao_encontrado' && (
+              <span className="text-xs text-danger-600">CEP não encontrado</span>
+            )}
           </label>
         </div>
       </fieldset>
