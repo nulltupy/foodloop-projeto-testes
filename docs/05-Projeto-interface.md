@@ -317,7 +317,7 @@ Acesse o protótipo interativo pelo link abaixo:
 
 A jornada do usuário do FoodLoop foi desenvolvida com base no modelo AIDA, permitindo representar as etapas percorridas pelo consumidor desde o primeiro contato com a plataforma até o pós-uso do serviço. O objetivo é compreender como o usuário interage com a aplicação, identificando ações, pontos de contato e percepções ao longo da experiência.
 
-Na fase de conscientização, o usuário conhece o FoodLoop por meio de anúncios, redes sociais, influenciadores ou indicações, despertando curiosidade e interesse pela proposta do aplicativo. Em seguida, na etapa de interesse, o consumidor realiza o download da aplicação, cria sua conta e começa a explorar as ofertas disponíveis.
+Na fase de conscientização, o usuário conhece o FoodLoop por meio de anúncios, redes sociais, influenciadores ou indicações, despertando curiosidade e interesse pela proposta do aplicativo. Em seguida, na etapa de interesse, o consumidor acessa a aplicação web pelo navegador, cria sua conta e começa a explorar as ofertas disponíveis.
 
 Na fase de desejo, o usuário compara preços, avaliações, localização e produtos disponíveis, aumentando sua intenção de compra. Já na etapa de ação, ocorre a reserva ou compra do alimento excedente, seguida da retirada no estabelecimento parceiro.
 

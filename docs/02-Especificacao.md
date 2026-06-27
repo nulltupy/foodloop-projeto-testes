@@ -90,11 +90,11 @@ As tabelas a seguir apresentam os requisitos funcionais e não funcionais que de
 
 | ID | Descrição do Requisito | Prioridade |
 | :--- | :--- | :--- |
-| RNF-001 | O aplicativo deve ser desenvolvido no framework **React Native**, garantindo compatibilidade com dispositivos móveis (Android e iOS). | ALTA |
+| RNF-001 | O sistema deve ser entregue como uma **aplicação web responsiva** (SPA em React + Vite), garantindo compatibilidade com os principais navegadores em desktop e dispositivos móveis. | ALTA |
 | RNF-002 | A persistência de dados deve ser implementada em **PostgreSQL** acessado por uma API REST em **Node.js + Express**, com autenticação de usuários baseada em **tokens JWT**. Os serviços auxiliares de armazenamento de mídia e notificações push devem usar o **Firebase** (Storage e Cloud Messaging) no plano gratuito. | ALTA |
 | RNF-003 | A integração com os provedores de meios de pagamento deve seguir protocolos de segurança avançados e criptografia ponta a ponta. | ALTA |
 | RNF-004 | O tempo de carregamento da listagem de ofertas no mapa não deve ultrapassar 3 segundos. | MÉDIA |
-| RNF-005 | O aplicativo deve estar disponível para uso em pelo menos 99% do tempo durante o horário de pico (18h–22h), minimizando interrupções no período de maior demanda. | ALTA |
+| RNF-005 | A aplicação deve estar disponível para uso em pelo menos 99% do tempo durante o horário de pico (18h–22h), minimizando interrupções no período de maior demanda. | ALTA |
 
 ## Restrições
 
@@ -104,7 +104,7 @@ O projeto está restrito aos itens apresentados na tabela a seguir, que delimita
 | :--- | :--- |
 | **001** | O projeto e a apresentação deverão ser entregues obrigatoriamente dentro do prazo estipulado pelo cronograma acadêmico. |
 | **002** | O desenvolvimento do software deve ser realizado exclusivamente pelos integrantes do grupo, sendo proibida a contratação de terceiros. |
-| **003** | A arquitetura de software está restrita à combinação React Native (Front-end), Node.js + Express + PostgreSQL hospedados no Render (Back-end e banco) e Firebase nos planos gratuitos para Storage e Cloud Messaging, conforme validação técnica da equipe. |
+| **003** | A arquitetura de software está restrita à combinação React + Vite (Front-end web), Node.js + Express + PostgreSQL hospedados no Render (Back-end e banco) e Firebase nos planos gratuitos para Storage e Cloud Messaging, conforme validação técnica da equipe. |
 | **004** | O custo total do projeto deve ser contido no orçamento zero, utilizando apenas os planos gratuitos (*Free Tier*) de plataformas de hospedagem e APIs. |
 ## Diagrama de casos de uso
 

@@ -147,7 +147,7 @@ Os artefatos do projeto são desenvolvidos a partir de diversas plataformas e a 
 | Documentos do projeto               | GitHub                             | https://github.com/ICEI-PUC-Minas-PBE-SI-TI/2026-1-p5-tias-foodloop/tree/main/docs |
 | Gerenciamento do projeto            | GitHub Projects                    | https://github.com/orgs/ICEI-PUC-Minas-PBE-SI-TI/projects/6/views/1 |
 | Comunicação da equipe               | WhatsApp                           | —                                      |
-| Desenvolvimento mobile              | React Native (Expo)                | https://reactnative.dev/   -   https://expo.dev/            |
+| Desenvolvimento web (front-end)     | React + Vite + TypeScript          | https://react.dev/   -   https://vitejs.dev/               |
 | Back-end, banco e hospedagem        | Render (Node.js + Express + PostgreSQL) | https://render.com/                |
 | Armazenamento de mídia e push       | Firebase (Storage e Cloud Messaging) | https://firebase.google.com/         |
 | Mapas e geolocalização              | Google Maps Platform               | https://developers.google.com/maps     |
