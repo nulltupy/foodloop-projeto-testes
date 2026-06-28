@@ -1,3 +1,103 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-bold;
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: #d6ebdf;
+    color: #14241a;
+  }
+
+  :focus-visible {
+    outline: 2px solid #0a7d52;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  .nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* ── Cartões: brancos, arredondados, sombra macia ──────────────────── */
+  .card {
+    @apply rounded-2xl border border-canvas-line bg-canvas-card shadow-card;
+  }
+
+  /* Rótulo curto: caixa alta, verde-névoa. */
+  .lbl {
+    @apply text-[0.7rem] font-bold uppercase text-ink-mute;
+  }
+
+  /* ── Botões ────────────────────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 text-sm font-bold
+      transition-[transform,box-shadow,background-color] duration-150 active:translate-y-px;
+  }
+  .btn-primary {
+    @apply bg-leaf text-white shadow-pop hover:bg-leaf-dark hover:-translate-y-0.5;
+  }
+  .btn-accent {
+    @apply bg-citrus text-ink shadow-badge hover:bg-citrus-dark hover:-translate-y-0.5;
+  }
+  .btn-soft {
+    @apply bg-leaf-50 text-leaf-dark hover:bg-leaf-100;
+  }
+  .btn-outline {
+    @apply border border-canvas-line bg-white text-ink-soft hover:border-leaf-200 hover:text-leaf-dark;
+  }
+  .btn-danger {
+    @apply bg-danger text-white hover:bg-danger-dark;
+  }
+  .btn:disabled {
+    @apply pointer-events-none translate-y-0 opacity-55 shadow-none;
+  }
+
+  /* ── Campos de formulário ──────────────────────────────────────────── */
+  .campo {
+    @apply min-h-11 w-full rounded-lg border border-canvas-line bg-white px-3.5 text-base text-ink
+      placeholder:text-ink-mute transition-colors;
+  }
+  .campo:focus {
+    @apply border-leaf outline-none ring-2 ring-leaf/25;
+  }
+
+  /* Selo redondo de desconto (o herói). Tinta escura sobre laranja passa AA. */
+  .selo {
+    @apply grid place-items-center rounded-full bg-citrus font-extrabold text-ink shadow-badge;
+  }
+
+  /* Pílula de meta (km, horário, status). */
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-leaf-50 px-3 py-1.5 text-xs font-semibold text-leaf-dark;
+  }
+}
+
+/* Reduced motion: troca qualquer animação por transição instantânea. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

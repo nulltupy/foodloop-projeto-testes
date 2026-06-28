@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import { RegisterRequestSchema, type RegisterRequest } from '@foodloop/lib';
 import { useRegister } from '../hooks/useRegister';
 
-const campo = 'min-h-11 rounded-lg border border-surface-200 px-3';
-
 export function CadastroComerciante() {
   const { registrar, erro } = useRegister();
   const {
@@ -18,45 +16,47 @@ export function CadastroComerciante() {
   });
 
   return (
-    <main className="mx-auto w-full max-w-sm p-6">
-      <h1 className="text-2xl font-semibold text-brand-700">Cadastrar comércio</h1>
-      <p className="mt-1 text-sm text-ink-500">Cadastro de comerciante</p>
+    <main className="mx-auto w-full max-w-md p-6">
+      <h1 className="text-2xl font-extrabold text-ink">Cadastrar comércio</h1>
+      <p className="mt-1 text-sm text-ink-mute">Cadastro de comerciante</p>
 
-      <form onSubmit={handleSubmit(registrar)} className="mt-6 flex flex-col gap-4" noValidate>
+      <form onSubmit={handleSubmit(registrar)} className="card mt-6 flex flex-col gap-4 p-6" noValidate>
         <input type="hidden" value="comerciante" {...register('tipo')} />
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="nome" className="font-medium text-ink-900">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="nome" className="text-sm font-bold text-ink-soft">
             Nome do responsável
           </label>
-          <input id="nome" className={campo} {...register('nome')} />
-          {errors.nome && <p className="text-sm text-danger-600">Informe o nome.</p>}
+          <input id="nome" className="campo" {...register('nome')} />
+          {errors.nome && <p className="text-sm font-semibold text-danger">Informe o nome.</p>}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="font-medium text-ink-900">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="email" className="text-sm font-bold text-ink-soft">
             E-mail
           </label>
-          <input id="email" type="email" autoComplete="email" className={campo} {...register('email')} />
-          {errors.email && <p className="text-sm text-danger-600">Informe um e-mail válido.</p>}
+          <input id="email" type="email" autoComplete="email" className="campo" {...register('email')} />
+          {errors.email && <p className="text-sm font-semibold text-danger">Informe um e-mail válido.</p>}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="cnpj" className="font-medium text-ink-900">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="cnpj" className="text-sm font-bold text-ink-soft">
             CNPJ
           </label>
           <input
             id="cnpj"
             inputMode="numeric"
             placeholder="14 dígitos"
-            className={campo}
+            className="campo"
             {...register('cnpj')}
           />
-          {errors.cnpj && <p className="text-sm text-danger-600">Informe um CNPJ com 14 dígitos.</p>}
+          {errors.cnpj && (
+            <p className="text-sm font-semibold text-danger">Informe um CNPJ com 14 dígitos.</p>
+          )}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="telefone" className="font-medium text-ink-900">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="telefone" className="text-sm font-bold text-ink-soft">
             Telefone
           </label>
           <input
@@ -64,46 +64,47 @@ export function CadastroComerciante() {
             type="tel"
             autoComplete="tel"
             placeholder="+5511999999999"
-            className={campo}
+            className="campo"
             {...register('telefone')}
           />
-          {errors.telefone && <p className="text-sm text-danger-600">Use o formato +55DDDNUMERO.</p>}
+          {errors.telefone && (
+            <p className="text-sm font-semibold text-danger">Use o formato +55DDDNUMERO.</p>
+          )}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="senha" className="font-medium text-ink-900">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="senha" className="text-sm font-bold text-ink-soft">
             Senha
           </label>
           <input
             id="senha"
             type="password"
             autoComplete="new-password"
-            className={campo}
+            className="campo"
             {...register('senha')}
           />
           {errors.senha && (
-            <p className="text-sm text-danger-600">A senha precisa de ao menos 8 caracteres.</p>
+            <p className="text-sm font-semibold text-danger">A senha precisa de ao menos 8 caracteres.</p>
           )}
         </div>
 
         {erro && (
-          <p role="alert" className="text-sm text-danger-600">
+          <p
+            role="alert"
+            className="rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-dark"
+          >
             {erro}
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="min-h-11 rounded-lg bg-brand-500 px-4 font-medium text-white disabled:opacity-60"
-        >
-          {isSubmitting ? 'Criando...' : 'Cadastrar comércio'}
+        <button type="submit" disabled={isSubmitting} className="btn btn-primary mt-1 w-full text-base">
+          {isSubmitting ? 'Criando…' : 'Cadastrar comércio'}
         </button>
       </form>
 
-      <p className="mt-4 text-sm text-ink-500">
+      <p className="mt-4 text-sm text-ink-soft">
         Quer comprar?{' '}
-        <Link to="/cadastro/cliente" className="font-medium text-brand-700">
+        <Link to="/cadastro/cliente" className="font-bold text-leaf-dark hover:underline">
           Criar conta de cliente
         </Link>
       </p>

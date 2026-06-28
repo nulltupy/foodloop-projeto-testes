@@ -8,7 +8,7 @@ import {
 
 import { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
-import { geocodingEndereco } from '../geocoding/service.js';
+import { geocodingEnderecoComFallback } from '../geocoding/service.js';
 import * as notificacoes from '../notificacoes/service.js';
 import { HttpError } from '../../shared/errors.js';
 
@@ -45,10 +45,19 @@ function normalizarCep(cep: string): string {
   return `${digitos.slice(0, 5)}-${digitos.slice(5, 8)}`;
 }
 
-function queryGeocoding(endereco: CreateEstabelecimentoRequest['endereco']): string {
-  return [endereco.rua, endereco.numero, endereco.bairro, endereco.cidade, endereco.estado, 'Brasil']
-    .filter((parte) => parte && parte.trim().length > 0)
-    .join(', ');
+// Queries de geocoding da mais específica para a mais ampla. O Nominatim falha
+// com frequência no número e no bairro de endereços brasileiros, então caímos
+// até rua/cidade. Não caímos para bairro ou cidade somente, porque isso salvaria
+// coordenadas genéricas enquanto o endereço parece exato para o cliente.
+function queriesGeocoding(e: CreateEstabelecimentoRequest['endereco']): string[] {
+  const montar = (...partes: (string | undefined)[]) =>
+    partes.filter((p) => p && p.trim().length > 0).join(', ');
+  const candidatas = [
+    montar(e.rua, e.numero, e.bairro, e.cidade, e.estado, 'Brasil'),
+    montar(e.rua, e.bairro, e.cidade, e.estado, 'Brasil'),
+    montar(e.rua, e.cidade, e.estado, 'Brasil'),
+  ];
+  return candidatas.filter((q, i) => q.length > 0 && candidatas.indexOf(q) === i);
 }
 
 export async function getById(id: number): Promise<Estabelecimento | null> {
@@ -69,8 +78,7 @@ export async function criar(
   input: CreateEstabelecimentoRequest,
 ): Promise<Estabelecimento> {
   // Checa antes de geocodificar: evita queimar uma chamada upstream e criar um
-  // endereço órfão quando o comerciante já tem estabelecimento (inclui o default
-  // lazy criado pelo fluxo de produtos).
+  // endereço órfão quando o comerciante já tem estabelecimento.
   const existente = await prisma.estabelecimento.findFirst({
     where: { id_comerciante: BigInt(comercianteId) },
     select: { id: true },
@@ -79,7 +87,7 @@ export async function criar(
     throw new HttpError(409, ErrorCode.ESTABELECIMENTO_JA_EXISTE, 'Comerciante já possui estabelecimento');
   }
 
-  const coords = await geocodingEndereco(queryGeocoding(input.endereco));
+  const coords = await geocodingEnderecoComFallback(queriesGeocoding(input.endereco));
 
   try {
     const criado = await prisma.$transaction(async (tx) => {
@@ -101,7 +109,7 @@ export async function criar(
           id_endereco: endereco.id,
           nome_fantasia: input.nome_fantasia,
           descricao: input.descricao ?? null,
-          horario_funcionamento: input.horario_funcionamento ?? null,
+          horario_funcionamento: input.horario_funcionamento,
         },
         include: comEndereco,
       });
@@ -129,7 +137,7 @@ export async function atualizar(
   }
 
   // Geocodifica fora da transação quando o endereço muda.
-  const coords = patch.endereco ? await geocodingEndereco(queryGeocoding(patch.endereco)) : null;
+  const coords = patch.endereco ? await geocodingEnderecoComFallback(queriesGeocoding(patch.endereco)) : null;
 
   const atualizado = await prisma.$transaction(async (tx) => {
     if (patch.endereco && coords) {

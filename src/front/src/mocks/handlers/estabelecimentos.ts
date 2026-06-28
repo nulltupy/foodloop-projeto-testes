@@ -52,7 +52,7 @@ export const estabelecimentosHandlers = [
       id,
       nome_fantasia: parsed.data.nome_fantasia,
       descricao: parsed.data.descricao ?? null,
-      horario_funcionamento: parsed.data.horario_funcionamento ?? null,
+      horario_funcionamento: parsed.data.horario_funcionamento,
       nota_media: null,
       ativo: true,
       endereco,
@@ -75,7 +75,7 @@ export const estabelecimentosHandlers = [
     if (d.nome_fantasia !== undefined) estab.nome_fantasia = d.nome_fantasia;
     if (d.descricao !== undefined) estab.descricao = d.descricao ?? null;
     if (d.horario_funcionamento !== undefined) {
-      estab.horario_funcionamento = d.horario_funcionamento ?? null;
+      estab.horario_funcionamento = d.horario_funcionamento;
     }
     if (d.endereco) estab.endereco = { ...estab.endereco, ...d.endereco };
     return HttpResponse.json(estab);

@@ -133,3 +133,27 @@ export async function geocodingEndereco(query: string): Promise<Coords> {
   gravarCache(chave, coords);
   return coords;
 }
+
+/**
+ * Geocodifica tentando uma lista de queries da mais específica para a mais ampla.
+ * O Nominatim costuma não achar o número da casa nem o bairro em endereços
+ * brasileiros; cair até rua/cidade evita rejeições falsas sem aceitar centroides
+ * genéricos de bairro/cidade. Só o "não encontrado" (GEOCODING_FALHOU) faz tentar
+ * a próxima — erros de upstream/limite sobem na hora.
+ */
+export async function geocodingEnderecoComFallback(queries: string[]): Promise<Coords> {
+  const candidatas = queries.filter((q) => q && q.trim().length > 0);
+  let ultimaFalha: unknown;
+  for (const query of candidatas) {
+    try {
+      return await geocodingEndereco(query);
+    } catch (e) {
+      if (e instanceof HttpError && e.code === ErrorCode.GEOCODING_FALHOU) {
+        ultimaFalha = e;
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw ultimaFalha ?? new HttpError(422, ErrorCode.GEOCODING_FALHOU, 'Endereço não localizado');
+}

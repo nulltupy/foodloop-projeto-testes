@@ -16,7 +16,7 @@ describe('App shell', () => {
         <App />
       </MemoryRouter>,
     );
-    expect(screen.getByRole('heading', { name: /entrar/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /que bom te ver/i })).toBeInTheDocument();
   });
 
   it('imports @foodloop/lib without throwing', async () => {

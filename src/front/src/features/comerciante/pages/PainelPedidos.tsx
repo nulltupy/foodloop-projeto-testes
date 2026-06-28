@@ -51,10 +51,7 @@ export function PainelPedidos() {
 
   const retirar = useMutation({
     mutationFn: (args: { id: number; codigo: string }) =>
-      api.pedidos.avancarStatus(args.id, {
-        novo_status: 'RETIRADO',
-        codigo_retirada: args.codigo,
-      }),
+      api.pedidos.avancarStatus(args.id, { novo_status: 'RETIRADO', codigo_retirada: args.codigo }),
     onSuccess: (_d, args) => {
       setCodigos((c) => ({ ...c, [args.id]: '' }));
       limparErro(args.id);
@@ -76,62 +73,63 @@ export function PainelPedidos() {
   const pedidos = pedidosQ.data ? [...pedidosQ.data].sort(ordenar) : [];
 
   return (
-    <main className="mx-auto max-w-3xl p-4">
-      <h1 className="text-2xl font-semibold text-brand-700">Pedidos</h1>
-      <p className="mt-1 text-sm text-ink-500">
-        Acompanhe os pedidos recebidos e avance cada um até a retirada. Para confirmar a entrega, peça o
-        código de 8 caracteres ao cliente.
+    <section>
+      <p className="mb-4 text-sm text-ink-soft">
+        Avance cada pedido até a retirada. Para confirmar a entrega, peça o código de 8 caracteres ao cliente.
       </p>
 
-      {pedidosQ.isLoading && <p className="mt-6 text-sm text-ink-500">Carregando…</p>}
+      {pedidosQ.isLoading && <p className="text-sm text-ink-mute">Carregando…</p>}
       {pedidosQ.isError && (
-        <div className="mt-6 rounded-md bg-danger-500/10 p-3 text-sm text-danger-600">
+        <div className="rounded-2xl bg-danger-50 p-3 text-sm font-semibold text-danger-dark">
           Não foi possível carregar os pedidos. Confirme que você está logado como comerciante.
         </div>
       )}
       {pedidosQ.data && pedidos.length === 0 && (
-        <p className="mt-6 text-sm text-ink-500">Nenhum pedido por enquanto.</p>
+        <div className="card p-8 text-center">
+          <p className="text-lg font-extrabold text-ink">Balcão tranquilo</p>
+          <p className="mt-1 text-sm text-ink-soft">Nenhum pedido por enquanto.</p>
+        </div>
       )}
 
-      <ul className="mt-6 grid gap-3">
+      <ul className="grid gap-3">
         {pedidos.map((p) => {
           const proximo = PROXIMO[p.status];
           const erro = erroPedido[p.id];
           const pendente = avancar.isPending || retirar.isPending || cancelar.isPending;
           return (
-            <li key={p.id} className="rounded-lg border border-surface-200 bg-white p-4">
+            <li key={p.id} className="card p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="font-medium text-ink-900">Pedido #{p.id}</p>
-                  <p className="text-sm text-ink-500">
+                  <p className="font-extrabold text-ink">Pedido #{p.id}</p>
+                  <p className="text-sm text-ink-mute">
                     {p.cliente.nome} · {dataHora(p.data_pedido)}
                   </p>
                 </div>
-                <span className={`rounded-full px-3 py-1 text-sm font-medium ${BADGE_STATUS[p.status]}`}>
+                <span className={`rounded-full px-3 py-1 text-sm font-bold ${BADGE_STATUS[p.status]}`}>
                   {ROTULO_STATUS[p.status]}
                 </span>
               </div>
 
-              <ul className="mt-3 grid gap-1 text-sm text-ink-700">
+              <ul className="mt-3 grid gap-1 text-sm text-ink-soft">
                 {p.itens.map((item) => (
                   <li key={item.id} className="flex justify-between">
                     <span>
                       {item.quantidade}× {item.produto_nome}
                     </span>
-                    <span>{moeda(item.subtotal)}</span>
+                    <span className="nums">{moeda(item.subtotal)}</span>
                   </li>
                 ))}
               </ul>
 
-              <div className="mt-2 flex justify-between border-t border-surface-200 pt-2 font-semibold text-ink-900">
+              <div className="mt-2 flex justify-between border-t border-canvas-line pt-2 font-bold text-ink">
                 <span>Total</span>
-                <span>{moeda(p.valor_total)}</span>
+                <span className="nums">{moeda(p.valor_total)}</span>
               </div>
 
               {erro && (
                 <div
                   role="alert"
-                  className="mt-3 rounded-md bg-danger-500/10 px-3 py-2 text-sm text-danger-600"
+                  className="mt-3 rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-dark"
                 >
                   {erro}
                 </div>
@@ -160,13 +158,9 @@ export function PainelPedidos() {
                     maxLength={8}
                     placeholder="Código do cliente"
                     aria-label={`Código de retirada do pedido ${p.id}`}
-                    className="min-h-11 flex-1 rounded-lg border border-surface-300 px-3 font-mono uppercase tracking-widest"
+                    className="campo min-w-0 flex-1 font-semibold uppercase"
                   />
-                  <button
-                    type="submit"
-                    disabled={pendente}
-                    className="min-h-11 rounded-lg bg-brand-700 px-4 font-medium text-white disabled:opacity-60"
-                  >
+                  <button type="submit" disabled={pendente} className="btn btn-primary">
                     Confirmar retirada
                   </button>
                 </form>
@@ -182,7 +176,7 @@ export function PainelPedidos() {
                         avancar.mutate({ id: p.id, status: proximo.status });
                       }}
                       disabled={pendente}
-                      className="min-h-11 flex-1 rounded-lg bg-brand-700 px-4 font-medium text-white disabled:opacity-60"
+                      className="btn btn-primary flex-1"
                     >
                       {proximo.rotulo}
                     </button>
@@ -191,19 +185,19 @@ export function PainelPedidos() {
                   {ehAtivo(p.status) &&
                     (confirmandoCancel === p.id ? (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-danger-600">Cancelar pedido?</span>
+                        <span className="text-sm font-semibold text-danger">Cancelar pedido?</span>
                         <button
                           type="button"
                           onClick={() => cancelar.mutate(p.id)}
                           disabled={pendente}
-                          className="min-h-11 rounded-lg bg-danger-500 px-3 text-sm font-medium text-white disabled:opacity-60"
+                          className="btn btn-danger"
                         >
                           Sim
                         </button>
                         <button
                           type="button"
                           onClick={() => setConfirmandoCancel(null)}
-                          className="min-h-11 rounded-lg border border-surface-300 px-3 text-sm font-medium text-ink-700"
+                          className="btn btn-outline"
                         >
                           Não
                         </button>
@@ -215,7 +209,7 @@ export function PainelPedidos() {
                           limparErro(p.id);
                           setConfirmandoCancel(p.id);
                         }}
-                        className="min-h-11 rounded-lg border border-danger-500 px-4 text-sm font-medium text-danger-600"
+                        className="btn btn-outline hover:border-danger hover:text-danger"
                       >
                         Cancelar
                       </button>
@@ -226,6 +220,6 @@ export function PainelPedidos() {
           );
         })}
       </ul>
-    </main>
+    </section>
   );
 }

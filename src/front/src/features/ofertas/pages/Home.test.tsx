@@ -36,12 +36,14 @@ describe('Home (lista de ofertas)', () => {
     expect(paraDetalhe.length).toBeGreaterThan(0);
   });
 
-  it('mostra estado vazio com CTA "Ampliar raio" quando o filtro não retorna nada', async () => {
+  it('mostra estado vazio com CTA "Limpar filtros" quando o filtro não retorna nada', async () => {
     renderHome();
     // Garante que a lista carregou antes de filtrar.
     await screen.findAllByRole('link');
     // Preço máximo de R$ 1 não cobre nenhuma promoção (mínimo ~R$ 5).
+    await userEvent.click(screen.getByRole('button', { name: /filtrar/i }));
     await userEvent.type(screen.getByLabelText('Preço máximo'), '1');
-    expect(await screen.findByRole('button', { name: /ampliar raio/i })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /ver ofertas/i }));
+    expect(await screen.findByRole('button', { name: /limpar filtros/i })).toBeInTheDocument();
   });
 });

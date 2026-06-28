@@ -64,9 +64,9 @@ export function Checkout() {
 
   if (itens.length === 0) {
     return (
-      <main className="mx-auto max-w-2xl p-6 text-center">
-        <p className="text-ink-700">Seu carrinho está vazio.</p>
-        <Link to="/" className="mt-3 inline-block font-medium text-brand-700">
+      <main className="mx-auto max-w-md p-6 text-center">
+        <p className="text-ink-soft">Seu carrinho está vazio.</p>
+        <Link to="/" className="mt-3 inline-block font-bold text-leaf-dark hover:underline">
           Voltar às ofertas
         </Link>
       </main>
@@ -74,35 +74,32 @@ export function Checkout() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl p-4">
-      <h1 className="text-2xl font-semibold text-brand-700">Checkout</h1>
+    <main className="mx-auto w-full max-w-md p-4 sm:p-6">
+      <h1 className="text-2xl font-extrabold text-ink">Quase lá</h1>
+      <p className="mt-1 text-ink-soft">Confira e reserve — o pagamento é no balcão.</p>
 
-      <ul className="mt-4 flex flex-col gap-2">
-        {itens.map((item) => (
-          <li
-            key={item.id_anuncio}
-            className="flex justify-between rounded-lg border border-surface-200 bg-white p-3"
-          >
-            <span className="text-ink-900">
-              {item.quantidade}× {item.produto_nome}
-            </span>
-            <span className="font-medium text-ink-900">{moeda(item.preco * item.quantidade)}</span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-3 flex justify-between text-lg font-semibold text-ink-900">
-        <span>Total</span>
-        <span>{moeda(total())}</span>
+      <div className="card mt-5 p-4 sm:p-5">
+        <ul className="flex flex-col gap-3">
+          {itens.map((item) => (
+            <li key={item.id_anuncio} className="flex items-baseline justify-between gap-3">
+              <span className="font-semibold text-ink">
+                {item.quantidade}× {item.produto_nome}
+              </span>
+              <span className="nums font-bold text-ink">{moeda(item.preco * item.quantidade)}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 flex items-baseline justify-between border-t border-canvas-line pt-3">
+          <span className="text-lg font-bold text-ink">Total</span>
+          <span className="nums text-2xl font-extrabold text-leaf-dark">{moeda(total())}</span>
+        </div>
       </div>
 
-      <p className="mt-4 rounded-lg bg-surface-100 p-3 text-sm text-ink-700">
-        No momento, o pagamento é presencial: você recebe um código de retirada e paga no balcão ao buscar o
-        pedido.
-      </p>
-
       {erro && (
-        <p role="alert" className="mt-3 text-sm text-danger-600">
+        <p
+          role="alert"
+          className="mt-4 rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-dark"
+        >
           {erro}
         </p>
       )}
@@ -111,9 +108,9 @@ export function Checkout() {
         type="button"
         onClick={finalizar}
         disabled={enviando}
-        className="mt-4 min-h-11 w-full rounded-lg bg-brand-500 px-4 font-medium text-white disabled:opacity-60"
+        className="btn btn-primary mt-5 w-full text-base"
       >
-        {enviando ? 'Reservando...' : 'Reservar e pagar presencialmente'}
+        {enviando ? 'Reservando…' : 'Reservar pedido'}
       </button>
     </main>
   );

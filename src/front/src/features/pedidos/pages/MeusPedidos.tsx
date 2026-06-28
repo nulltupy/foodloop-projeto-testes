@@ -1,18 +1,55 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
-import type { PedidoClienteListItem } from '@foodloop/lib';
+import type { PedidoClienteListItem, StatusPedido } from '@foodloop/lib';
 import { BADGE_STATUS, ehAtivo, ROTULO_STATUS } from '../status';
 import { dataHora, moeda } from '../../../lib/format';
 import { mensagemErro } from '../../../lib/erros';
+import { Marca } from '../../../components/ui/Marca';
 
 const CHAVE = ['pedidos-meus'];
+
+const PASSOS: StatusPedido[] = ['RECEBIDO', 'EM_PREPARO', 'PRONTO_PARA_RETIRADA', 'RETIRADO'];
+const PASSO_LABEL: Record<string, string> = {
+  RECEBIDO: 'Recebido',
+  EM_PREPARO: 'Preparo',
+  PRONTO_PARA_RETIRADA: 'Pronto',
+  RETIRADO: 'Retirado',
+};
 
 // Ativos primeiro (mais recentes no topo); encerrados depois, também por data desc.
 function ordenar(a: PedidoClienteListItem, b: PedidoClienteListItem): number {
   if (ehAtivo(a.status) !== ehAtivo(b.status)) return ehAtivo(a.status) ? -1 : 1;
   return new Date(b.data_pedido).getTime() - new Date(a.data_pedido).getTime();
+}
+
+function Stepper({ status }: { status: StatusPedido }) {
+  const atual = PASSOS.indexOf(status);
+  return (
+    <div className="mt-3 flex items-center">
+      {PASSOS.map((s, i) => {
+        const feito = i <= atual;
+        return (
+          <Fragment key={s}>
+            <div className="flex flex-col items-center gap-1">
+              <span
+                className={`h-2.5 w-2.5 rounded-full transition-colors ${feito ? 'bg-leaf' : 'bg-canvas-line'}`}
+              />
+              <span className={`text-[11px] font-bold ${feito ? 'text-leaf-dark' : 'text-ink-mute'}`}>
+                {PASSO_LABEL[s]}
+              </span>
+            </div>
+            {i < PASSOS.length - 1 && (
+              <span
+                className={`mx-1 mb-4 h-0.5 flex-1 rounded-full transition-colors ${i < atual ? 'bg-leaf' : 'bg-canvas-line'}`}
+              />
+            )}
+          </Fragment>
+        );
+      })}
+    </div>
+  );
 }
 
 export function MeusPedidos() {
@@ -39,84 +76,93 @@ export function MeusPedidos() {
   const pedidos = pedidosQ.data ? [...pedidosQ.data].sort(ordenar) : [];
 
   return (
-    <main className="mx-auto max-w-2xl p-4">
-      <h1 className="text-2xl font-semibold text-brand-700">Meus pedidos</h1>
-      <p className="mt-1 text-sm text-ink-500">
-        Acompanhe seus pedidos e apresente o código de retirada no balcão.
-      </p>
+    <main className="mx-auto max-w-2xl p-4 sm:p-6">
+      <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Meus pedidos</h1>
+      <p className="mt-1 text-ink-soft">Acompanhe o status e mostre o código no balcão.</p>
 
-      {pedidosQ.isLoading && <p className="mt-6 text-sm text-ink-500">Carregando…</p>}
+      {pedidosQ.isLoading && (
+        <div className="mt-6 grid gap-3" aria-hidden>
+          {[0, 1].map((i) => (
+            <div key={i} className="h-40 animate-pulse rounded-2xl bg-canvas-line/60" />
+          ))}
+        </div>
+      )}
       {pedidosQ.isError && (
-        <div className="mt-6 rounded-md bg-danger-500/10 p-3 text-sm text-danger-600">
+        <div className="mt-6 rounded-2xl bg-danger-50 p-4 text-sm font-semibold text-danger-dark">
           Não foi possível carregar seus pedidos.
         </div>
       )}
       {pedidosQ.data && pedidos.length === 0 && (
-        <div className="mt-6 text-center text-sm text-ink-500">
-          <p>Você ainda não fez nenhum pedido.</p>
-          <Link to="/" className="mt-2 inline-block font-medium text-brand-700">
+        <div className="card mx-auto mt-10 max-w-sm p-8 text-center">
+          <Marca className="mx-auto h-12 w-12" />
+          <p className="mt-4 text-lg font-extrabold text-ink">Nenhum pedido ainda</p>
+          <p className="mt-1 text-ink-soft">Que tal resgatar algo gostoso pertinho de você?</p>
+          <Link to="/" className="btn btn-primary mt-5">
             Ver ofertas
           </Link>
         </div>
       )}
 
-      <ul className="mt-6 grid gap-3">
-        {pedidos.map((p) => {
+      <ul className="mt-6 grid gap-4">
+        {pedidos.map((p, i) => {
           const ativo = ehAtivo(p.status);
           const erro = erroPedido[p.id];
           return (
-            <li key={p.id} className="rounded-lg border border-surface-200 bg-white p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+            <li
+              key={p.id}
+              style={{ animationDelay: `${Math.min(i, 6) * 45}ms` }}
+              className="card animate-rise p-4 sm:p-5"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="font-medium text-ink-900">{p.estabelecimento.nome_fantasia}</p>
-                  <p className="text-sm text-ink-500">
+                  <p className="font-extrabold text-ink">{p.estabelecimento.nome_fantasia}</p>
+                  <p className="text-sm text-ink-mute">
                     Pedido #{p.id} · {dataHora(p.data_pedido)}
                   </p>
                 </div>
-                <span className={`rounded-full px-3 py-1 text-sm font-medium ${BADGE_STATUS[p.status]}`}>
+                <span className={`rounded-full px-3 py-1 text-sm font-bold ${BADGE_STATUS[p.status]}`}>
                   {ROTULO_STATUS[p.status]}
                 </span>
               </div>
 
+              {p.status !== 'CANCELADO' && <Stepper status={p.status} />}
+
               {ativo && (
-                <div className="mt-3 rounded-md bg-surface-50 p-3 text-center">
-                  <p className="text-xs text-ink-500">Código de retirada</p>
-                  <p className="select-all font-mono text-2xl font-bold tracking-widest text-ink-900">
+                <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-leaf-50 px-4 py-3">
+                  <span className="text-sm font-semibold text-leaf-dark">Código de retirada</span>
+                  <span className="nums select-all text-xl font-extrabold text-leaf-deep">
                     {p.codigo_retirada}
-                  </p>
+                  </span>
                 </div>
               )}
 
-              <ul className="mt-3 grid gap-1 text-sm text-ink-700">
+              <ul className="mt-3 grid gap-1 text-sm text-ink-soft">
                 {p.itens.map((item) => (
                   <li key={item.id} className="flex justify-between">
                     <span>
                       {item.quantidade}× {item.produto_nome}
                     </span>
-                    <span>{moeda(item.subtotal)}</span>
+                    <span className="nums">{moeda(item.subtotal)}</span>
                   </li>
                 ))}
               </ul>
 
-              <div className="mt-2 flex justify-between border-t border-surface-200 pt-2 font-semibold text-ink-900">
+              <div className="mt-2 flex justify-between border-t border-canvas-line pt-2 font-bold text-ink">
                 <span>Total</span>
-                <span>{moeda(p.valor_total)}</span>
+                <span className="nums">{moeda(p.valor_total)}</span>
               </div>
 
               {erro && (
                 <div
                   role="alert"
-                  className="mt-3 rounded-md bg-danger-500/10 px-3 py-2 text-sm text-danger-600"
+                  className="mt-3 rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-dark"
                 >
                   {erro}
                 </div>
               )}
 
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <Link
-                  to={`/pedidos/${p.id}`}
-                  className="min-h-11 rounded-lg border border-surface-300 px-4 text-sm font-medium leading-[2.75rem] text-ink-700"
-                >
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Link to={`/pedidos/${p.id}`} className="btn btn-outline">
                   Detalhes
                 </Link>
 
@@ -124,19 +170,19 @@ export function MeusPedidos() {
                 {p.status === 'RECEBIDO' &&
                   (confirmandoCancel === p.id ? (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-danger-600">Cancelar pedido?</span>
+                      <span className="text-sm font-semibold text-danger">Cancelar?</span>
                       <button
                         type="button"
                         onClick={() => cancelar.mutate(p.id)}
                         disabled={cancelar.isPending}
-                        className="min-h-11 rounded-lg bg-danger-500 px-3 text-sm font-medium text-white disabled:opacity-60"
+                        className="btn btn-danger"
                       >
                         Sim
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmandoCancel(null)}
-                        className="min-h-11 rounded-lg border border-surface-300 px-3 text-sm font-medium text-ink-700"
+                        className="btn btn-outline"
                       >
                         Não
                       </button>
@@ -148,7 +194,7 @@ export function MeusPedidos() {
                         setErroPedido((m) => ({ ...m, [p.id]: '' }));
                         setConfirmandoCancel(p.id);
                       }}
-                      className="min-h-11 rounded-lg border border-danger-500 px-4 text-sm font-medium text-danger-600"
+                      className="btn btn-outline hover:border-danger hover:text-danger"
                     >
                       Cancelar
                     </button>

@@ -16,11 +16,12 @@ export function ehAtivo(status: StatusPedido): boolean {
   return STATUS_ATIVOS.includes(status);
 }
 
-// Classes do badge por status, usando os tokens do design system.
+// Cor do selo de status (Hortelã). Pronto = verde, preparo = âmbar,
+// cancelado = vermelho, recebido/retirado = neutros.
 export const BADGE_STATUS: Record<StatusPedido, string> = {
-  RECEBIDO: 'bg-accent-500/10 text-accent-600',
-  EM_PREPARO: 'bg-brand-50 text-brand-700',
-  PRONTO_PARA_RETIRADA: 'bg-brand-100 text-brand-800',
-  RETIRADO: 'bg-surface-100 text-ink-500',
-  CANCELADO: 'bg-danger-500/10 text-danger-600',
+  RECEBIDO: 'bg-leaf-50 text-leaf-dark',
+  EM_PREPARO: 'bg-amber-50 text-[#8a5b00]',
+  PRONTO_PARA_RETIRADA: 'bg-leaf text-white',
+  RETIRADO: 'bg-canvas text-ink-mute',
+  CANCELADO: 'bg-danger-50 text-danger-dark',
 };

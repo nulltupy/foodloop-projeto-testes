@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
 import { NotaEstrelas } from '../../../components/ui/NotaEstrelas';
+import { Marca } from '../../../components/ui/Marca';
 
 function moeda(valor: number): string {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -51,14 +52,14 @@ export function OfertaDetalhe() {
   const produto = produtosQ.data?.find((p) => p.id === anuncio?.id_produto);
 
   if (anuncioQ.isLoading) {
-    return <div className="mx-auto m-4 h-64 max-w-2xl animate-pulse rounded-lg bg-surface-100" />;
+    return <div className="mx-auto m-4 h-72 max-w-2xl animate-pulse rounded-3xl bg-canvas-line/60" />;
   }
 
   if (anuncioQ.isError || !anuncio) {
     return (
       <main className="mx-auto max-w-2xl p-6 text-center">
-        <p className="text-ink-700">Não foi possível carregar esta oferta.</p>
-        <Link to="/" className="mt-3 inline-block font-medium text-brand-700">
+        <p className="text-ink-soft">Não foi possível carregar esta oferta.</p>
+        <Link to="/" className="mt-3 inline-block font-bold text-leaf-dark hover:underline">
           Voltar às ofertas
         </Link>
       </main>
@@ -67,56 +68,107 @@ export function OfertaDetalhe() {
 
   const indisponivel = anuncio.quantidade_disponivel === 0 || anuncio.status !== 'ATIVO';
   const coords = estab?.endereco;
+  const regular = produto?.preco_regular ?? anuncio.preco_promocional;
+  const off = Math.max(0, Math.round((1 - anuncio.preco_promocional / regular) * 100));
+  const economia = Math.max(0, regular - anuncio.preco_promocional);
+  const prazo = tempoRestante(anuncio.prazo_retirada, agora);
+  const encerrando =
+    prazo !== 'Prazo encerrado' && new Date(anuncio.prazo_retirada).getTime() - agora < 2 * 3_600_000;
 
   return (
-    <main className="mx-auto w-full max-w-2xl p-4">
-      {produto?.imagem && (
-        <img
-          src={produto.imagem}
-          alt={produto.nome}
-          className="aspect-video w-full rounded-lg object-cover"
-        />
-      )}
+    <main className="mx-auto w-full max-w-2xl p-4 sm:p-6">
+      <Link
+        to="/"
+        className="mb-3 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-soft transition-colors hover:text-leaf-dark"
+      >
+        ← Voltar às ofertas
+      </Link>
 
-      <h1 className="mt-4 text-2xl font-semibold text-ink-900">{produto?.nome ?? 'Oferta'}</h1>
-      <div className="mt-1 flex items-center gap-2">
-        <span className="text-ink-700">{estab?.nome_fantasia}</span>
-        <NotaEstrelas nota={estab?.nota_media} />
-      </div>
-
-      <div className="mt-3 flex items-baseline gap-3">
-        <span className="text-2xl font-semibold text-brand-700">{moeda(anuncio.preco_promocional)}</span>
-        {produto && <span className="text-ink-500 line-through">{moeda(produto.preco_regular)}</span>}
-      </div>
-
-      <p className="mt-2 text-sm text-ink-700">
-        {anuncio.quantidade_disponivel} disponível(is) · retirada em{' '}
-        <span className="font-mono">{tempoRestante(anuncio.prazo_retirada, agora)}</span>
-      </p>
-
-      {produto?.descricao && <p className="mt-3 text-ink-700">{produto.descricao}</p>}
-
-      <div className="mt-6 flex flex-col gap-3">
-        <button
-          type="button"
-          disabled={indisponivel}
-          onClick={() => navigate(`/checkout?anuncio=${anuncio.id}`)}
-          className="min-h-11 rounded-lg bg-brand-500 px-4 font-medium text-white disabled:opacity-60"
-        >
-          {indisponivel ? 'Indisponível' : 'Reservar'}
-        </button>
-
-        {coords && (
-          <a
-            href={`https://maps.google.com/?q=${coords.latitude},${coords.longitude}`}
-            target="_blank"
-            rel="noreferrer"
-            className="min-h-11 rounded-lg border border-surface-200 px-4 py-2 text-center font-medium text-brand-700"
+      <article className="card animate-rise overflow-hidden">
+        <div className="relative aspect-[4/3] bg-leaf-50 sm:aspect-[16/9]">
+          {produto?.imagem ? (
+            <img src={produto.imagem} alt={produto.nome} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <Marca className="h-14 w-14" />
+            </div>
+          )}
+          {off > 0 && (
+            <span className="selo absolute right-4 top-4 h-16 w-16 text-lg leading-none">−{off}%</span>
+          )}
+          <span
+            className={`absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-bold backdrop-blur-sm ${
+              encerrando ? 'bg-citrus text-ink' : 'bg-ink/80 text-white'
+            }`}
           >
-            Como chegar
-          </a>
-        )}
-      </div>
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 2" strokeLinecap="round" />
+            </svg>
+            Retira em <span className="nums tabular-nums">{prazo}</span>
+          </span>
+        </div>
+
+        <div className="p-5 sm:p-7">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-semibold text-ink-soft">{estab?.nome_fantasia}</span>
+            <NotaEstrelas nota={estab?.nota_media} />
+          </div>
+
+          <h1 className="mt-1.5 text-2xl font-extrabold text-ink sm:text-3xl">{produto?.nome ?? 'Oferta'}</h1>
+
+          <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="nums text-4xl font-extrabold text-leaf-dark">
+              {moeda(anuncio.preco_promocional)}
+            </span>
+            {produto && <span className="nums text-ink-mute line-through">{moeda(regular)}</span>}
+            {economia > 0 && (
+              <span className="rounded-full bg-citrus-50 px-3 py-1 text-sm font-bold text-citrus-dark">
+                economize {moeda(economia)}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="pill">
+              {anuncio.quantidade_disponivel} disponíve{anuncio.quantidade_disponivel > 1 ? 'is' : 'l'}
+            </span>
+            {estab && <span className="pill bg-canvas text-ink-soft">📍 {estab.nome_fantasia}</span>}
+          </div>
+
+          {produto?.descricao && <p className="mt-4 text-ink-soft">{produto.descricao}</p>}
+
+          <div className="mt-6 flex flex-col gap-3">
+            <button
+              type="button"
+              disabled={indisponivel}
+              onClick={() => navigate(`/checkout?anuncio=${anuncio.id}`)}
+              className="btn btn-primary w-full text-base"
+            >
+              {indisponivel ? 'Esgotado por enquanto' : 'Reservar agora'}
+            </button>
+
+            {coords && (
+              <a
+                href={`https://maps.google.com/?q=${coords.latitude},${coords.longitude}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-outline w-full"
+              >
+                Como chegar
+              </a>
+            )}
+          </div>
+        </div>
+      </article>
     </main>
   );
 }

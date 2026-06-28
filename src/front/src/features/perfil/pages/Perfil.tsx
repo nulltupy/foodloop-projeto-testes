@@ -5,8 +5,14 @@ import type { UpdateUsuarioRequest } from '@foodloop/lib';
 import { useAuthStore } from '../../auth/store';
 import { mensagemErro } from '../../../lib/erros';
 
-const campo = 'mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base';
 const telRegex = /^\+?[1-9]\d{1,14}$/;
+
+function iniciaisDe(nome: string): string {
+  const partes = nome.trim().split(/\s+/).filter(Boolean);
+  const a = partes[0]?.[0] ?? '';
+  const b = partes.length > 1 ? (partes[partes.length - 1]?.[0] ?? '') : '';
+  return (a + b).toUpperCase() || '?';
+}
 
 export function Perfil() {
   const qc = useQueryClient();
@@ -66,13 +72,13 @@ export function Perfil() {
   }
 
   if (meQ.isLoading) {
-    return <div className="mx-auto m-4 h-64 max-w-lg animate-pulse rounded-lg bg-surface-100" />;
+    return <div className="mx-auto m-4 h-64 max-w-lg animate-pulse rounded-2xl bg-canvas-line/60" />;
   }
 
   if (meQ.isError || !meQ.data) {
     return (
       <main className="mx-auto max-w-lg p-4">
-        <div className="rounded-md bg-danger-500/10 p-3 text-sm text-danger-600">
+        <div className="rounded-xl bg-danger-50 p-3 text-sm font-semibold text-danger-dark">
           Não foi possível carregar seu perfil.
         </div>
       </main>
@@ -82,71 +88,93 @@ export function Perfil() {
   const me = meQ.data;
 
   return (
-    <main className="mx-auto max-w-lg p-4">
-      <h1 className="text-2xl font-semibold text-brand-700">Meu perfil</h1>
-      <p className="mt-1 text-sm text-ink-500">Atualize seus dados de contato.</p>
+    <main className="mx-auto max-w-lg p-4 sm:p-6">
+      <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Meu perfil</h1>
 
-      <section className="mt-6 rounded-lg border border-surface-200 bg-white p-4">
-        <form onSubmit={onSubmit} className="grid gap-3">
-          <label className="text-sm">
-            E-mail
+      <div className="card mt-5 flex items-center gap-4 p-5">
+        {fotoUrl ? (
+          <img
+            src={fotoUrl}
+            alt=""
+            className="h-16 w-16 shrink-0 rounded-full object-cover ring-2 ring-leaf-100"
+          />
+        ) : (
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-leaf text-xl font-bold text-white">
+            {iniciaisDe(nome || me.nome)}
+          </span>
+        )}
+        <div className="min-w-0">
+          <p className="truncate text-lg font-extrabold text-ink">{nome || me.nome}</p>
+          <p className="truncate text-sm text-ink-mute">{me.email}</p>
+          <span className="mt-1 inline-block rounded-full bg-leaf-50 px-2.5 py-0.5 text-xs font-bold text-leaf-dark">
+            {me.tipo === 'comerciante' ? 'Comerciante' : 'Cliente'}
+          </span>
+        </div>
+      </div>
+
+      <section className="card mt-4 p-5">
+        <h2 className="text-lg font-extrabold text-ink">Dados de contato</h2>
+        <form onSubmit={onSubmit} className="mt-3 grid gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-ink-soft">E-mail</label>
             <input
               type="email"
               value={me.email}
               disabled
-              className={`${campo} bg-surface-100 text-ink-500`}
+              className="campo cursor-not-allowed bg-canvas text-ink-mute"
             />
-          </label>
+          </div>
 
-          <label className="text-sm">
-            Nome
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-ink-soft">Nome</label>
             <input
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              className={campo}
+              className="campo"
               maxLength={120}
               required
             />
-          </label>
+          </div>
 
-          <label className="text-sm">
-            Telefone
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-ink-soft">Telefone</label>
             <input
               type="tel"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
-              className={campo}
+              className="campo"
               placeholder="+5511999999999"
             />
-          </label>
+          </div>
 
-          <label className="text-sm">
-            URL da foto (opcional)
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-bold text-ink-soft">URL da foto (opcional)</label>
             <input
               type="url"
               value={fotoUrl}
               onChange={(e) => setFotoUrl(e.target.value)}
-              className={campo}
+              className="campo"
               placeholder="https://..."
             />
-          </label>
+          </div>
 
           {salvo && (
-            <div className="rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-700">Perfil atualizado.</div>
+            <div className="rounded-xl bg-leaf-50 px-3 py-2 text-sm font-semibold text-leaf-dark">
+              Perfil atualizado.
+            </div>
           )}
           {erro && (
-            <div role="alert" className="rounded-md bg-danger-500/10 px-3 py-2 text-sm text-danger-600">
+            <div
+              role="alert"
+              className="rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-dark"
+            >
               {erro}
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={salvar.isPending}
-            className="min-h-11 rounded-lg bg-brand-700 px-4 font-medium text-white disabled:opacity-60"
-          >
-            {salvar.isPending ? 'Salvando…' : 'Salvar'}
+          <button type="submit" disabled={salvar.isPending} className="btn btn-primary mt-1 w-full text-base">
+            {salvar.isPending ? 'Salvando…' : 'Salvar alterações'}
           </button>
         </form>
       </section>

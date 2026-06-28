@@ -40,7 +40,7 @@ export type UpdateAnuncioRequest = z.infer<typeof UpdateAnuncioRequestSchema>;
 export const ListarAnunciosQuerySchema = z.object({
   lat: z.coerce.number().min(-90).max(90),
   lng: z.coerce.number().min(-180).max(180),
-  raio_km: z.coerce.number().positive().max(50).default(5),
+  raio_km: z.coerce.number().positive().max(5000).default(5),
   preco_max: z.coerce.number().positive().optional(),
   categoria: z.string().optional(),
   pagina: z.coerce.number().int().positive().default(1),

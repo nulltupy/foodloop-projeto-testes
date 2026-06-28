@@ -2,15 +2,20 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
 import type { CreateProdutoRequest, Produto } from '@foodloop/lib';
+import { Sheet } from '../../../components/ui/Sheet';
 
 const CATEGORIAS = ['Lanche', 'Bebida', 'Sobremesa', 'Padaria', 'Refeição', 'Outros'];
-const DESCONTOS = [10, 20, 30, 40, 50, 60, 70];
-const PRAZOS = [
-  { horas: 4, rotulo: 'Em 4 horas' },
-  { horas: 8, rotulo: 'Em 8 horas' },
-  { horas: 24, rotulo: 'Amanhã (24h)' },
-  { horas: 48, rotulo: 'Em 2 dias' },
-];
+const rotulo = 'text-sm font-bold text-ink-soft';
+const acaoIcone =
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-canvas-line text-ink-soft transition-colors';
+const MINUTOS_DIA = 24 * 60;
+
+interface OfertaForm {
+  desconto: string;
+  quantidade: string;
+  prazoHoras: string;
+  prazoMinutos: string;
+}
 
 interface Formulario {
   nome: string;
@@ -18,10 +23,13 @@ interface Formulario {
   preco_regular: string;
   categoria: string;
   imagem: string;
-  desconto: number;
+  desconto: string;
   quantidade: string;
-  prazoHoras: number;
+  prazoHoras: string;
+  prazoMinutos: string;
 }
+
+const OFERTA_VAZIA: OfertaForm = { desconto: '50', quantidade: '5', prazoHoras: '4', prazoMinutos: '0' };
 
 const FORM_VAZIO: Formulario = {
   nome: '',
@@ -29,13 +37,17 @@ const FORM_VAZIO: Formulario = {
   preco_regular: '',
   categoria: 'Lanche',
   imagem: '',
-  desconto: 50,
-  quantidade: '5',
-  prazoHoras: 24,
+  ...OFERTA_VAZIA,
 };
 
-// Formulário enxuto para anunciar um produto já cadastrado.
-const ANUNCIO_VAZIO = { desconto: 50, quantidade: '5', prazoHoras: 24 };
+const ANUNCIO_VAZIO: OfertaForm = OFERTA_VAZIA;
+
+type Modal =
+  | { tipo: 'novo' }
+  | { tipo: 'editar'; produto: Produto }
+  | { tipo: 'anunciar'; produto: Produto }
+  | { tipo: 'excluir'; produto: Produto }
+  | null;
 
 function paraRequest(f: Formulario): CreateProdutoRequest {
   return {
@@ -58,10 +70,47 @@ function deProduto(p: Produto): Formulario {
   };
 }
 
+function inteiroEmFaixa(valor: string, min: number, max: number): number | null {
+  if (!/^\d+$/.test(valor.trim())) return null;
+  const numero = Number(valor);
+  return Number.isInteger(numero) && numero >= min && numero <= max ? numero : null;
+}
+
+function descontoNumero(valor: string): number | null {
+  return inteiroEmFaixa(valor, 0, 100);
+}
+
+function quantidadeNumero(valor: string): number | null {
+  return inteiroEmFaixa(valor, 1, 999_999);
+}
+
+function prazoTotalMinutos(horasRaw: string, minutosRaw: string): number | null {
+  const horas = inteiroEmFaixa(horasRaw, 0, 23);
+  const minutos = inteiroEmFaixa(minutosRaw, 0, 59);
+  if (horas === null || minutos === null) return null;
+  const total = horas * 60 + minutos;
+  return total > 0 && total < MINUTOS_DIA ? total : null;
+}
+
+function prazoIso(horasRaw: string, minutosRaw: string): string | null {
+  const total = prazoTotalMinutos(horasRaw, minutosRaw);
+  return total === null ? null : new Date(Date.now() + total * 60 * 1000).toISOString();
+}
+
+function validarOferta(f: OfertaForm): { desconto: number; quantidade: number; prazo: string } | string {
+  const desconto = descontoNumero(f.desconto);
+  if (desconto === null) return 'Desconto deve ser um número inteiro entre 0 e 100';
+  const quantidade = quantidadeNumero(f.quantidade);
+  if (quantidade === null) return 'Quantidade precisa ser um número inteiro maior que zero';
+  const prazo = prazoIso(f.prazoHoras, f.prazoMinutos);
+  if (prazo === null) return 'Retirada deve ser maior que zero e menor que 24 horas';
+  return { desconto, quantidade, prazo };
+}
+
 function precoComDesconto(precoRegular: string, desconto: number): number | null {
   const preco = Number(precoRegular);
   if (!Number.isFinite(preco) || preco <= 0) return null;
-  return Number((preco * (1 - desconto / 100)).toFixed(2));
+  return Math.max(0.01, Number((preco * (1 - desconto / 100)).toFixed(2)));
 }
 
 function moeda(valor: number): string {
@@ -77,25 +126,159 @@ function formatarPrazo(iso: string): string {
   });
 }
 
+function IconeMais() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      aria-hidden="true"
+    >
+      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+    </svg>
+  );
+}
+function IconeLapis() {
+  return (
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
+      <path d="M4 20h4L19 9l-4-4L4 16v4Z" strokeLinejoin="round" />
+      <path d="m13.5 6.5 4 4" />
+    </svg>
+  );
+}
+function IconeLixeira() {
+  return (
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
+      <path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function PreviaPreco({ regular, desconto }: { regular: number; desconto: number }) {
+  const preco = precoComDesconto(String(regular), desconto);
+  if (preco === null) return null;
+  return (
+    <p className="mt-2 flex items-baseline gap-2 text-sm text-ink-soft">
+      Cliente paga <span className="nums text-lg font-extrabold text-leaf-dark">{moeda(preco)}</span>
+      <span className="nums text-xs text-ink-mute line-through">{moeda(regular)}</span>
+    </p>
+  );
+}
+
+// Bloco "Oferta" reaproveitado em Novo produto e em Anunciar.
+function CamposOferta({
+  desconto,
+  quantidade,
+  prazoHoras,
+  prazoMinutos,
+  onChange,
+}: {
+  desconto: string;
+  quantidade: string;
+  prazoHoras: string;
+  prazoMinutos: string;
+  onChange: (patch: Partial<OfertaForm>) => void;
+}) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-3">
+      <label className="grid gap-1.5">
+        <span className={rotulo}>Desconto (%)</span>
+        <input
+          type="number"
+          min="0"
+          max="100"
+          step="1"
+          inputMode="numeric"
+          value={desconto}
+          onChange={(e) => onChange({ desconto: e.target.value })}
+          className="campo"
+          required
+        />
+      </label>
+      <label className="grid gap-1.5">
+        <span className={rotulo}>Quantidade</span>
+        <input
+          type="number"
+          min="1"
+          step="1"
+          value={quantidade}
+          onChange={(e) => onChange({ quantidade: e.target.value })}
+          className="campo"
+          required
+        />
+      </label>
+      <div className="grid gap-1.5">
+        <span className={rotulo}>Retirada até</span>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] items-center gap-1.5">
+          <input
+            aria-label="Horas para retirada"
+            type="number"
+            min="0"
+            max="23"
+            step="1"
+            inputMode="numeric"
+            value={prazoHoras}
+            onChange={(e) => onChange({ prazoHoras: e.target.value })}
+            className="campo min-w-0"
+            required
+          />
+          <span className="text-xs font-bold text-ink-mute">h</span>
+          <input
+            aria-label="Minutos para retirada"
+            type="number"
+            min="0"
+            max="59"
+            step="1"
+            inputMode="numeric"
+            value={prazoMinutos}
+            onChange={(e) => onChange({ prazoMinutos: e.target.value })}
+            className="campo min-w-0"
+            required
+          />
+          <span className="text-xs font-bold text-ink-mute">min</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function PainelProdutos() {
   const qc = useQueryClient();
   const lista = useQuery({ queryKey: ['produtos-meus'], queryFn: () => api.produtos.listarMeus() });
-  const anuncios = useQuery({
-    queryKey: ['anuncios-meus'],
-    queryFn: () => api.anuncios.listarMeus(),
-  });
+  const anuncios = useQuery({ queryKey: ['anuncios-meus'], queryFn: () => api.anuncios.listarMeus() });
 
   function anuncioAtivoDe(produtoId: number) {
     return anuncios.data?.find((a) => a.id_produto === produtoId && a.status === 'ATIVO');
   }
 
-  const [emEdicao, setEmEdicao] = useState<Produto | null>(null);
+  const [modal, setModal] = useState<Modal>(null);
   const [form, setForm] = useState<Formulario>(FORM_VAZIO);
-  const [erro, setErro] = useState<string | null>(null);
-  const [excluindo, setExcluindo] = useState<number | null>(null);
-  const [anunciando, setAnunciando] = useState<Produto | null>(null);
   const [anuncioForm, setAnuncioForm] = useState(ANUNCIO_VAZIO);
-  const [erroAnuncio, setErroAnuncio] = useState<string | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
+
+  function fechar() {
+    setModal(null);
+    setErro(null);
+  }
 
   function invalidar() {
     void qc.invalidateQueries({ queryKey: ['produtos-meus'] });
@@ -104,168 +287,263 @@ export function PainelProdutos() {
   }
 
   const criar = useMutation({
-    mutationFn: async (f: Formulario) => {
+    mutationFn: async (args: {
+      form: Formulario;
+      oferta: { desconto: number; quantidade: number; prazo: string };
+    }) => {
+      const f = args.form;
       const produto = await api.produtos.criar(paraRequest(f));
-      const prazo = new Date(Date.now() + f.prazoHoras * 60 * 60 * 1000).toISOString();
       await api.anuncios.criar({
         id_produto: produto.id,
-        preco_promocional: precoComDesconto(f.preco_regular, f.desconto)!,
-        quantidade_inicial: Number(f.quantidade),
-        prazo_retirada: prazo,
+        preco_promocional: precoComDesconto(f.preco_regular, args.oferta.desconto)!,
+        quantidade_inicial: args.oferta.quantidade,
+        prazo_retirada: args.oferta.prazo,
       });
       return produto;
     },
     onSuccess: () => {
-      setForm(FORM_VAZIO);
-      setErro(null);
+      fechar();
       invalidar();
     },
-    onError: (e: unknown) => {
-      setErro(e instanceof Error ? e.message : 'Erro ao criar produto');
-    },
+    onError: (e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao criar produto'),
   });
 
   const atualizar = useMutation({
     mutationFn: (args: { id: number; data: CreateProdutoRequest }) =>
       api.produtos.atualizar(args.id, args.data),
     onSuccess: () => {
-      setEmEdicao(null);
-      setForm(FORM_VAZIO);
-      setErro(null);
+      fechar();
       invalidar();
     },
-    onError: (e: unknown) => {
-      setErro(e instanceof Error ? e.message : 'Erro ao atualizar produto');
-    },
+    onError: (e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao atualizar produto'),
   });
 
   const desativar = useMutation({
     mutationFn: (id: number) => api.produtos.desativar(id),
     onSuccess: () => {
-      setExcluindo(null);
+      fechar();
       invalidar();
     },
-    onError: () => {
-      setExcluindo(null);
-      setErro('Erro ao excluir produto');
-    },
+    onError: () => setErro('Erro ao excluir produto'),
   });
 
-  // Publica uma oferta para um produto que já existe e está sem anúncio ativo.
   const anunciar = useMutation({
-    mutationFn: (args: { produto: Produto; desconto: number; quantidade: string; prazoHoras: number }) => {
-      const prazo = new Date(Date.now() + args.prazoHoras * 60 * 60 * 1000).toISOString();
+    mutationFn: (args: {
+      produto: Produto;
+      oferta: { desconto: number; quantidade: number; prazo: string };
+    }) => {
       return api.anuncios.criar({
         id_produto: args.produto.id,
-        preco_promocional: precoComDesconto(String(args.produto.preco_regular), args.desconto)!,
-        quantidade_inicial: Number(args.quantidade),
-        prazo_retirada: prazo,
+        preco_promocional: precoComDesconto(String(args.produto.preco_regular), args.oferta.desconto)!,
+        quantidade_inicial: args.oferta.quantidade,
+        prazo_retirada: args.oferta.prazo,
       });
     },
     onSuccess: () => {
-      setAnunciando(null);
-      setAnuncioForm(ANUNCIO_VAZIO);
-      setErroAnuncio(null);
+      fechar();
       invalidar();
     },
-    onError: (e: unknown) => {
-      setErroAnuncio(e instanceof Error ? e.message : 'Erro ao publicar anúncio');
-    },
+    onError: (e: unknown) => setErro(e instanceof Error ? e.message : 'Erro ao publicar anúncio'),
   });
 
-  function onSubmit(e: React.FormEvent) {
+  function abrirNovo() {
+    setForm(FORM_VAZIO);
+    setErro(null);
+    setModal({ tipo: 'novo' });
+  }
+  function abrirEditar(p: Produto) {
+    setForm(deProduto(p));
+    setErro(null);
+    setModal({ tipo: 'editar', produto: p });
+  }
+  function abrirAnunciar(p: Produto) {
+    setAnuncioForm(ANUNCIO_VAZIO);
+    setErro(null);
+    setModal({ tipo: 'anunciar', produto: p });
+  }
+
+  function submitProduto(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.nome || !form.preco_regular) {
+    if (!form.nome.trim() || !form.preco_regular) {
       setErro('Nome e preço são obrigatórios');
       return;
     }
-    const quantidade = Number(form.quantidade);
-    if (!emEdicao && (!Number.isInteger(quantidade) || quantidade < 1)) {
-      setErro('Quantidade precisa ser um número inteiro maior que zero');
+    if (!Number.isFinite(Number(form.preco_regular)) || Number(form.preco_regular) <= 0) {
+      setErro('Preço regular precisa ser maior que zero');
       return;
     }
-    if (emEdicao) {
-      atualizar.mutate({ id: emEdicao.id, data: paraRequest(form) });
-    } else {
-      criar.mutate(form);
+    if (modal?.tipo === 'editar') {
+      setErro(null);
+      atualizar.mutate({ id: modal.produto.id, data: paraRequest(form) });
+      return;
     }
-  }
-
-  function iniciarEdicao(p: Produto) {
-    setEmEdicao(p);
-    setForm(deProduto(p));
+    const oferta = validarOferta(form);
+    if (typeof oferta === 'string') {
+      setErro(oferta);
+      return;
+    }
     setErro(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    criar.mutate({ form, oferta });
   }
 
-  function cancelarEdicao() {
-    setEmEdicao(null);
-    setForm(FORM_VAZIO);
+  function submitAnuncio(e: React.FormEvent) {
+    e.preventDefault();
+    if (modal?.tipo !== 'anunciar') return;
+    const oferta = validarOferta(anuncioForm);
+    if (typeof oferta === 'string') {
+      setErro(oferta);
+      return;
+    }
     setErro(null);
+    anunciar.mutate({ produto: modal.produto, oferta });
   }
 
-  const precoFinal = precoComDesconto(form.preco_regular, form.desconto);
+  const salvando = criar.isPending || atualizar.isPending;
+  const editando = modal?.tipo === 'editar';
 
   return (
-    <main className="mx-auto max-w-3xl p-4">
-      <h1 className="text-2xl font-semibold text-brand-700">Meus anúncios</h1>
-      <p className="mt-1 text-sm text-ink-500">
-        Cadastre um produto e publique a oferta: você escolhe o desconto, a quantidade e o prazo de retirada.
-        A oferta aparece na home dos clientes próximos.
-      </p>
+    <section>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-extrabold text-ink">Produtos cadastrados</h2>
+        <button type="button" onClick={abrirNovo} className="btn btn-primary">
+          <IconeMais /> Novo produto
+        </button>
+      </div>
 
-      <section className="mt-6 rounded-lg border border-surface-200 bg-white p-4">
-        <h2 className="text-lg font-medium text-ink-900">
-          {emEdicao ? `Editar: ${emEdicao.nome}` : 'Novo produto + oferta'}
-        </h2>
+      {lista.isLoading && (
+        <ul className="grid gap-2.5" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <li key={i} className="h-20 animate-pulse rounded-2xl bg-canvas-line/60" />
+          ))}
+        </ul>
+      )}
+      {lista.isError && (
+        <div className="rounded-2xl bg-danger-50 p-3 text-sm font-semibold text-danger-dark">
+          Não foi possível carregar seus produtos. Confirme que você está logado como comerciante.
+        </div>
+      )}
+      {lista.data && lista.data.length === 0 && (
+        <div className="card flex flex-col items-center p-8 text-center">
+          <p className="text-lg font-extrabold text-ink">Cardápio vazio</p>
+          <p className="mt-1 text-sm text-ink-soft">Cadastre seu primeiro produto e publique a oferta.</p>
+          <button type="button" onClick={abrirNovo} className="btn btn-primary mt-5">
+            <IconeMais /> Novo produto
+          </button>
+        </div>
+      )}
 
-        <form onSubmit={onSubmit} className="mt-3 grid gap-3">
-          <label className="text-sm">
-            Nome
+      <ul className="grid gap-2.5">
+        {lista.data?.map((p) => {
+          const anuncio = anuncioAtivoDe(p.id);
+          return (
+            <li key={p.id} className="card flex items-center gap-3 p-3.5">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-extrabold text-ink">{p.nome}</p>
+                <p className="truncate text-sm text-ink-mute">
+                  {moeda(p.preco_regular)} · {p.categoria}
+                  {!p.ativo && ' · inativo'}
+                </p>
+                {anuncio ? (
+                  <p className="mt-1 flex flex-wrap items-center gap-1.5 text-sm font-semibold text-ink">
+                    <span className="rounded-full bg-leaf-50 px-2 py-0.5 text-xs font-bold text-leaf-dark">
+                      {moeda(anuncio.preco_promocional)}
+                    </span>
+                    {anuncio.quantidade_disponivel} un · até {formatarPrazo(anuncio.prazo_retirada)}
+                  </p>
+                ) : (
+                  p.ativo && <p className="mt-1 text-xs font-semibold text-ink-mute">Sem anúncio ativo</p>
+                )}
+              </div>
+
+              <div className="flex shrink-0 items-center gap-1.5">
+                {p.ativo && !anuncio && (
+                  <button type="button" onClick={() => abrirAnunciar(p)} className="btn btn-soft h-11 px-3.5">
+                    Anunciar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => abrirEditar(p)}
+                  aria-label={`Editar ${p.nome}`}
+                  className={`${acaoIcone} hover:border-leaf-200 hover:text-leaf-dark`}
+                >
+                  <IconeLapis />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModal({ tipo: 'excluir', produto: p })}
+                  aria-label={`Excluir ${p.nome}`}
+                  className={`${acaoIcone} hover:border-danger hover:text-danger`}
+                >
+                  <IconeLixeira />
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Popup: novo / editar produto */}
+      <Sheet
+        aberto={modal?.tipo === 'novo' || modal?.tipo === 'editar'}
+        onFechar={fechar}
+        titulo={editando ? 'Editar produto' : 'Novo produto'}
+        rodape={
+          <div className="flex gap-2">
+            <button type="button" onClick={fechar} className="btn btn-outline flex-1">
+              Cancelar
+            </button>
+            <button type="submit" form="form-produto" disabled={salvando} className="btn btn-primary flex-1">
+              {editando ? 'Salvar' : 'Publicar oferta'}
+            </button>
+          </div>
+        }
+      >
+        <form id="form-produto" onSubmit={submitProduto} className="grid gap-3.5">
+          <label className="grid gap-1.5">
+            <span className={rotulo}>Nome</span>
             <input
               type="text"
               value={form.nome}
               onChange={(e) => setForm({ ...form, nome: e.target.value })}
-              className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
+              className="campo"
               placeholder="Ex: Coxinha de Frango"
               required
               maxLength={120}
             />
           </label>
 
-          <label className="text-sm">
-            Descrição
+          <label className="grid gap-1.5">
+            <span className={rotulo}>Descrição (opcional)</span>
             <textarea
               value={form.descricao}
               onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-              className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
-              placeholder="Detalhe o item (opcional)"
+              className="campo py-2.5"
               rows={2}
               maxLength={500}
             />
           </label>
 
           <div className="grid grid-cols-2 gap-3">
-            <label className="text-sm">
-              Preço regular (R$)
+            <label className="grid gap-1.5">
+              <span className={rotulo}>Preço regular (R$)</span>
               <input
                 type="number"
                 step="0.01"
                 min="0.01"
                 value={form.preco_regular}
                 onChange={(e) => setForm({ ...form, preco_regular: e.target.value })}
-                className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
-                placeholder="0.00"
+                className="campo"
+                placeholder="0,00"
                 required
               />
             </label>
-
-            <label className="text-sm">
-              Categoria
+            <label className="grid gap-1.5">
+              <span className={rotulo}>Categoria</span>
               <select
                 value={form.categoria}
                 onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
+                className="campo"
               >
                 {CATEGORIAS.map((c) => (
                   <option key={c} value={c}>
@@ -276,299 +554,133 @@ export function PainelProdutos() {
             </label>
           </div>
 
-          <label className="text-sm">
-            URL da imagem (opcional)
+          <label className="grid gap-1.5">
+            <span className={rotulo}>URL da imagem (opcional)</span>
             <input
               type="url"
               value={form.imagem}
               onChange={(e) => setForm({ ...form, imagem: e.target.value })}
-              className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
+              className="campo"
               placeholder="https://..."
             />
           </label>
 
-          {!emEdicao && (
-            <fieldset className="rounded-md border border-surface-200 bg-surface-50 p-3">
-              <legend className="px-1 text-sm font-medium text-ink-900">Oferta</legend>
-
-              <div className="grid grid-cols-3 gap-3">
-                <label className="text-sm">
-                  Desconto
-                  <select
-                    value={form.desconto}
-                    onChange={(e) => setForm({ ...form, desconto: Number(e.target.value) })}
-                    className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
-                  >
-                    {DESCONTOS.map((d) => (
-                      <option key={d} value={d}>
-                        {d}%
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="text-sm">
-                  Quantidade
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={form.quantidade}
-                    onChange={(e) => setForm({ ...form, quantidade: e.target.value })}
-                    className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
-                    required
-                  />
-                </label>
-
-                <label className="text-sm">
-                  Retirada até
-                  <select
-                    value={form.prazoHoras}
-                    onChange={(e) => setForm({ ...form, prazoHoras: Number(e.target.value) })}
-                    className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
-                  >
-                    {PRAZOS.map((p) => (
-                      <option key={p.horas} value={p.horas}>
-                        {p.rotulo}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <p className="mt-2 text-sm text-ink-700">
-                {precoFinal !== null ? (
-                  <>
-                    Cliente paga <span className="font-semibold text-brand-700">{moeda(precoFinal)}</span>{' '}
-                    <span className="text-ink-500 line-through">{moeda(Number(form.preco_regular))}</span>
-                  </>
-                ) : (
-                  'Informe o preço regular para ver o valor da oferta.'
-                )}
-              </p>
+          {!editando && (
+            <fieldset className="rounded-xl border border-canvas-line bg-canvas p-3.5">
+              <legend className="px-1.5 text-sm font-bold text-ink">Oferta</legend>
+              <CamposOferta
+                desconto={form.desconto}
+                quantidade={form.quantidade}
+                prazoHoras={form.prazoHoras}
+                prazoMinutos={form.prazoMinutos}
+                onChange={(patch) => setForm({ ...form, ...patch })}
+              />
+              {Number(form.preco_regular) > 0 ? (
+                <PreviaPreco
+                  regular={Number(form.preco_regular)}
+                  desconto={descontoNumero(form.desconto) ?? 0}
+                />
+              ) : (
+                <p className="mt-2 text-sm text-ink-mute">
+                  Informe o preço regular para ver o valor da oferta.
+                </p>
+              )}
             </fieldset>
           )}
 
           {erro && (
-            <div role="alert" className="rounded-md bg-danger-50 px-3 py-2 text-sm text-danger-700">
+            <div
+              role="alert"
+              className="rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-dark"
+            >
               {erro}
             </div>
           )}
+        </form>
+      </Sheet>
 
+      {/* Popup: anunciar produto existente */}
+      <Sheet
+        aberto={modal?.tipo === 'anunciar'}
+        onFechar={fechar}
+        titulo={modal?.tipo === 'anunciar' ? `Anunciar ${modal.produto.nome}` : 'Anunciar'}
+        rodape={
           <div className="flex gap-2">
+            <button type="button" onClick={fechar} className="btn btn-outline flex-1">
+              Cancelar
+            </button>
             <button
               type="submit"
-              disabled={criar.isPending || atualizar.isPending}
-              className="min-h-11 flex-1 rounded-lg bg-brand-700 px-4 font-medium text-white disabled:opacity-60"
+              form="form-anuncio"
+              disabled={anunciar.isPending}
+              className="btn btn-primary flex-1"
             >
-              {emEdicao ? 'Salvar alterações' : 'Publicar oferta'}
+              Publicar oferta
             </button>
-            {emEdicao && (
-              <button
-                type="button"
-                onClick={cancelarEdicao}
-                className="min-h-11 rounded-lg border border-surface-300 px-4 font-medium text-ink-700"
-              >
-                Cancelar
-              </button>
-            )}
           </div>
+        }
+      >
+        <form id="form-anuncio" onSubmit={submitAnuncio} className="grid gap-2">
+          <CamposOferta
+            desconto={anuncioForm.desconto}
+            quantidade={anuncioForm.quantidade}
+            prazoHoras={anuncioForm.prazoHoras}
+            prazoMinutos={anuncioForm.prazoMinutos}
+            onChange={(patch) => setAnuncioForm({ ...anuncioForm, ...patch })}
+          />
+          {modal?.tipo === 'anunciar' && (
+            <PreviaPreco
+              regular={modal.produto.preco_regular}
+              desconto={descontoNumero(anuncioForm.desconto) ?? 0}
+            />
+          )}
+          {erro && (
+            <div
+              role="alert"
+              className="mt-1 rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-dark"
+            >
+              {erro}
+            </div>
+          )}
         </form>
-      </section>
+      </Sheet>
 
-      <section className="mt-6">
-        <h2 className="text-lg font-medium text-ink-900">Produtos cadastrados</h2>
-        {lista.isLoading && <p className="mt-2 text-sm text-ink-500">Carregando…</p>}
-        {lista.isError && (
-          <div className="mt-2 rounded-md bg-danger-50 p-3 text-sm text-danger-700">
-            Não foi possível carregar seus produtos. Confirme que você está logado como comerciante.
+      {/* Popup: confirmar exclusão */}
+      <Sheet
+        aberto={modal?.tipo === 'excluir'}
+        onFechar={fechar}
+        titulo="Excluir produto"
+        rodape={
+          <div className="flex gap-2">
+            <button type="button" onClick={fechar} className="btn btn-outline flex-1">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              disabled={desativar.isPending}
+              onClick={() => modal?.tipo === 'excluir' && desativar.mutate(modal.produto.id)}
+              className="btn btn-danger flex-1"
+            >
+              Excluir
+            </button>
+          </div>
+        }
+      >
+        {modal?.tipo === 'excluir' && (
+          <p className="text-ink-soft">
+            Tem certeza que quer excluir <span className="font-bold text-ink">{modal.produto.nome}</span>?
+            Isso também encerra o anúncio ativo, se houver.
+          </p>
+        )}
+        {erro && (
+          <div
+            role="alert"
+            className="mt-3 rounded-xl bg-danger-50 px-3 py-2 text-sm font-semibold text-danger-dark"
+          >
+            {erro}
           </div>
         )}
-        {lista.data && lista.data.length === 0 && (
-          <p className="mt-2 text-sm text-ink-500">Nenhum produto cadastrado ainda.</p>
-        )}
-        <ul className="mt-3 grid gap-3">
-          {lista.data?.map((p) => {
-            const anuncio = anuncioAtivoDe(p.id);
-            return (
-              <li key={p.id} className="rounded-lg border border-surface-200 bg-white p-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-ink-900">{p.nome}</p>
-                    <p className="truncate text-sm text-ink-500">
-                      {moeda(p.preco_regular)} · {p.categoria}
-                      {!p.ativo && ' · inativo'}
-                    </p>
-                    {anuncio ? (
-                      <p className="truncate text-sm font-medium text-brand-700">
-                        Anunciado: {moeda(anuncio.preco_promocional)} · {anuncio.quantidade_disponivel}{' '}
-                        disponíveis · retirada até {formatarPrazo(anuncio.prazo_retirada)}
-                      </p>
-                    ) : (
-                      p.ativo && <p className="truncate text-sm text-ink-500">Sem anúncio ativo</p>
-                    )}
-                  </div>
-
-                  {excluindo === p.id ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-danger-700">
-                        Excluir &ldquo;{p.nome}&rdquo;?
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => desativar.mutate(p.id)}
-                        disabled={desativar.isPending}
-                        className="min-h-11 rounded-lg bg-danger-500 px-3 text-sm font-medium text-white disabled:opacity-60"
-                      >
-                        Sim, excluir
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setExcluindo(null)}
-                        className="min-h-11 rounded-lg border border-surface-300 px-3 text-sm font-medium text-ink-700"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {p.ativo && !anuncio && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAnunciando(anunciando?.id === p.id ? null : p);
-                            setAnuncioForm(ANUNCIO_VAZIO);
-                            setErroAnuncio(null);
-                          }}
-                          className="min-h-11 rounded-lg bg-brand-700 px-3 text-sm font-medium text-white"
-                        >
-                          Anunciar
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => iniciarEdicao(p)}
-                        className="min-h-11 rounded-lg border border-surface-300 px-3 text-sm font-medium text-ink-700"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setExcluindo(p.id)}
-                        className="min-h-11 rounded-lg border border-danger-500 px-3 text-sm font-medium text-danger-700"
-                      >
-                        Excluir
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {anunciando?.id === p.id && (
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const quantidade = Number(anuncioForm.quantidade);
-                      if (!Number.isInteger(quantidade) || quantidade < 1) {
-                        setErroAnuncio('Quantidade precisa ser um número inteiro maior que zero');
-                        return;
-                      }
-                      setErroAnuncio(null);
-                      anunciar.mutate({ produto: p, ...anuncioForm });
-                    }}
-                    className="mt-3 rounded-md border border-surface-200 bg-surface-50 p-3"
-                  >
-                    <div className="grid grid-cols-3 gap-3">
-                      <label className="text-sm">
-                        Desconto
-                        <select
-                          value={anuncioForm.desconto}
-                          onChange={(e) =>
-                            setAnuncioForm({ ...anuncioForm, desconto: Number(e.target.value) })
-                          }
-                          className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
-                        >
-                          {DESCONTOS.map((d) => (
-                            <option key={d} value={d}>
-                              {d}%
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-
-                      <label className="text-sm">
-                        Quantidade
-                        <input
-                          type="number"
-                          min="1"
-                          step="1"
-                          value={anuncioForm.quantidade}
-                          onChange={(e) => setAnuncioForm({ ...anuncioForm, quantidade: e.target.value })}
-                          className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
-                          required
-                        />
-                      </label>
-
-                      <label className="text-sm">
-                        Retirada até
-                        <select
-                          value={anuncioForm.prazoHoras}
-                          onChange={(e) =>
-                            setAnuncioForm({ ...anuncioForm, prazoHoras: Number(e.target.value) })
-                          }
-                          className="mt-1 w-full rounded-md border border-surface-300 px-3 py-2 text-base"
-                        >
-                          {PRAZOS.map((pr) => (
-                            <option key={pr.horas} value={pr.horas}>
-                              {pr.rotulo}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
-
-                    <p className="mt-2 text-sm text-ink-700">
-                      Cliente paga{' '}
-                      <span className="font-semibold text-brand-700">
-                        {moeda(precoComDesconto(String(p.preco_regular), anuncioForm.desconto)!)}
-                      </span>{' '}
-                      <span className="text-ink-500 line-through">{moeda(p.preco_regular)}</span>
-                    </p>
-
-                    {erroAnuncio && (
-                      <div
-                        role="alert"
-                        className="mt-2 rounded-md bg-danger-500/10 px-3 py-2 text-sm text-danger-600"
-                      >
-                        {erroAnuncio}
-                      </div>
-                    )}
-
-                    <div className="mt-3 flex gap-2">
-                      <button
-                        type="submit"
-                        disabled={anunciar.isPending}
-                        className="min-h-11 flex-1 rounded-lg bg-brand-700 px-4 font-medium text-white disabled:opacity-60"
-                      >
-                        Publicar oferta
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAnunciando(null);
-                          setErroAnuncio(null);
-                        }}
-                        className="min-h-11 rounded-lg border border-surface-300 px-4 font-medium text-ink-700"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-    </main>
+      </Sheet>
+    </section>
   );
 }

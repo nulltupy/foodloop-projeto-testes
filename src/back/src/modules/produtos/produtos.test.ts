@@ -27,10 +27,34 @@ async function registrarComerciante(n: number) {
   return { usuario, token };
 }
 
+async function criarEstabelecimento(usuarioId: bigint, n: number) {
+  const endereco = await prisma.endereco.create({
+    data: {
+      rua: 'Rua Produto',
+      numero: String(n),
+      bairro: 'Centro',
+      cidade: 'Betim',
+      estado: 'MG',
+      cep: '32600-000',
+      latitude: -19.954,
+      longitude: -44.199,
+    },
+  });
+  return prisma.estabelecimento.create({
+    data: {
+      id_comerciante: usuarioId,
+      id_endereco: endereco.id,
+      nome_fantasia: `Estab Produto ${n}`,
+      horario_funcionamento: '08:00–18:00',
+      ativo: true,
+    },
+  });
+}
+
 const PRODUTO = { nome: 'Coxinha', preco_regular: 8.5, categoria: 'Lanche' };
 
 describe('POST /api/v1/produtos — comerciante sem estabelecimento', () => {
-  it('cria estabelecimento default e o produto (201)', async () => {
+  it('retorna 404 até a loja ser cadastrada', async () => {
     const { usuario, token } = await registrarComerciante(1);
 
     const res = await request(app)
@@ -38,23 +62,18 @@ describe('POST /api/v1/produtos — comerciante sem estabelecimento', () => {
       .set('Authorization', `Bearer ${token}`)
       .send(PRODUTO);
 
-    expect(res.status).toBe(201);
-    expect(res.body).toMatchObject({ nome: 'Coxinha', preco_regular: 8.5, ativo: true });
+    expect(res.status).toBe(404);
+    expect(res.body.error.code).toBe(ErrorCode.RECURSO_NAO_ENCONTRADO);
 
     const estab = await prisma.estabelecimento.findFirst({
       where: { id_comerciante: usuario.id },
-      include: { endereco: true },
     });
-    expect(estab).not.toBeNull();
-    expect(res.body.id_estabelecimento).toBe(Number(estab!.id));
-    // Endereço default no centro de Betim — onde está o seed de demonstração,
-    // pra anúncios desse estab aparecerem na home sem onboarding de endereço.
-    expect(Number(estab!.endereco.latitude)).toBeCloseTo(-19.954, 3);
-    expect(Number(estab!.endereco.longitude)).toBeCloseTo(-44.199, 3);
+    expect(estab).toBeNull();
   });
 
-  it('GET /api/v1/produtos lista produtos após o lazy-create', async () => {
-    const { token } = await registrarComerciante(2);
+  it('GET /api/v1/produtos lista produtos após cadastrar loja', async () => {
+    const { usuario, token } = await registrarComerciante(2);
+    await criarEstabelecimento(usuario.id, 2);
 
     await request(app).post('/api/v1/produtos').set('Authorization', `Bearer ${token}`).send(PRODUTO);
 
@@ -65,7 +84,8 @@ describe('POST /api/v1/produtos — comerciante sem estabelecimento', () => {
   });
 
   it('fluxo completo: produto novo + anúncio aparecem na listagem geo de Betim', async () => {
-    const { token } = await registrarComerciante(3);
+    const { usuario, token } = await registrarComerciante(3);
+    await criarEstabelecimento(usuario.id, 3);
 
     const produto = await request(app)
       .post('/api/v1/produtos')
@@ -115,7 +135,8 @@ describe('POST /api/v1/produtos — comerciante sem estabelecimento', () => {
 
 describe('GET /api/v1/anuncios/meus e ciclo de vida do anúncio', () => {
   it('lista os anúncios do comerciante autenticado', async () => {
-    const { token } = await registrarComerciante(5);
+    const { usuario, token } = await registrarComerciante(5);
+    await criarEstabelecimento(usuario.id, 5);
     const produto = await request(app)
       .post('/api/v1/produtos')
       .set('Authorization', `Bearer ${token}`)
@@ -138,7 +159,8 @@ describe('GET /api/v1/anuncios/meus e ciclo de vida do anúncio', () => {
   });
 
   it('desativar produto encerra anúncios ativos dele (some da home)', async () => {
-    const { token } = await registrarComerciante(6);
+    const { usuario, token } = await registrarComerciante(6);
+    await criarEstabelecimento(usuario.id, 6);
     const produto = await request(app)
       .post('/api/v1/produtos')
       .set('Authorization', `Bearer ${token}`)
@@ -171,7 +193,8 @@ describe('GET /api/v1/anuncios/meus e ciclo de vida do anúncio', () => {
 
 describe('DELETE /api/v1/produtos/:id — produto some da listagem', () => {
   it('produto excluído não aparece mais no GET /api/v1/produtos', async () => {
-    const { token } = await registrarComerciante(7);
+    const { usuario, token } = await registrarComerciante(7);
+    await criarEstabelecimento(usuario.id, 7);
     const produto = await request(app)
       .post('/api/v1/produtos')
       .set('Authorization', `Bearer ${token}`)

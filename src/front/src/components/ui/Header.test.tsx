@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Header } from './Header';
 import { useAuthStore } from '../../features/auth/store';
+import { abrirSessao } from '../../mocks/db';
 
 // O header agora inclui o sino de notificações (React Query), então o render
 // precisa do QueryClientProvider — mesmas dependências do app real.
@@ -33,10 +34,13 @@ describe('Header', () => {
   it('mostra as iniciais e permite sair quando logado', async () => {
     useAuthStore
       .getState()
-      .setSession({ id: 1, nome: 'Maria Silva', email: 'maria@foodloop.dev', tipo: 'cliente' }, 'tok');
+      .setSession(
+        { id: 1, nome: 'Maria Silva', email: 'maria@foodloop.dev', tipo: 'cliente' },
+        abrirSessao(1),
+      );
     renderHeader();
 
-    const avatar = screen.getByRole('button', { name: /abrir menu da conta/i });
+    const avatar = screen.getByRole('button', { name: /conta e perfil/i });
     expect(avatar).toHaveTextContent('MS');
 
     await userEvent.click(avatar);

@@ -36,48 +36,13 @@ function shape(p: {
   };
 }
 
-// Endereço default no centro de Betim/MG — mesma região do seed de demo, pra
-// anúncios do estab novo aparecerem na home sem onboarding de endereço.
-const ENDERECO_DEFAULT = {
-  rua: 'Endereço pendente',
-  numero: 's/n',
-  bairro: 'Centro',
-  cidade: 'Betim',
-  estado: 'MG',
-  cep: '32600-000',
-  latitude: -19.954,
-  longitude: -44.199,
-};
-
 async function meuEstabId(userId: number): Promise<bigint> {
   const estab = await prisma.estabelecimento.findFirst({
     where: { id_comerciante: BigInt(userId) },
     select: { id: true },
   });
   if (estab) return estab.id;
-
-  // Conta comerciante sai do /register sem estabelecimento (não há tela de
-  // onboarding ainda). Lazy-create com defaults destrava o CRUD de produtos.
-  const usuario = await prisma.usuario.findUnique({
-    where: { id: BigInt(userId) },
-    select: { nome: true, tipo: true },
-  });
-  if (!usuario || usuario.tipo !== 'comerciante') {
-    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Estabelecimento não encontrado');
-  }
-
-  const novo = await prisma.$transaction(async (tx) => {
-    const endereco = await tx.endereco.create({ data: ENDERECO_DEFAULT });
-    return tx.estabelecimento.create({
-      data: {
-        id_comerciante: BigInt(userId),
-        id_endereco: endereco.id,
-        nome_fantasia: usuario.nome,
-      },
-      select: { id: true },
-    });
-  });
-  return novo.id;
+  throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Estabelecimento não encontrado');
 }
 
 export async function listarMeus(userId: number): Promise<Produto[]> {
