@@ -1,4 +1,9 @@
-import { CreateAnuncioRequestSchema, ErrorCode, ListarAnunciosQuerySchema } from '@foodloop/lib';
+import {
+  CreateAnuncioRequestSchema,
+  ErrorCode,
+  ListarAnunciosQuerySchema,
+  UpdateAnuncioRequestSchema,
+} from '@foodloop/lib';
 import { Router } from 'express';
 
 import { HttpError } from '../../shared/errors.js';
@@ -57,6 +62,24 @@ export function createAnunciosRouter(): Router {
         throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Anúncio não encontrado');
       }
       res.json(anuncio);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.patch('/:id', requireAuth, requireRole('comerciante'), async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
+      }
+      const parsed = UpdateAnuncioRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const fields = Object.keys(parsed.error.flatten().fieldErrors);
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Payload inválido', { fields });
+      }
+      const atualizado = await service.atualizar(id, parsed.data, req.usuario!.id);
+      res.json(atualizado);
     } catch (e) {
       next(e);
     }

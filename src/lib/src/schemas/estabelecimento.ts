@@ -15,7 +15,7 @@ export type Estabelecimento = z.infer<typeof EstabelecimentoSchema>;
 export const CreateEstabelecimentoRequestSchema = z.object({
   nome_fantasia: z.string().min(2).max(120),
   descricao: z.string().max(500).optional(),
-  horario_funcionamento: z.string().trim().min(1).max(120),
+  horario_funcionamento: z.string().trim().min(1).max(120).optional(),
   endereco: CreateEnderecoRequestSchema,
 });
 export type CreateEstabelecimentoRequest = z.infer<typeof CreateEstabelecimentoRequestSchema>;

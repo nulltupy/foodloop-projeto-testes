@@ -1,4 +1,10 @@
-import { AuthResponseSchema, ErrorCode, LoginRequestSchema, RegisterRequestSchema } from '@foodloop/lib';
+import {
+  AuthResponseSchema,
+  ErrorCode,
+  LoginRequestSchema,
+  RegisterComercianteRequestSchema,
+  RegisterRequestSchema,
+} from '@foodloop/lib';
 import { type RequestHandler, Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
@@ -76,6 +82,45 @@ export function createAuthRouter(): Router {
           ip: req.ip,
         },
         'usuario registrado',
+      );
+      res.status(201).json(safe);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.post('/register-comerciante', registerLimiter, async (req, res, next) => {
+    try {
+      const parsed = RegisterComercianteRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const fields = Object.keys(parsed.error.flatten().fieldErrors);
+        req.log?.info(
+          { event: 'auth.register_comerciante.failure', reason: 'VALIDACAO', ip: req.ip, fields },
+          'falha de validação no cadastro de comerciante',
+        );
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Payload inválido', { fields });
+      }
+      let out;
+      try {
+        out = await service.registrarComerciante(parsed.data);
+      } catch (err) {
+        if (err instanceof HttpError && err.code === ErrorCode.CADASTRO_DUPLICADO) {
+          req.log?.info(
+            { event: 'auth.register_comerciante.failure', reason: 'CADASTRO_DUPLICADO', ip: req.ip },
+            'cadastro de comerciante duplicado',
+          );
+        }
+        throw err;
+      }
+      const safe = AuthResponseSchema.parse(out);
+      req.log?.info(
+        {
+          event: 'auth.register_comerciante.success',
+          usuarioId: safe.usuario.id,
+          tipo: safe.usuario.tipo,
+          ip: req.ip,
+        },
+        'comerciante registrado com estabelecimento',
       );
       res.status(201).json(safe);
     } catch (e) {

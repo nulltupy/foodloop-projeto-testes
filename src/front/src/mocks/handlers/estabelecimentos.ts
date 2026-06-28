@@ -52,7 +52,7 @@ export const estabelecimentosHandlers = [
       id,
       nome_fantasia: parsed.data.nome_fantasia,
       descricao: parsed.data.descricao ?? null,
-      horario_funcionamento: parsed.data.horario_funcionamento,
+      horario_funcionamento: parsed.data.horario_funcionamento ?? null,
       nota_media: null,
       ativo: true,
       endereco,

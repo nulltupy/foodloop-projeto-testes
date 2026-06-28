@@ -83,12 +83,18 @@ export function Login() {
         </form>
       </div>
 
-      <p className="mt-5 text-center text-ink-soft">
-        Novo por aqui?{' '}
+      <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-ink-soft">
+        <span>Novo por aqui?</span>
         <Link to="/cadastro/cliente" className="font-bold text-leaf-dark underline-offset-2 hover:underline">
-          Criar conta
+          Cliente
         </Link>
-      </p>
+        <Link
+          to="/cadastro/comerciante"
+          className="font-bold text-leaf-dark underline-offset-2 hover:underline"
+        >
+          Comerciante
+        </Link>
+      </div>
     </main>
   );
 }

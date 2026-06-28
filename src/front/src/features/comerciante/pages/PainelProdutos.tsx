@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
-import type { CreateProdutoRequest, Produto } from '@foodloop/lib';
+import type { Anuncio, CreateProdutoRequest, Produto } from '@foodloop/lib';
 import { Sheet } from '../../../components/ui/Sheet';
 
 const CATEGORIAS = ['Lanche', 'Bebida', 'Sobremesa', 'Padaria', 'Refeição', 'Outros'];
@@ -15,6 +15,12 @@ interface OfertaForm {
   quantidade: string;
   prazoHoras: string;
   prazoMinutos: string;
+}
+
+interface OfertaValidada {
+  desconto: number;
+  quantidade: number;
+  prazo: string;
 }
 
 interface Formulario {
@@ -59,9 +65,24 @@ function paraRequest(f: Formulario): CreateProdutoRequest {
   };
 }
 
-function deProduto(p: Produto): Formulario {
+function ofertaDeAnuncio(p: Produto, a: Anuncio): OfertaForm {
+  const desconto = Math.round((1 - a.preco_promocional / p.preco_regular) * 100);
+  const totalMinutos = Math.max(
+    1,
+    Math.min(MINUTOS_DIA - 1, Math.ceil((Date.parse(a.prazo_retirada) - Date.now()) / 60_000)),
+  );
+  return {
+    desconto: String(Math.max(0, Math.min(100, desconto))),
+    quantidade: String(a.quantidade_inicial),
+    prazoHoras: String(Math.floor(totalMinutos / 60)),
+    prazoMinutos: String(totalMinutos % 60),
+  };
+}
+
+function deProduto(p: Produto, anuncio?: Anuncio): Formulario {
   return {
     ...FORM_VAZIO,
+    ...(anuncio ? ofertaDeAnuncio(p, anuncio) : {}),
     nome: p.nome,
     descricao: p.descricao ?? '',
     preco_regular: String(p.preco_regular),
@@ -97,7 +118,7 @@ function prazoIso(horasRaw: string, minutosRaw: string): string | null {
   return total === null ? null : new Date(Date.now() + total * 60 * 1000).toISOString();
 }
 
-function validarOferta(f: OfertaForm): { desconto: number; quantidade: number; prazo: string } | string {
+function validarOferta(f: OfertaForm): OfertaValidada | string {
   const desconto = descontoNumero(f.desconto);
   if (desconto === null) return 'Desconto deve ser um número inteiro entre 0 e 100';
   const quantidade = quantidadeNumero(f.quantidade);
@@ -199,36 +220,39 @@ function CamposOferta({
   onChange: (patch: Partial<OfertaForm>) => void;
 }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      <label className="grid gap-1.5">
-        <span className={rotulo}>Desconto (%)</span>
-        <input
-          type="number"
-          min="0"
-          max="100"
-          step="1"
-          inputMode="numeric"
-          value={desconto}
-          onChange={(e) => onChange({ desconto: e.target.value })}
-          className="campo"
-          required
-        />
-      </label>
-      <label className="grid gap-1.5">
-        <span className={rotulo}>Quantidade</span>
-        <input
-          type="number"
-          min="1"
-          step="1"
-          value={quantidade}
-          onChange={(e) => onChange({ quantidade: e.target.value })}
-          className="campo"
-          required
-        />
-      </label>
+    <div className="grid gap-3">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="grid gap-1.5">
+          <span className={rotulo}>Desconto (%)</span>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            step="1"
+            inputMode="numeric"
+            value={desconto}
+            onChange={(e) => onChange({ desconto: e.target.value })}
+            className="campo"
+            required
+          />
+        </label>
+        <label className="grid gap-1.5">
+          <span className={rotulo}>Quantidade</span>
+          <input
+            type="number"
+            min="1"
+            step="1"
+            value={quantidade}
+            onChange={(e) => onChange({ quantidade: e.target.value })}
+            className="campo"
+            required
+          />
+        </label>
+      </div>
+
       <div className="grid gap-1.5">
         <span className={rotulo}>Retirada até</span>
-        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] items-center gap-1.5">
+        <div className="grid max-w-sm grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] items-center gap-2">
           <input
             aria-label="Horas para retirada"
             type="number"
@@ -287,10 +311,7 @@ export function PainelProdutos() {
   }
 
   const criar = useMutation({
-    mutationFn: async (args: {
-      form: Formulario;
-      oferta: { desconto: number; quantidade: number; prazo: string };
-    }) => {
+    mutationFn: async (args: { form: Formulario; oferta: OfertaValidada }) => {
       const f = args.form;
       const produto = await api.produtos.criar(paraRequest(f));
       await api.anuncios.criar({
@@ -309,8 +330,22 @@ export function PainelProdutos() {
   });
 
   const atualizar = useMutation({
-    mutationFn: (args: { id: number; data: CreateProdutoRequest }) =>
-      api.produtos.atualizar(args.id, args.data),
+    mutationFn: async (args: {
+      id: number;
+      form: Formulario;
+      anuncio?: Anuncio;
+      oferta?: OfertaValidada;
+    }) => {
+      const produto = await api.produtos.atualizar(args.id, paraRequest(args.form));
+      if (args.anuncio && args.oferta) {
+        await api.anuncios.atualizar(args.anuncio.id, {
+          preco_promocional: precoComDesconto(args.form.preco_regular, args.oferta.desconto)!,
+          quantidade_inicial: args.oferta.quantidade,
+          prazo_retirada: args.oferta.prazo,
+        });
+      }
+      return produto;
+    },
     onSuccess: () => {
       fechar();
       invalidar();
@@ -328,10 +363,7 @@ export function PainelProdutos() {
   });
 
   const anunciar = useMutation({
-    mutationFn: (args: {
-      produto: Produto;
-      oferta: { desconto: number; quantidade: number; prazo: string };
-    }) => {
+    mutationFn: (args: { produto: Produto; oferta: OfertaValidada }) => {
       return api.anuncios.criar({
         id_produto: args.produto.id,
         preco_promocional: precoComDesconto(String(args.produto.preco_regular), args.oferta.desconto)!,
@@ -352,7 +384,7 @@ export function PainelProdutos() {
     setModal({ tipo: 'novo' });
   }
   function abrirEditar(p: Produto) {
-    setForm(deProduto(p));
+    setForm(deProduto(p, anuncioAtivoDe(p.id)));
     setErro(null);
     setModal({ tipo: 'editar', produto: p });
   }
@@ -373,8 +405,14 @@ export function PainelProdutos() {
       return;
     }
     if (modal?.tipo === 'editar') {
+      const anuncio = anuncioAtivoDe(modal.produto.id);
+      const oferta = anuncio ? validarOferta(form) : undefined;
+      if (typeof oferta === 'string') {
+        setErro(oferta);
+        return;
+      }
       setErro(null);
-      atualizar.mutate({ id: modal.produto.id, data: paraRequest(form) });
+      atualizar.mutate({ id: modal.produto.id, form, anuncio, oferta });
       return;
     }
     const oferta = validarOferta(form);
@@ -400,6 +438,7 @@ export function PainelProdutos() {
 
   const salvando = criar.isPending || atualizar.isPending;
   const editando = modal?.tipo === 'editar';
+  const anuncioEditando = modal?.tipo === 'editar' ? anuncioAtivoDe(modal.produto.id) : undefined;
 
   return (
     <section>
@@ -568,6 +607,29 @@ export function PainelProdutos() {
           {!editando && (
             <fieldset className="rounded-xl border border-canvas-line bg-canvas p-3.5">
               <legend className="px-1.5 text-sm font-bold text-ink">Oferta</legend>
+              <CamposOferta
+                desconto={form.desconto}
+                quantidade={form.quantidade}
+                prazoHoras={form.prazoHoras}
+                prazoMinutos={form.prazoMinutos}
+                onChange={(patch) => setForm({ ...form, ...patch })}
+              />
+              {Number(form.preco_regular) > 0 ? (
+                <PreviaPreco
+                  regular={Number(form.preco_regular)}
+                  desconto={descontoNumero(form.desconto) ?? 0}
+                />
+              ) : (
+                <p className="mt-2 text-sm text-ink-mute">
+                  Informe o preço regular para ver o valor da oferta.
+                </p>
+              )}
+            </fieldset>
+          )}
+
+          {editando && anuncioEditando && (
+            <fieldset className="rounded-xl border border-canvas-line bg-canvas p-3.5">
+              <legend className="px-1.5 text-sm font-bold text-ink">Oferta ativa</legend>
               <CamposOferta
                 desconto={form.desconto}
                 quantidade={form.quantidade}

@@ -6,6 +6,7 @@ import {
   type AnuncioListItem,
   type CreateAnuncioRequest,
   type ListarAnunciosQuery,
+  type UpdateAnuncioRequest,
 } from '../schemas/anuncio.js';
 import { z } from 'zod';
 
@@ -34,5 +35,10 @@ export async function getById(id: number): Promise<Anuncio> {
 
 export async function criar(data: CreateAnuncioRequest): Promise<Anuncio> {
   const r = await getApiClient().post('/api/v1/anuncios', data);
+  return AnuncioSchema.parse(r.data);
+}
+
+export async function atualizar(id: number, data: UpdateAnuncioRequest): Promise<Anuncio> {
+  const r = await getApiClient().patch(`/api/v1/anuncios/${id}`, data);
   return AnuncioSchema.parse(r.data);
 }

@@ -1,4 +1,4 @@
-import { type Anuncio, type CreateAnuncioRequest, ErrorCode } from '@foodloop/lib';
+import { type Anuncio, type CreateAnuncioRequest, ErrorCode, type UpdateAnuncioRequest } from '@foodloop/lib';
 
 import { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
@@ -203,6 +203,71 @@ export async function criar(input: CreateAnuncioRequest, userId: number): Promis
     },
   });
   return shapeAnuncio(novo);
+}
+
+export async function atualizar(id: number, input: UpdateAnuncioRequest, userId: number): Promise<Anuncio> {
+  const estab = await prisma.estabelecimento.findFirst({
+    where: { id_comerciante: BigInt(userId) },
+    select: { id: true },
+  });
+  if (!estab) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Estabelecimento não encontrado');
+  }
+
+  const atual = await prisma.anuncio.findUnique({
+    where: { id: BigInt(id) },
+    select: {
+      id: true,
+      id_produto: true,
+      id_estabelecimento: true,
+      quantidade_inicial: true,
+      quantidade_disponivel: true,
+      status: true,
+    },
+  });
+  if (!atual) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Anúncio não encontrado');
+  }
+  if (atual.id_estabelecimento !== estab.id) {
+    throw new HttpError(403, ErrorCode.PERMISSAO_NEGADA, 'Anúncio não pertence ao seu estabelecimento');
+  }
+  if (atual.status !== 'ATIVO') {
+    throw new HttpError(409, ErrorCode.ANUNCIO_NAO_ATIVO, 'Anúncio não está ativo');
+  }
+
+  let idProduto = atual.id_produto;
+  if (input.id_produto !== undefined) {
+    const produto = await prisma.produto.findUnique({
+      where: { id: BigInt(input.id_produto) },
+      select: { id: true, id_estabelecimento: true },
+    });
+    if (!produto) {
+      throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Produto não encontrado');
+    }
+    if (produto.id_estabelecimento !== estab.id) {
+      throw new HttpError(403, ErrorCode.PERMISSAO_NEGADA, 'Produto não pertence ao seu estabelecimento');
+    }
+    idProduto = produto.id;
+  }
+
+  const quantidadeInicial = input.quantidade_inicial ?? atual.quantidade_inicial;
+  const reservados = Math.max(0, atual.quantidade_inicial - atual.quantidade_disponivel);
+  const quantidadeDisponivel =
+    input.quantidade_inicial === undefined
+      ? undefined
+      : Math.max(0, Math.min(input.quantidade_inicial, quantidadeInicial - reservados));
+
+  const atualizado = await prisma.anuncio.update({
+    where: { id: BigInt(id) },
+    data: {
+      id_produto: idProduto,
+      preco_promocional: input.preco_promocional,
+      quantidade_inicial: input.quantidade_inicial,
+      quantidade_disponivel: quantidadeDisponivel,
+      prazo_retirada: input.prazo_retirada ? new Date(input.prazo_retirada) : undefined,
+    },
+  });
+  return shapeAnuncio(atualizado);
 }
 
 export async function getById(id: number) {

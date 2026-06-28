@@ -11,6 +11,7 @@ import { prisma } from '../../db/client.js';
 import { geocodingEnderecoComFallback } from '../geocoding/service.js';
 import * as notificacoes from '../notificacoes/service.js';
 import { HttpError } from '../../shared/errors.js';
+import { normalizarCep, queriesGeocoding } from './endereco.js';
 
 // Inclui o endereço — formato de retorno comum a getById/getMeu/criar/atualizar.
 const comEndereco = { endereco: true } as const;
@@ -37,27 +38,6 @@ function shape(e: EstabComEndereco): Estabelecimento {
       longitude: Number(e.endereco.longitude),
     },
   };
-}
-
-// Coluna é Char(9): normaliza para o formato com hífen (#####-###).
-function normalizarCep(cep: string): string {
-  const digitos = cep.replace(/\D/g, '');
-  return `${digitos.slice(0, 5)}-${digitos.slice(5, 8)}`;
-}
-
-// Queries de geocoding da mais específica para a mais ampla. O Nominatim falha
-// com frequência no número e no bairro de endereços brasileiros, então caímos
-// até rua/cidade. Não caímos para bairro ou cidade somente, porque isso salvaria
-// coordenadas genéricas enquanto o endereço parece exato para o cliente.
-function queriesGeocoding(e: CreateEstabelecimentoRequest['endereco']): string[] {
-  const montar = (...partes: (string | undefined)[]) =>
-    partes.filter((p) => p && p.trim().length > 0).join(', ');
-  const candidatas = [
-    montar(e.rua, e.numero, e.bairro, e.cidade, e.estado, 'Brasil'),
-    montar(e.rua, e.bairro, e.cidade, e.estado, 'Brasil'),
-    montar(e.rua, e.cidade, e.estado, 'Brasil'),
-  ];
-  return candidatas.filter((q, i) => q.length > 0 && candidatas.indexOf(q) === i);
 }
 
 export async function getById(id: number): Promise<Estabelecimento | null> {
@@ -109,7 +89,7 @@ export async function criar(
           id_endereco: endereco.id,
           nome_fantasia: input.nome_fantasia,
           descricao: input.descricao ?? null,
-          horario_funcionamento: input.horario_funcionamento,
+          horario_funcionamento: input.horario_funcionamento ?? null,
         },
         include: comEndereco,
       });
