@@ -119,7 +119,16 @@ export function OfertaDetalhe() {
 
         <div className="p-5 sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="font-semibold text-ink-soft">{estab?.nome_fantasia}</span>
+            {estab ? (
+              <Link
+                to={`/estabelecimentos/${estab.id}`}
+                className="font-semibold text-ink-soft transition-colors hover:text-leaf-dark hover:underline"
+              >
+                {estab.nome_fantasia}
+              </Link>
+            ) : (
+              <span className="font-semibold text-ink-soft">Estabelecimento</span>
+            )}
             <NotaEstrelas nota={estab?.nota_media} />
           </div>
 

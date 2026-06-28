@@ -88,6 +88,32 @@ describe('GET /api/v1/anuncios — filtros adicionais', () => {
     expect(res.body.data[0].preco_promocional).toBe(10);
   });
 
+  it('filtra por estabelecimento', async () => {
+    const alvo = await criarAnuncioParaTeste({
+      lat: BETIM_LAT,
+      lng: BETIM_LNG,
+      nomeFantasia: 'Padaria Perfil',
+    });
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeFantasia: 'Outro Estabelecimento' });
+
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({
+        lat: BETIM_LAT,
+        lng: BETIM_LNG,
+        raio_km: 50,
+        id_estabelecimento: Number(alvo.estabelecimento.id),
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.meta.total).toBe(1);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0]).toMatchObject({
+      id_estabelecimento: Number(alvo.estabelecimento.id),
+      nome_fantasia: 'Padaria Perfil',
+    });
+  });
+
   it('exclui status não-ATIVO, quantidade_disponivel 0, prazo no passado', async () => {
     await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG });
     await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, status: 'ENCERRADO_COM_SOBRA' });

@@ -95,6 +95,9 @@ export const anunciosHandlers = [
         return produto?.categoria === q.categoria;
       });
     }
+    if (q.id_estabelecimento !== undefined) {
+      itens = itens.filter((li) => li.id_estabelecimento === q.id_estabelecimento);
+    }
 
     itens.sort((a, b) => a.distancia_km - b.distancia_km);
 

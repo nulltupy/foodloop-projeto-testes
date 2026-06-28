@@ -12,6 +12,7 @@ interface ListarParams {
   raio_km: number;
   preco_max?: number;
   categoria?: string;
+  id_estabelecimento?: number;
   pagina: number;
 }
 
@@ -40,10 +41,15 @@ function filtroCategoria(categoria: string | undefined): Prisma.Sql {
   return categoria === undefined ? Prisma.empty : Prisma.sql`AND p.categoria = ${categoria}`;
 }
 
+function filtroEstabelecimento(id: number | undefined): Prisma.Sql {
+  return id === undefined ? Prisma.empty : Prisma.sql`AND a.id_estabelecimento = ${BigInt(id)}`;
+}
+
 export async function listarProximos(params: ListarParams) {
   const offset = (params.pagina - 1) * TAMANHO_PAGINA;
   const precoFiltro = filtroPrecoMax(params.preco_max);
   const catFiltro = filtroCategoria(params.categoria);
+  const estabelecimentoFiltro = filtroEstabelecimento(params.id_estabelecimento);
 
   // Subquery wraps the Haversine expression so the outer WHERE can filter by
   // the computed alias `distancia_km`. PG não aceita HAVING sem GROUP BY com
@@ -71,6 +77,7 @@ export async function listarProximos(params: ListarParams) {
         AND a.prazo_retirada > NOW()
         ${precoFiltro}
         ${catFiltro}
+        ${estabelecimentoFiltro}
     ) sub
     WHERE sub.distancia_km <= ${params.raio_km}
     ORDER BY sub.distancia_km ASC, sub.preco_promocional ASC
@@ -107,6 +114,7 @@ export async function listarProximos(params: ListarParams) {
 async function contarProximos(params: ListarParams): Promise<number> {
   const precoFiltro = filtroPrecoMax(params.preco_max);
   const catFiltro = filtroCategoria(params.categoria);
+  const estabelecimentoFiltro = filtroEstabelecimento(params.id_estabelecimento);
 
   const result = await prisma.$queryRaw<Array<{ total: bigint }>>`
     SELECT COUNT(*)::bigint AS total FROM (
@@ -126,6 +134,7 @@ async function contarProximos(params: ListarParams): Promise<number> {
         AND a.prazo_retirada > NOW()
         ${precoFiltro}
         ${catFiltro}
+        ${estabelecimentoFiltro}
     ) sub
     WHERE sub.distancia_km <= ${params.raio_km}
   `;

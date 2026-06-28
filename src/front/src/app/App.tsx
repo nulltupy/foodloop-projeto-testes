@@ -7,6 +7,7 @@ import { CadastroCliente } from '../features/auth/pages/CadastroCliente';
 import { CadastroComerciante } from '../features/auth/pages/CadastroComerciante';
 import { Home } from '../features/ofertas/pages/Home';
 import { OfertaDetalhe } from '../features/ofertas/pages/OfertaDetalhe';
+import { PerfilEstabelecimento } from '../features/estabelecimentos/pages/PerfilEstabelecimento';
 import { Checkout } from '../features/checkout/pages/Checkout';
 import { PedidoConfirmacao } from '../features/pedidos/pages/PedidoConfirmacao';
 import { MeusPedidos } from '../features/pedidos/pages/MeusPedidos';
@@ -29,6 +30,7 @@ export function App() {
           <Route element={<RotaProtegida />}>
             <Route path="/" element={<Home />} />
             <Route path="/oferta/:id" element={<OfertaDetalhe />} />
+            <Route path="/estabelecimentos/:id" element={<PerfilEstabelecimento />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/pedidos" element={<MeusPedidos />} />
             <Route path="/pedidos/:id" element={<PedidoConfirmacao />} />

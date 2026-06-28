@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
 import type { AnuncioListItem, ListarAnunciosQuery } from '@foodloop/lib';
@@ -13,6 +13,7 @@ import { Sheet } from '../../../components/ui/Sheet';
 const CENTRO_BETIM = { latitude: -19.954, longitude: -44.199 };
 const RAIO_BUSCA_KM = 5000;
 const CATEGORIAS = ['Padaria', 'Lanche', 'Refeição', 'Doce', 'Bebida', 'Hortifruti'];
+const PARAM_ESTABELECIMENTO = 'estabelecimento';
 type OrdemDistancia = 'asc' | 'desc';
 
 function moeda(valor: number): string {
@@ -27,6 +28,11 @@ function descontoPct(promo: number, regular: number): number {
 function fechaLogo(iso: string): boolean {
   const ms = new Date(iso).getTime() - Date.now();
   return ms > 0 && ms < 2 * 3_600_000;
+}
+
+function estabelecimentoDoParam(params: URLSearchParams): number | '' {
+  const valor = Number(params.get(PARAM_ESTABELECIMENTO));
+  return Number.isInteger(valor) && valor > 0 ? valor : '';
 }
 
 async function listarPrimeirasPaginas(query: ListarAnunciosQuery): Promise<AnuncioListItem[]> {
@@ -88,12 +94,11 @@ function OfertaCard({ oferta, indice }: { oferta: AnuncioListItem; indice: numbe
   const off = descontoPct(oferta.preco_promocional, oferta.preco_regular);
   const soon = fechaLogo(oferta.prazo_retirada);
   return (
-    <Link
-      to={`/oferta/${oferta.id}`}
+    <article
       style={{ animationDelay: `${Math.min(indice, 8) * 45}ms` }}
       className="group flex animate-rise flex-col overflow-hidden rounded-2xl border border-canvas-line bg-canvas-card shadow-card transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-pop"
     >
-      <div className="relative h-[150px] overflow-hidden bg-leaf-50">
+      <Link to={`/oferta/${oferta.id}`} className="relative block h-[150px] overflow-hidden bg-leaf-50">
         {oferta.produto_imagem ? (
           <img
             src={oferta.produto_imagem}
@@ -116,32 +121,40 @@ function OfertaCard({ oferta, indice }: { oferta: AnuncioListItem; indice: numbe
             ⚡ fecha logo
           </span>
         )}
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-sm font-semibold text-ink-mute">{oferta.nome_fantasia}</span>
+          <Link
+            to={`/estabelecimentos/${oferta.id_estabelecimento}`}
+            className="truncate text-sm font-semibold text-ink-mute transition-colors hover:text-leaf-dark hover:underline"
+          >
+            {oferta.nome_fantasia}
+          </Link>
           <NotaEstrelas nota={oferta.nota_media} />
         </div>
-        <h3 className="mt-0.5 truncate text-lg font-extrabold text-ink">{oferta.produto_nome}</h3>
 
-        <div className="mt-2 flex items-baseline gap-2">
-          <span className="nums text-2xl font-extrabold text-leaf-dark">
-            {moeda(oferta.preco_promocional)}
-          </span>
-          <span className="nums text-sm text-ink-mute line-through">{moeda(oferta.preco_regular)}</span>
-        </div>
+        <Link to={`/oferta/${oferta.id}`} className="mt-0.5 block">
+          <h3 className="truncate text-lg font-extrabold text-ink">{oferta.produto_nome}</h3>
 
-        <div className="mt-3 flex items-center gap-2">
-          <span className="pill">
-            <IconePino /> {oferta.distancia_km.toFixed(1)} km
-          </span>
-          <span className={`pill ${soon ? 'bg-citrus-50 text-citrus-dark' : ''}`}>
-            <IconeRelogio /> até {horaRetirada(oferta.prazo_retirada)}
-          </span>
-        </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="nums text-2xl font-extrabold text-leaf-dark">
+              {moeda(oferta.preco_promocional)}
+            </span>
+            <span className="nums text-sm text-ink-mute line-through">{moeda(oferta.preco_regular)}</span>
+          </div>
+
+          <div className="mt-3 flex items-center gap-2">
+            <span className="pill">
+              <IconePino /> {oferta.distancia_km.toFixed(1)} km
+            </span>
+            <span className={`pill ${soon ? 'bg-citrus-50 text-citrus-dark' : ''}`}>
+              <IconeRelogio /> até {horaRetirada(oferta.prazo_retirada)}
+            </span>
+          </div>
+        </Link>
       </div>
-    </Link>
+    </article>
   );
 }
 
@@ -258,10 +271,16 @@ function FiltroSheet({
 
 export function Home() {
   const { coords, erro, definirManual } = useGeoCoords();
-  const [filtros, setFiltros] = useState<Filtros>(FILTROS_PADRAO);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const estabParam = estabelecimentoDoParam(searchParams);
+  const [filtros, setFiltros] = useState<Filtros>(() => ({ ...FILTROS_PADRAO, estab: estabParam }));
   const [sheetAberto, setSheetAberto] = useState(false);
   const precoMax = Number(filtros.precoMax.replace(',', '.'));
   const origem = coords ?? CENTRO_BETIM;
+
+  useEffect(() => {
+    setFiltros((atual) => (atual.estab === estabParam ? atual : { ...atual, estab: estabParam }));
+  }, [estabParam]);
 
   const query: ListarAnunciosQuery = {
     lat: origem.latitude,
@@ -270,6 +289,7 @@ export function Home() {
     pagina: 1,
     ...(filtros.precoMax.trim() && Number.isFinite(precoMax) && precoMax > 0 ? { preco_max: precoMax } : {}),
     ...(filtros.categoria ? { categoria: filtros.categoria } : {}),
+    ...(filtros.estab ? { id_estabelecimento: filtros.estab } : {}),
   };
 
   const { data, isLoading } = useQuery({
@@ -299,6 +319,18 @@ export function Home() {
     (filtros.precoMax.trim() ? 1 : 0) +
     (filtros.categoria ? 1 : 0) +
     (filtros.estab ? 1 : 0);
+
+  function aplicarFiltros(proximos: Filtros) {
+    setFiltros(proximos);
+    setSheetAberto(false);
+    const novo = new URLSearchParams(searchParams);
+    if (proximos.estab) {
+      novo.set(PARAM_ESTABELECIMENTO, String(proximos.estab));
+    } else {
+      novo.delete(PARAM_ESTABELECIMENTO);
+    }
+    setSearchParams(novo, { replace: true });
+  }
 
   return (
     <main className="mx-auto w-full max-w-3xl p-4 sm:p-6">
@@ -376,7 +408,7 @@ export function Home() {
           <Marca className="mx-auto h-12 w-12" />
           <p className="mt-4 text-lg font-extrabold text-ink">Nenhuma oferta por aqui</p>
           <p className="mt-1 text-ink-soft">Tente limpar os filtros.</p>
-          <button type="button" onClick={() => setFiltros(FILTROS_PADRAO)} className="btn btn-soft mt-5">
+          <button type="button" onClick={() => aplicarFiltros(FILTROS_PADRAO)} className="btn btn-soft mt-5">
             Limpar filtros
           </button>
         </div>
@@ -387,10 +419,7 @@ export function Home() {
         onFechar={() => setSheetAberto(false)}
         filtros={filtros}
         estabs={estabs}
-        onAplicar={(f) => {
-          setFiltros(f);
-          setSheetAberto(false);
-        }}
+        onAplicar={aplicarFiltros}
       />
     </main>
   );
