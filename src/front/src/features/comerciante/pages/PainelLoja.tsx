@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
 import type { CreateEstabelecimentoRequest, Estabelecimento } from '@foodloop/lib';
-import { mensagemErro, statusErro } from '../../../lib/erros';
+import { mensagemErro } from '../../../lib/erros';
+import { buscarMinhaLoja, CHAVE_LOJA } from '../lojaQuery';
 
-const CHAVE = ['estabelecimento-meu'];
 const cepRegex = /^\d{5}-?\d{3}$/;
 const rotulo = 'text-sm font-bold text-ink-soft';
 const HORAS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
@@ -377,14 +377,13 @@ function FormularioLoja({
 export function PainelLoja() {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const lojaQ = useQuery({ queryKey: CHAVE, queryFn: () => api.estabelecimentos.getMeu(), retry: false });
-  const semLoja = lojaQ.isError && statusErro(lojaQ.error) === 404;
+  const lojaQ = useQuery({ queryKey: CHAVE_LOJA, queryFn: buscarMinhaLoja, retry: false });
 
   const [erroServidor, setErroServidor] = useState<string | null>(null);
   const [salvo, setSalvo] = useState(false);
 
   function invalidar() {
-    void qc.invalidateQueries({ queryKey: CHAVE });
+    void qc.invalidateQueries({ queryKey: CHAVE_LOJA });
   }
 
   const criar = useMutation({
@@ -392,7 +391,7 @@ export function PainelLoja() {
     onSuccess: (loja) => {
       setErroServidor(null);
       setSalvo(true);
-      qc.setQueryData(CHAVE, loja);
+      qc.setQueryData(CHAVE_LOJA, loja);
       invalidar();
       navigate('/comerciante/cardapio', { replace: true });
     },
@@ -419,7 +418,7 @@ export function PainelLoja() {
     return <div className="h-72 animate-pulse rounded-2xl bg-canvas-line/60" />;
   }
 
-  if (lojaQ.isError && !semLoja) {
+  if (lojaQ.isError) {
     return (
       <div className="rounded-2xl bg-danger-50 p-4 text-sm font-semibold text-danger-dark">
         Não foi possível carregar sua loja. Tente novamente.
@@ -428,6 +427,7 @@ export function PainelLoja() {
   }
 
   const loja = lojaQ.data;
+  const semLoja = lojaQ.isSuccess && !loja;
 
   return (
     <section className="card p-4 sm:p-5">

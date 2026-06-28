@@ -2,9 +2,7 @@ import { Navigate, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
 import { ehAtivo } from '../../pedidos/status';
-import { statusErro } from '../../../lib/erros';
-
-const CHAVE_LOJA = ['estabelecimento-meu'];
+import { buscarMinhaLoja, CHAVE_LOJA } from '../lojaQuery';
 
 function aba({ isActive }: { isActive: boolean }) {
   return `inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-colors ${
@@ -18,11 +16,11 @@ export function PainelComerciante() {
 
   const lojaQ = useQuery({
     queryKey: CHAVE_LOJA,
-    queryFn: () => api.estabelecimentos.getMeu(),
+    queryFn: buscarMinhaLoja,
     retry: false,
   });
-  const semLoja = lojaQ.isError && statusErro(lojaQ.error) === 404;
   const loja = lojaQ.data;
+  const semLoja = lojaQ.isSuccess && !loja;
   const podeBuscarPedidos = lojaQ.isSuccess && !!loja;
 
   const pedidosQ = useQuery({
