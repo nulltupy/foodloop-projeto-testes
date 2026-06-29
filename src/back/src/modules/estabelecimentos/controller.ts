@@ -9,6 +9,8 @@ import { Router } from 'express';
 import { HttpError } from '../../shared/errors.js';
 import { requireAuth, requireRole } from '../../shared/middlewares/auth.js';
 
+import * as avaliacoes from '../avaliacoes/service.js';
+
 import * as service from './service.js';
 
 export function createEstabelecimentosRouter(): Router {
@@ -99,6 +101,19 @@ export function createEstabelecimentosRouter(): Router {
       }
       const produtos = await service.listarProdutos(id);
       res.json(produtos);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Avaliações do estabelecimento (perfil público), com a thread de comentários.
+  router.get('/:id/avaliacoes', async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
+      }
+      res.json(await avaliacoes.listarDoEstabelecimento(id));
     } catch (err) {
       next(err);
     }

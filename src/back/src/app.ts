@@ -10,6 +10,7 @@ import pinoHttp from 'pino-http';
 import { prisma } from './db/client.js';
 import { createAnunciosRouter } from './modules/anuncios/controller.js';
 import { createAuthRouter } from './modules/auth/controller.js';
+import { createAvaliacoesRouter } from './modules/avaliacoes/controller.js';
 import { createEstabelecimentosRouter } from './modules/estabelecimentos/controller.js';
 import { createGeocodingRouter } from './modules/geocoding/controller.js';
 import { createNotificacoesRouter } from './modules/notificacoes/controller.js';
@@ -84,6 +85,7 @@ export function buildApp(): Express {
   app.use('/api/v1/geocoding', createGeocodingRouter());
   app.use('/api/v1/notificacoes', createNotificacoesRouter());
   app.use('/api/v1/pedidos', createPedidosRouter());
+  app.use('/api/v1/avaliacoes', createAvaliacoesRouter());
 
   app.use(errorHandler);
 

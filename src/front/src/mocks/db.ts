@@ -4,6 +4,8 @@
 import { faker } from '@faker-js/faker';
 import type {
   Anuncio,
+  Avaliacao,
+  ComentarioAvaliacao,
   Endereco,
   Estabelecimento,
   Notificacao,
@@ -28,6 +30,13 @@ export interface UsuarioMock {
 // Notificação do mock com o dono, para filtrar por usuário autenticado.
 export type NotificacaoMock = Notificacao & { id_usuario: number };
 
+// Avaliação do mock com o autor (cliente do pedido), para resolver o nome na
+// listagem do perfil sem alterar o contrato.
+export type AvaliacaoMock = Avaliacao & { id_cliente: number };
+
+// Comentário do mock guarda o id do autor para a autorização e o nome resolvido.
+export type ComentarioMock = ComentarioAvaliacao & { id_usuario: number };
+
 export interface MockDb {
   usuarios: UsuarioMock[];
   estabelecimentos: Estabelecimento[];
@@ -35,9 +44,11 @@ export interface MockDb {
   anuncios: Anuncio[];
   pedidos: Pedido[];
   notificacoes: NotificacaoMock[];
+  avaliacoes: AvaliacaoMock[];
+  comentarios: ComentarioMock[];
   // token -> id do usuário autenticado
   sessoes: Map<string, number>;
-  proximoId: { usuario: number; pedido: number };
+  proximoId: { usuario: number; pedido: number; avaliacao: number; comentario: number };
 }
 
 // Centro aproximado de São Paulo, usado como origem das coordenadas fake.
@@ -172,8 +183,10 @@ function semear(): MockDb {
     anuncios,
     pedidos: [],
     notificacoes,
+    avaliacoes: [],
+    comentarios: [],
     sessoes: new Map(),
-    proximoId: { usuario: 3, pedido: 1 },
+    proximoId: { usuario: 3, pedido: 1, avaliacao: 1, comentario: 1 },
   };
 }
 

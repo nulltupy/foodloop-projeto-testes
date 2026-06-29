@@ -7,6 +7,7 @@ import { BADGE_STATUS, ehAtivo, ROTULO_STATUS } from '../status';
 import { dataHora, moeda } from '../../../lib/format';
 import { mensagemErro } from '../../../lib/erros';
 import { Marca } from '../../../components/ui/Marca';
+import { FormAvaliacao } from '../../avaliacoes/components/FormAvaliacao';
 
 const CHAVE = ['pedidos-meus'];
 
@@ -63,6 +64,9 @@ export function MeusPedidos() {
 
   const [confirmandoCancel, setConfirmandoCancel] = useState<number | null>(null);
   const [erroPedido, setErroPedido] = useState<Record<number, string>>({});
+  // Pedido cujo formulário de avaliação está aberto, e os já avaliados nesta sessão.
+  const [avaliando, setAvaliando] = useState<number | null>(null);
+  const [avaliados, setAvaliados] = useState<Set<number>>(new Set());
 
   const cancelar = useMutation({
     mutationFn: (id: number) => api.pedidos.cancelar(id),
@@ -74,6 +78,7 @@ export function MeusPedidos() {
   });
 
   const pedidos = pedidosQ.data ? [...pedidosQ.data].sort(ordenar) : [];
+  const pedidoAvaliando = avaliando !== null ? pedidos.find((p) => p.id === avaliando) : undefined;
 
   return (
     <main className="mx-auto max-w-2xl p-4 sm:p-6">
@@ -166,6 +171,16 @@ export function MeusPedidos() {
                   Detalhes
                 </Link>
 
+                {/* Avaliação só faz sentido depois que o pedido foi retirado. */}
+                {p.status === 'RETIRADO' &&
+                  (avaliados.has(p.id) ? (
+                    <span className="text-sm font-semibold text-leaf-dark">Avaliação enviada</span>
+                  ) : (
+                    <button type="button" onClick={() => setAvaliando(p.id)} className="btn btn-soft">
+                      Avaliar
+                    </button>
+                  ))}
+
                 {/* Cliente só pode cancelar enquanto o pedido foi apenas recebido. */}
                 {p.status === 'RECEBIDO' &&
                   (confirmandoCancel === p.id ? (
@@ -204,6 +219,19 @@ export function MeusPedidos() {
           );
         })}
       </ul>
+
+      {pedidoAvaliando && (
+        <FormAvaliacao
+          pedidoId={pedidoAvaliando.id}
+          estabelecimentoNome={pedidoAvaliando.estabelecimento.nome_fantasia}
+          aberto
+          onFechar={() => setAvaliando(null)}
+          onSucesso={() => {
+            setAvaliados((s) => new Set(s).add(pedidoAvaliando.id));
+            setAvaliando(null);
+          }}
+        />
+      )}
     </main>
   );
 }

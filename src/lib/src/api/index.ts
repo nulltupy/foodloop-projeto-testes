@@ -7,3 +7,4 @@ export * as produtos from './produtos.js';
 export * as anuncios from './anuncios.js';
 export * as pedidos from './pedidos.js';
 export * as notificacoes from './notificacoes.js';
+export * as avaliacoes from './avaliacoes.js';

@@ -4,6 +4,7 @@ import { api } from '@foodloop/lib';
 import type { Endereco } from '@foodloop/lib';
 import { Marca } from '../../../components/ui/Marca';
 import { NotaEstrelas } from '../../../components/ui/NotaEstrelas';
+import { AvaliacoesEstabelecimento } from '../../avaliacoes/components/AvaliacoesEstabelecimento';
 
 function enderecoTexto(endereco: Endereco): string {
   return `${endereco.rua}, ${endereco.numero} - ${endereco.bairro}, ${endereco.cidade} - ${endereco.estado}, ${endereco.cep}`;
@@ -204,7 +205,7 @@ export function PerfilEstabelecimento() {
           <h2 className="text-xl font-extrabold text-ink">Avaliações</h2>
           <NotaEstrelas nota={estabelecimento.nota_media} />
         </div>
-        <p className="mt-2 text-ink-soft">Comentários ainda não disponíveis para este estabelecimento.</p>
+        <AvaliacoesEstabelecimento estabelecimentoId={estabelecimento.id} />
       </section>
     </main>
   );
