@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import { TipoUsuarioSchema } from './comum.js';
 
-// Nota inteira de 1 a 5 estrelas — sem meia-estrela (regra do produto).
-export const NotaSchema = z.number().int().min(1).max(5);
+// Nota inteira de 1 a 5 estrelas, sem meia-estrela.
+export const NotaSchema = z.coerce.number().int().min(1).max(5);
 
-// Criação de uma avaliação a partir de um pedido entregue do próprio cliente.
-// Uma avaliação por pedido (garantido pela uq_avaliacao_pedido no banco).
+// Criação de uma avaliação a partir de um pedido retirado do próprio cliente.
+// Uma avaliação por pedido é garantida pela uq_avaliacao_pedido no banco.
 export const CriarAvaliacaoRequestSchema = z.object({
-  id_pedido: z.number().int().positive(),
+  id_pedido: z.coerce.number().int().positive(),
   nota: NotaSchema,
   comentario: z.string().trim().max(500).optional(),
 });
@@ -24,8 +24,8 @@ export const AvaliacaoSchema = z.object({
 });
 export type Avaliacao = z.infer<typeof AvaliacaoSchema>;
 
-// Comentário público numa avaliação (thread). O autor é o cliente que avaliou
-// ou o comerciante dono do estabelecimento avaliado.
+// Comentário público numa avaliação. O autor é o cliente que avaliou ou o
+// comerciante dono do estabelecimento avaliado.
 export const ComentarioAvaliacaoSchema = z.object({
   id: z.number().int().positive(),
   id_avaliacao: z.number().int().positive(),
@@ -40,9 +40,8 @@ export const CriarComentarioRequestSchema = z.object({
 });
 export type CriarComentarioRequest = z.infer<typeof CriarComentarioRequestSchema>;
 
-// Avaliação como aparece no perfil do estabelecimento (GET
-// /estabelecimentos/:id/avaliacoes): traz o nome do autor e a thread de
-// comentários resolvida.
+// Avaliação como aparece no perfil do estabelecimento: traz o autor público e
+// a thread de comentários resolvida.
 export const AvaliacaoPerfilItemSchema = z.object({
   id: z.number().int().positive(),
   nota: NotaSchema,

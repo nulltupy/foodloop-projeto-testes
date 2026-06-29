@@ -36,6 +36,7 @@ async function seedPedido(status: StatusPedido = 'RETIRADO') {
       valor_total: 15,
       codigo_retirada: `AVAL${String(n).padStart(4, '0')}`,
       status,
+      data_retirada: status === 'RETIRADO' ? new Date() : null,
       item_pedido: { create: { id_anuncio: anuncio.id, quantidade: 1, preco_unitario: 15 } },
     },
   });

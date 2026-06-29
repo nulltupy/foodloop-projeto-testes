@@ -7,6 +7,8 @@ function erro(code: string, message: string, status: number) {
   return HttpResponse.json({ error: { code, message } }, { status });
 }
 
+const JANELA_AVALIACAO_MS = 24 * 60 * 60 * 1000;
+
 // Recalcula a nota_media do estabelecimento (no back é feito por trigger).
 function recalcularNota(idEstabelecimento: number) {
   const notas = db.avaliacoes.filter((a) => a.id_estabelecimento === idEstabelecimento).map((a) => a.nota);
@@ -16,6 +18,13 @@ function recalcularNota(idEstabelecimento: number) {
   }
 }
 
+function nomePublico(nome: string): string {
+  const partes = nome.trim().split(/\s+/).filter(Boolean);
+  if (partes.length === 0) return 'Cliente';
+  const inicial = partes[1]?.[0];
+  return inicial ? `${partes[0]} ${inicial}.` : partes[0]!;
+}
+
 function montarPerfil(avaliacao: AvaliacaoMock): AvaliacaoPerfilItem {
   const autor = db.usuarios.find((u) => u.id === avaliacao.id_cliente);
   return {
@@ -23,7 +32,7 @@ function montarPerfil(avaliacao: AvaliacaoMock): AvaliacaoPerfilItem {
     nota: avaliacao.nota,
     comentario: avaliacao.comentario,
     data_avaliacao: avaliacao.data_avaliacao,
-    autor: { nome: autor?.nome ?? 'Cliente' },
+    autor: { nome: autor ? nomePublico(autor.nome) : 'Cliente' },
     comentarios: db.comentarios.filter((c) => c.id_avaliacao === avaliacao.id),
   };
 }
@@ -47,6 +56,11 @@ export const avaliacoesHandlers = [
     }
     if (db.avaliacoes.some((a) => a.id_pedido === pedido.id)) {
       return erro(ErrorCode.AVALIACAO_DUPLICADA, 'Este pedido já foi avaliado', 409);
+    }
+    const dataRetirada = pedido.data_retirada ? new Date(pedido.data_retirada) : null;
+    const expiraEm = dataRetirada ? new Date(dataRetirada.getTime() + JANELA_AVALIACAO_MS) : null;
+    if (!expiraEm || expiraEm.getTime() < Date.now()) {
+      return erro(ErrorCode.AVALIACAO_PRAZO_EXPIRADO, 'Prazo para avaliação expirado', 409);
     }
 
     const avaliacao: AvaliacaoMock = {

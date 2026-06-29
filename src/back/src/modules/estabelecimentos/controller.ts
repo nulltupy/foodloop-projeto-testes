@@ -93,19 +93,6 @@ export function createEstabelecimentosRouter(): Router {
     }
   });
 
-  router.get('/:id/produtos', async (req, res, next) => {
-    try {
-      const id = Number(req.params.id);
-      if (!Number.isInteger(id) || id <= 0) {
-        throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
-      }
-      const produtos = await service.listarProdutos(id);
-      res.json(produtos);
-    } catch (err) {
-      next(err);
-    }
-  });
-
   // Avaliações do estabelecimento (perfil público), com a thread de comentários.
   router.get('/:id/avaliacoes', async (req, res, next) => {
     try {
@@ -114,6 +101,19 @@ export function createEstabelecimentosRouter(): Router {
         throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
       }
       res.json(await avaliacoes.listarDoEstabelecimento(id));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/:id/produtos', async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
+      }
+      const produtos = await service.listarProdutos(id);
+      res.json(produtos);
     } catch (err) {
       next(err);
     }

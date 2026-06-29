@@ -1,4 +1,4 @@
-// Códigos de erro padronizados; consumidos por back, front e MSW.
+// Códigos de erro padronizados; consumidos por back, front e testes.
 export const ErrorCode = {
   // Cadastro duplicado é único pra prevenir enumeração de email/CNPJ via diff de códigos.
   CADASTRO_DUPLICADO: 'CADASTRO_DUPLICADO',
@@ -15,6 +15,9 @@ export const ErrorCode = {
   PEDIDO_NAO_ENTREGUE: 'PEDIDO_NAO_ENTREGUE',
   // Uma avaliação por pedido (uq_avaliacao_pedido).
   AVALIACAO_DUPLICADA: 'AVALIACAO_DUPLICADA',
+  // Compatibilidade com a primeira versão do endpoint /pedidos/:id/avaliacao.
+  AVALIACAO_JA_EXISTE: 'AVALIACAO_JA_EXISTE',
+  AVALIACAO_PRAZO_EXPIRADO: 'AVALIACAO_PRAZO_EXPIRADO',
   GEOCODING_FALHOU: 'GEOCODING_FALHOU',
   GEOCODING_INDISPONIVEL: 'GEOCODING_INDISPONIVEL',
   GEOCODING_UPSTREAM_ERRO: 'GEOCODING_UPSTREAM_ERRO',

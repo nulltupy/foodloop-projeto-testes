@@ -44,7 +44,7 @@ describe('Avaliações do estabelecimento', () => {
     renderLista(estabelecimento.id);
 
     expect(await screen.findByText('Comida excelente')).toBeInTheDocument();
-    expect(screen.getByText(cliente.nome)).toBeInTheDocument();
+    expect(screen.getByText('Cliente D.')).toBeInTheDocument();
     expect(screen.getByText('Obrigado pela visita!')).toBeInTheDocument();
     expect(screen.getByText('Estabelecimento')).toBeInTheDocument();
   });

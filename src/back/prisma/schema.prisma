@@ -172,6 +172,7 @@ model pedido {
   cancelado_por       origem_cancelamento?
   motivo_cancelamento String?
   data_cancelamento   DateTime?            @db.Timestamp(6)
+  data_retirada        DateTime?            @db.Timestamp(6)
   avaliacao           avaliacao?
   item_pedido         item_pedido[]
   pagamento           pagamento?

@@ -4,6 +4,7 @@ import {
   type ComentarioAvaliacao,
   type CriarAvaliacaoRequest,
   ErrorCode,
+  type StatusPedido,
   type TipoUsuario,
 } from '@foodloop/lib';
 
@@ -11,12 +12,76 @@ import { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
 import { HttpError } from '../../shared/errors.js';
 
-// Cria a avaliação de um pedido entregue do próprio cliente. A nota_media do
-// estabelecimento é recalculada pelo trigger trg_nota_media — não mexemos nela aqui.
+const JANELA_AVALIACAO_MS = 24 * 60 * 60 * 1000;
+
+interface AvaliacaoResumoInput {
+  id: bigint;
+  nota: number;
+  comentario: string | null;
+  data_avaliacao: Date;
+}
+
+interface AvaliacaoRow extends AvaliacaoResumoInput {
+  id_pedido: bigint;
+  id_estabelecimento: bigint;
+}
+
+export function shapeAvaliacaoResumo(a: AvaliacaoResumoInput | null) {
+  if (!a) return null;
+  return {
+    id: Number(a.id),
+    nota: a.nota,
+    comentario: a.comentario,
+    data_avaliacao: a.data_avaliacao.toISOString(),
+  };
+}
+
+export function elegibilidadeAvaliacao(params: {
+  status: StatusPedido;
+  data_retirada: Date | null;
+  avaliacao: AvaliacaoResumoInput | null;
+}) {
+  const expiraEm = params.data_retirada
+    ? new Date(params.data_retirada.getTime() + JANELA_AVALIACAO_MS)
+    : null;
+  const podeAvaliar =
+    params.status === 'RETIRADO' &&
+    !params.avaliacao &&
+    expiraEm !== null &&
+    expiraEm.getTime() >= Date.now();
+
+  return {
+    avaliacao: shapeAvaliacaoResumo(params.avaliacao),
+    data_retirada: params.data_retirada?.toISOString() ?? null,
+    pode_avaliar: podeAvaliar,
+    avaliacao_expira_em: expiraEm?.toISOString() ?? null,
+  };
+}
+
+function shape(a: AvaliacaoRow): Avaliacao {
+  return {
+    id: Number(a.id),
+    id_pedido: Number(a.id_pedido),
+    id_estabelecimento: Number(a.id_estabelecimento),
+    nota: a.nota,
+    comentario: a.comentario,
+    data_avaliacao: a.data_avaliacao.toISOString(),
+  };
+}
+
+function nomePublico(nome: string): string {
+  const partes = nome.trim().split(/\s+/).filter(Boolean);
+  if (partes.length === 0) return 'Cliente';
+  const inicial = partes[1]?.[0];
+  return inicial ? `${partes[0]} ${inicial}.` : partes[0]!;
+}
+
+// Cria a avaliação de um pedido retirado do próprio cliente. A nota_media do
+// estabelecimento é recalculada pelo trigger trg_nota_media.
 export async function criar(clienteId: number, input: CriarAvaliacaoRequest): Promise<Avaliacao> {
   const pedido = await prisma.pedido.findUnique({
     where: { id: BigInt(input.id_pedido) },
-    select: { id_cliente: true, id_estabelecimento: true, status: true },
+    include: { avaliacao: true },
   });
   if (!pedido) {
     throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Pedido não encontrado');
@@ -24,15 +89,26 @@ export async function criar(clienteId: number, input: CriarAvaliacaoRequest): Pr
   if (pedido.id_cliente !== BigInt(clienteId)) {
     throw new HttpError(403, ErrorCode.PERMISSAO_NEGADA, 'Pedido de outro cliente');
   }
-  // Só avalia o que recebeu: a entrega é o estado RETIRADO.
+  if (pedido.avaliacao) {
+    throw new HttpError(409, ErrorCode.AVALIACAO_DUPLICADA, 'Este pedido já foi avaliado');
+  }
   if (pedido.status !== 'RETIRADO') {
     throw new HttpError(409, ErrorCode.PEDIDO_NAO_ENTREGUE, 'Só é possível avaliar pedidos entregues');
+  }
+
+  const elegibilidade = elegibilidadeAvaliacao({
+    status: pedido.status,
+    data_retirada: pedido.data_retirada,
+    avaliacao: pedido.avaliacao,
+  });
+  if (!elegibilidade.pode_avaliar) {
+    throw new HttpError(409, ErrorCode.AVALIACAO_PRAZO_EXPIRADO, 'Prazo para avaliação expirado');
   }
 
   try {
     const criada = await prisma.avaliacao.create({
       data: {
-        id_pedido: BigInt(input.id_pedido),
+        id_pedido: pedido.id,
         id_estabelecimento: pedido.id_estabelecimento,
         nota: input.nota,
         comentario: input.comentario?.trim() ? input.comentario.trim() : null,
@@ -46,26 +122,6 @@ export async function criar(clienteId: number, input: CriarAvaliacaoRequest): Pr
     }
     throw e;
   }
-}
-
-interface AvaliacaoRow {
-  id: bigint;
-  id_pedido: bigint;
-  id_estabelecimento: bigint;
-  nota: number;
-  comentario: string | null;
-  data_avaliacao: Date;
-}
-
-function shape(a: AvaliacaoRow): Avaliacao {
-  return {
-    id: Number(a.id),
-    id_pedido: Number(a.id_pedido),
-    id_estabelecimento: Number(a.id_estabelecimento),
-    nota: a.nota,
-    comentario: a.comentario,
-    data_avaliacao: a.data_avaliacao.toISOString(),
-  };
 }
 
 const incluiComentarios = {
@@ -97,7 +153,7 @@ function shapePerfil(a: AvaliacaoPerfil): AvaliacaoPerfilItem {
     nota: a.nota,
     comentario: a.comentario,
     data_avaliacao: a.data_avaliacao.toISOString(),
-    autor: { nome: a.pedido.cliente.usuario.nome },
+    autor: { nome: nomePublico(a.pedido.cliente.usuario.nome) },
     comentarios: a.comentario_avaliacao.map(shapeComentario),
   };
 }

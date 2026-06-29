@@ -1,9 +1,7 @@
 import '@testing-library/jest-dom';
-import { afterAll, afterEach, beforeAll } from 'vitest';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import { server } from '../mocks/server';
 import { resetarDb } from '../mocks/db';
-// Registra o api client (@foodloop/lib) para os testes de tela.
-import '../lib/api';
 
 if (typeof localStorage === 'undefined') {
   const store = new Map<string, string>();
@@ -25,6 +23,12 @@ if (typeof localStorage === 'undefined') {
     },
   });
 }
+
+vi.stubEnv('VITE_API_URL', 'http://localhost:3010');
+
+// Registra o api client (@foodloop/lib) para os testes de tela depois de fixar
+// a URL usada pelo MSW node server.
+await import('../lib/api');
 
 // Os testes rodam sempre contra os handlers do MSW.
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));

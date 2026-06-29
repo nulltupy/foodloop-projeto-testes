@@ -1,6 +1,7 @@
 import {
   AtualizarStatusRequestSchema,
   CancelarPedidoRequestSchema,
+  CriarAvaliacaoRequestSchema,
   CriarPedidoRequestSchema,
   ErrorCode,
   StatusPedidoSchema,
@@ -12,12 +13,15 @@ import { requireAuth, requireRole } from '../../shared/middlewares/auth.js';
 import { HttpError } from '../../shared/errors.js';
 
 import * as service from './service.js';
+import * as avaliacoes from '../avaliacoes/service.js';
 
 const QuerySchema = z.object({
   status: StatusPedidoSchema.optional(),
   pagina: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(50).default(20),
 });
+
+const CriarAvaliacaoPedidoRequestSchema = CriarAvaliacaoRequestSchema.omit({ id_pedido: true });
 
 export function createPedidosRouter(): Router {
   const router = Router();
@@ -116,6 +120,24 @@ export function createPedidosRouter(): Router {
       }
       const cancelado = await service.cancelar(req.usuario!, id, parsed.data.motivo);
       res.json(cancelado);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.post('/:id/avaliacao', requireAuth, requireRole('cliente'), async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'ID inválido');
+      }
+      const parsed = CriarAvaliacaoPedidoRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const fields = Object.keys(parsed.error.flatten().fieldErrors);
+        throw new HttpError(400, ErrorCode.VALIDACAO, 'Payload inválido', { fields });
+      }
+      const avaliacao = await avaliacoes.criar(req.usuario!.id, { id_pedido: id, ...parsed.data });
+      res.status(201).json(avaliacao);
     } catch (e) {
       next(e);
     }

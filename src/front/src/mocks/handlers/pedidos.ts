@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import {
   AtualizarStatusRequestSchema,
+  CriarAvaliacaoRequestSchema,
   CriarPedidoRequestSchema,
   ErrorCode,
   gerarCodigoRetirada,
@@ -17,6 +18,8 @@ import { db, usuarioPorAuth } from '../db';
 function erro(code: string, message: string, status: number) {
   return HttpResponse.json({ error: { code, message } }, { status });
 }
+
+const CriarAvaliacaoPedidoRequestSchema = CriarAvaliacaoRequestSchema.omit({ id_pedido: true });
 
 // Resolve o nome do produto a partir do anúncio do item, para as listagens.
 function resumirItens(itens: ItemPedido[]): ItemPedidoResumo[] {
@@ -35,6 +38,41 @@ function resumirItens(itens: ItemPedido[]): ItemPedidoResumo[] {
 
 function envelopar<T>(data: T[]) {
   return { data, meta: { pagina: 1, tamanho: 20, total: data.length } };
+}
+
+const JANELA_AVALIACAO_MS = 24 * 60 * 60 * 1000;
+
+function avaliacaoDoPedido(idPedido: number) {
+  const avaliacao = db.avaliacoes.find((a) => a.id_pedido === idPedido);
+  if (!avaliacao) return null;
+  return {
+    id: avaliacao.id,
+    nota: avaliacao.nota,
+    comentario: avaliacao.comentario,
+    data_avaliacao: avaliacao.data_avaliacao,
+  };
+}
+
+function elegibilidadeAvaliacao(pedido: Pedido) {
+  const retirada = pedido.data_retirada ? new Date(pedido.data_retirada) : null;
+  const expira = retirada ? new Date(retirada.getTime() + JANELA_AVALIACAO_MS) : null;
+  const avaliacao = avaliacaoDoPedido(pedido.id);
+  return {
+    data_retirada: pedido.data_retirada ?? null,
+    avaliacao,
+    pode_avaliar:
+      pedido.status === 'RETIRADO' && !avaliacao && expira !== null && expira.getTime() >= Date.now(),
+    avaliacao_expira_em: expira?.toISOString() ?? null,
+  };
+}
+
+function atualizarNotaMedia(idEstabelecimento: number) {
+  const estab = db.estabelecimentos.find((e) => e.id === idEstabelecimento);
+  if (!estab) return;
+  const notas = db.avaliacoes.filter((a) => a.id_estabelecimento === idEstabelecimento).map((a) => a.nota);
+  estab.nota_media = notas.length
+    ? Number((notas.reduce((acc, n) => acc + n, 0) / notas.length).toFixed(2))
+    : 0;
 }
 
 export const pedidosHandlers = [
@@ -74,6 +112,7 @@ export const pedidosHandlers = [
       status: 'RECEBIDO',
       codigo_retirada: gerarCodigoRetirada(),
       data_pedido: new Date().toISOString(),
+      data_retirada: null,
       itens: [itemPedido],
     };
     db.pedidos.push(pedido);
@@ -94,6 +133,7 @@ export const pedidosHandlers = [
           data_pedido: p.data_pedido,
           codigo_retirada: p.codigo_retirada,
           estabelecimento: { id: p.id_estabelecimento, nome_fantasia: est?.nome_fantasia ?? 'Loja' },
+          ...elegibilidadeAvaliacao(p),
           itens: resumirItens(p.itens),
         };
       });
@@ -140,7 +180,42 @@ export const pedidosHandlers = [
       return erro(ErrorCode.CODIGO_RETIRADA_INVALIDO, 'Código de retirada inválido', 400);
     }
     pedido.status = parsed.data.novo_status;
+    if (pedido.status === 'RETIRADO') {
+      pedido.data_retirada = new Date().toISOString();
+    }
     return HttpResponse.json(pedido);
+  }),
+
+  http.post('/api/v1/pedidos/:id/avaliacao', async ({ params, request }) => {
+    const usuario = usuarioPorAuth(request.headers.get('Authorization'));
+    if (!usuario || usuario.tipo !== 'cliente')
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Acesso restrito', 403);
+    const pedido = db.pedidos.find((p) => p.id === Number(params.id));
+    if (!pedido) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Pedido não encontrado', 404);
+    if (pedido.id_cliente !== usuario.id)
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Pedido de outro cliente', 403);
+    if (db.avaliacoes.some((a) => a.id_pedido === pedido.id)) {
+      return erro(ErrorCode.AVALIACAO_DUPLICADA, 'Este pedido já foi avaliado', 409);
+    }
+    if (!elegibilidadeAvaliacao(pedido).pode_avaliar) {
+      return erro(ErrorCode.AVALIACAO_PRAZO_EXPIRADO, 'Prazo para avaliação expirado', 409);
+    }
+    const parsed = CriarAvaliacaoPedidoRequestSchema.safeParse(await request.json());
+    if (!parsed.success) return erro(ErrorCode.VALIDACAO, 'Avaliação inválida', 400);
+
+    const avaliacao = {
+      id: db.proximoId.avaliacao++,
+      id_pedido: pedido.id,
+      id_estabelecimento: pedido.id_estabelecimento,
+      nota: parsed.data.nota,
+      comentario: parsed.data.comentario?.trim() || null,
+      data_avaliacao: new Date().toISOString(),
+      id_cliente: usuario.id,
+    };
+    db.avaliacoes.push(avaliacao);
+    atualizarNotaMedia(pedido.id_estabelecimento);
+    const { id_cliente: _omit, ...resposta } = avaliacao;
+    return HttpResponse.json(resposta, { status: 201 });
   }),
 
   http.post('/api/v1/pedidos/:id/cancelar', ({ params, request }) => {

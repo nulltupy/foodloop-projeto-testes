@@ -27,6 +27,18 @@ const globalRateLimitHandler: RequestHandler = (_req, _res, next) => {
   next(new HttpError(429, ErrorCode.RATE_LIMIT, 'Limite de requisições excedido.'));
 };
 
+function corsOrigins(): string[] {
+  const frontUrl = process.env.FRONT_URL || 'http://localhost:5173';
+  const origins = new Set([frontUrl]);
+
+  if (process.env.NODE_ENV !== 'production') {
+    origins.add('http://localhost:5173');
+    origins.add('http://127.0.0.1:5173');
+  }
+
+  return [...origins];
+}
+
 export function buildApp(): Express {
   const app = express();
 
@@ -41,7 +53,7 @@ export function buildApp(): Express {
       hsts: { maxAge: 31_536_000, includeSubDomains: true, preload: true },
     }),
   );
-  app.use(cors({ origin: process.env.FRONT_URL || 'http://localhost:5173' }));
+  app.use(cors({ origin: corsOrigins() }));
   app.use(express.json({ limit: '1mb' }));
   app.use(
     pinoHttp({
