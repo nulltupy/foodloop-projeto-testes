@@ -10,9 +10,18 @@ beforeEach(() => {
 });
 
 describe('App shell', () => {
-  it('redireciona para o login ao acessar / sem sessão', () => {
+  it('mostra a landing pública ao acessar / sem sessão', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('heading', { name: /comida boa que sobrou/i })).toBeInTheDocument();
+  });
+
+  it('redireciona rota protegida para o login sem sessão', () => {
+    render(
+      <MemoryRouter initialEntries={['/pedidos']}>
         <App />
       </MemoryRouter>,
     );
