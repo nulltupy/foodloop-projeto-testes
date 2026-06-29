@@ -4,13 +4,28 @@ on:
     branches: [main]
     paths: ['src/back/**', 'src/lib/**']
 
-permissions: {}
+concurrency:
+  group: deploy-back-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci --workspaces --include-workspace-root
+      - run: npm run -w src/lib build
+      - run: npm run -w src/back prisma:generate
+      - name: Apply production migrations
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+        run: npm run -w src/back prisma:migrate:deploy
       - name: Trigger Render deploy hook
         env:
           HOOK: ${{ secrets.RENDER_BACK_DEPLOY_HOOK }}

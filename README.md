@@ -175,14 +175,14 @@ Detalhes do front (scripts, layout, stack) em [`src/front/README.md`](src/front/
 
 Workflows em `.github/workflows/`:
 
-| Arquivo           | Quando roda                                           | O que faz                                                                                                                                                 |
-| ----------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ci.yml`          | PR + push em `main`                                   | Detecta diffs por path; roda lint+test+build dos workspaces afetados em paralelo; converge em `ci-success` — único `required check` em branch protection. |
-| `deploy-back.yml` | Push em `main` afetando `src/back/**` ou `src/lib/**` | Aciona o deploy hook do Render. Pula se o secret `RENDER_BACK_DEPLOY_HOOK` ainda não estiver configurado.                                                 |
-| `keep-alive.yml`  | Cron a cada 10 min, 20-02 UTC (17h-23h BR)            | Pinga `/health` para combater cold start. Pula se `vars.BACK_HEALTH_URL` ainda não estiver setado.                                                        |
-| `db-migrate.yml`  | `workflow_dispatch` manual                            | Aplica `prisma migrate deploy` em prod. Exige digitar `MIGRATE` como input e passa por `environment: production` (required reviewers).                    |
-| `seed-prod.yml`   | `workflow_dispatch` manual                            | Roda `npm run -w src/back seed` contra `PROD_DATABASE_URL`. Exige digitar `SEED` como input. Apaga e recria todos os dados de demo (TRUNCATE CASCADE).    |
-| `e2e.yml`         | `workflow_dispatch` manual                            | Stub até o card de Playwright entrar. `on.schedule` está comentado.                                                                                       |
+| Arquivo           | Quando roda                                           | O que faz                                                                                                                                                      |
+| ----------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`          | PR + push em `main`                                   | Detecta diffs por path; roda lint+test+build dos workspaces afetados em paralelo; converge em `ci-success` — único `required check` em branch protection.      |
+| `deploy-back.yml` | Push em `main` afetando `src/back/**` ou `src/lib/**` | Aplica `prisma migrate deploy` em prod e, se passar, aciona o deploy hook do Render. Pula o deploy se `RENDER_BACK_DEPLOY_HOOK` ainda não estiver configurado. |
+| `keep-alive.yml`  | Cron a cada 10 min, 20-02 UTC (17h-23h BR)            | Pinga `/health` para combater cold start. Pula se `vars.BACK_HEALTH_URL` ainda não estiver setado.                                                             |
+| `db-migrate.yml`  | `workflow_dispatch` manual                            | Aplica `prisma migrate deploy` em prod. Exige digitar `MIGRATE` como input e passa por `environment: production` (required reviewers).                         |
+| `seed-prod.yml`   | `workflow_dispatch` manual                            | Roda `npm run -w src/back seed` contra `PROD_DATABASE_URL`. Exige digitar `SEED` como input. Apaga e recria todos os dados de demo (TRUNCATE CASCADE).         |
+| `e2e.yml`         | `workflow_dispatch` manual                            | Stub até o card de Playwright entrar. `on.schedule` está comentado.                                                                                            |
 
 **Secrets/variables que o maintainer precisa configurar** (Settings → Secrets and variables → Actions):
 
