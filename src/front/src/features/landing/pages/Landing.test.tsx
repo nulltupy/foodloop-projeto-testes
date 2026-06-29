@@ -27,4 +27,10 @@ describe('Landing', () => {
     expect(hrefs).toContain('/cadastro/cliente');
     expect(hrefs).toContain('/cadastro/comerciante');
   });
+
+  it('usa os botões do design system nos CTAs principais', () => {
+    renderLanding();
+    expect(screen.getByRole('link', { name: /quero economizar/i })).toHaveClass('btn-primary');
+    expect(screen.getByRole('link', { name: /sou um comércio/i })).toHaveClass('btn-outline');
+  });
 });
