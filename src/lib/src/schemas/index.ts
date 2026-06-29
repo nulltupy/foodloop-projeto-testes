@@ -9,3 +9,4 @@ export * from './pedido.js';
 export * from './pagamento.js';
 export * from './notificacao.js';
 export * from './avaliacao.js';
+export * from './push-subscription.js';
