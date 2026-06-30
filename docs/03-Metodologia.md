@@ -150,6 +150,6 @@ Os artefatos do projeto são desenvolvidos a partir de diversas plataformas e a 
 | Desenvolvimento web (front-end)     | React + Vite + TypeScript          | https://react.dev/   -   https://vitejs.dev/               |
 | Back-end, banco e hospedagem        | Render (Node.js + Express + PostgreSQL) | https://render.com/                |
 | Armazenamento de mídia e push       | Firebase (Storage e Cloud Messaging) | https://firebase.google.com/         |
-| Mapas e geolocalização              | Google Maps Platform               | https://developers.google.com/maps     |
+| Mapas e geolocalização              | ViaCEP + Nominatim/OpenStreetMap + links Google Maps | https://viacep.com.br/ - https://nominatim.org/ - https://maps.google.com |
 | Gateway de pagamento                | Mercado Pago                       | https://www.mercadopago.com.br/developers |
  

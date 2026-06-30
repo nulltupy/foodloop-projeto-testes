@@ -26,22 +26,23 @@ A solução delega funcionalidades especializadas a serviços externos consolida
 
 - **Firebase Storage** — armazenamento de imagens dos produtos anunciados e das fotos de perfil de usuários e comércios;
 - **Mercado Pago** — gateway de pagamento responsável pelo processamento das transações financeiras (cartão de crédito e PIX);
-- **Google Maps API** — fornecimento dos mapas, da geolocalização do cliente e das rotas até os estabelecimentos parceiros;
-- **Firebase Cloud Messaging (FCM)** — envio de notificações push à aplicação web, utilizadas para alertar clientes sobre novos anúncios próximos e o status de seus pedidos, bem como para informar comerciantes sobre novas reservas.
+- **ViaCEP e Nominatim/OpenStreetMap** — resolução de CEPs e endereços em coordenadas geográficas para cadastro e busca por proximidade;
+- **Google Maps** — abertura de rotas por link externo a partir das coordenadas dos estabelecimentos;
+- **Firebase Cloud Messaging (FCM)** — serviço previsto para entrega de notificações push; a base de persistência de assinaturas Web Push já é modelada no banco e nos schemas compartilhados.
 
 ##  Ambiente de hospedagem
 
 O back-end e o banco de dados são hospedados na plataforma **Render**, serviço de cloud que oferece **plano gratuito** suficiente para o ciclo de desenvolvimento e para a apresentação do projeto. A plataforma fornece deploy automatizado a partir do repositório Git, certificado SSL nativo e gerenciamento simplificado de variáveis de ambiente, reduzindo a complexidade operacional do projeto.
 
-Os serviços externos (Firebase Storage, Firebase Cloud Messaging, Google Maps API e Mercado Pago) são consumidos diretamente de seus respectivos provedores, dispensando hospedagem própria. A aplicação web, por sua vez, é entregue ao navegador dos usuários finais a partir de uma URL pública, sem necessidade de instalação por lojas de aplicativos.
+Os serviços externos (Firebase Storage, Firebase Cloud Messaging, ViaCEP, Nominatim/OpenStreetMap, Google Maps e Mercado Pago) são consumidos diretamente de seus respectivos provedores, dispensando hospedagem própria. A aplicação web, por sua vez, é entregue ao navegador dos usuários finais a partir de uma URL pública, sem necessidade de instalação por lojas de aplicativos.
 
 ##  Fluxo de comunicação entre os componentes
 
 1. O usuário (cliente ou comerciante) interage com a **aplicação web** no navegador;
 2. A aplicação envia requisições **HTTPS** à **API REST**, transportando dados em formato **JSON**;
 3. A API valida o **token JWT** da requisição, processa a regra de negócio e consulta ou atualiza o **banco de dados PostgreSQL**;
-4. Quando necessário, a API comunica-se com os **serviços externos** (Mercado Pago para pagamento, Firebase Storage para imagens, Firebase Cloud Messaging para envio de push);
-5. A aplicação também consome diretamente a **Google Maps API** para apresentar o mapa e a geolocalização;
+4. Quando necessário, a API comunica-se com os **serviços externos** (Mercado Pago para pagamento, Firebase Storage para imagens, Firebase Cloud Messaging para envio de push, ViaCEP e Nominatim/OpenStreetMap para geocoding);
+5. A aplicação usa as coordenadas retornadas pela API e pode abrir rotas em link externo do **Google Maps**;
 6. A API devolve a resposta em **JSON**, e a aplicação atualiza a interface apresentada ao usuário.
 
 **Diagrama de arquitetura da solução FoodLoop**
@@ -309,19 +310,19 @@ A escolha do conjunto de tecnologias do FoodLoop priorizou três critérios: **a
 | Front-end (navegação) | React Router | Roteamento de telas e navegação por perfil de usuário |
 | Front-end (estado/dados) | TanStack Query + Zustand | Cache de dados da API e estado global do cliente |
 | Front-end (HTTP) | Axios | Cliente HTTP para consumo da API REST |
-| Front-end (mapa) | Google Maps Platform (JavaScript API) | Mapa e marcadores de estabelecimentos próximos no navegador |
-| Front-end (push) | Firebase Cloud Messaging (Web Push) | Recebimento de notificações de status de pedido e novos anúncios |
+| Front-end (mapa/rota) | Links externos do Google Maps | Abertura de rota no navegador a partir das coordenadas do estabelecimento |
+| Front-end (push) | Web Push API + Firebase Cloud Messaging (planejado para entrega) | Base para assinatura Web Push no navegador e recebimento futuro de notificações de status de pedido e novos anúncios |
 | Front-end (armazenamento local) | Web Storage (localStorage) | Persistência do token JWT e preferências locais |
 | Back-end | Node.js LTS (v20) + Express | Servidor HTTP que expõe a API REST do FoodLoop |
 | Back-end (autenticação) | jsonwebtoken + bcrypt | Emissão e verificação de tokens JWT e hash seguro de senhas |
 | Back-end (banco) | Driver `pg` ou Prisma ORM | Acesso ao PostgreSQL a partir do Node.js |
-| Back-end (integrações) | firebase-admin, mercadopago, @googlemaps/google-maps-services-js | SDKs oficiais para FCM, gateway de pagamento e API do Google Maps |
+| Back-end (integrações) | `fetch`, Bottleneck e SDKs de provedores quando aplicável | Consulta a ViaCEP/Nominatim para geocoding, integração planejada com FCM e gateway de pagamento |
 | Back-end (qualidade) | helmet, cors, express-rate-limit | Cabeçalhos de segurança, controle de origem e limitação de requisições |
 | Banco de dados | PostgreSQL 16 | SGBD relacional para usuários, ofertas, pedidos, pagamentos e avaliações |
 | Serviços externos | Firebase Storage | Armazenamento de imagens de produtos e fotos de perfil |
-| Serviços externos | Firebase Cloud Messaging | Entrega de notificações push aos dispositivos |
+| Serviços externos | Firebase Cloud Messaging | Entrega planejada de notificações push Web; assinaturas persistidas em `push_subscription` |
 | Serviços externos | Mercado Pago (Checkout Pro) | Processamento de pagamentos via cartão de crédito e PIX |
-| Serviços externos | Google Maps Platform | Mapa, geocodificação reversa e cálculo de proximidade |
+| Serviços externos | ViaCEP + Nominatim/OpenStreetMap + Google Maps | Geocoding de CEP/endereço, cálculo de proximidade e abertura de rotas por link externo |
 | Hospedagem (back + banco) | Render (free tier) | Web service Node.js e banco PostgreSQL gerenciado |
 | Hospedagem (storage e push) | Firebase (plano Spark, gratuito) | Storage e FCM consumidos diretamente do Google |
 | IDE | Visual Studio Code | Desenvolvimento front-end e back-end |
@@ -354,8 +355,8 @@ A configuração do serviço é descrita por um arquivo `render.yaml` versionado
 
 Os serviços abaixo são consumidos diretamente de seus provedores, sem qualquer infraestrutura mantida pela equipe:
 
-- **Firebase Storage e Firebase Cloud Messaging:** projeto criado no [Firebase Console](https://console.firebase.google.com) no plano Spark (gratuito), com migração para o plano pago Blaze prevista quando o volume de mídia ou de mensagens push ultrapassar a cota gratuita. As credenciais de administrador são geradas no console e injetadas como variáveis de ambiente na API hospedada no Render. A configuração do cliente Firebase no front-end web é injetada por variáveis de ambiente do Vite (`VITE_*`) no momento do build.
-- **Google Maps Platform:** chave de API gerada no [Google Cloud Console](https://console.cloud.google.com) com a cota gratuita mensal de 200 dólares em uso. As APIs habilitadas são Maps JavaScript API e Geocoding API. A chave é restringida por referenciador HTTP (domínio do front-end web) para evitar uso indevido.
+- **Firebase Storage e Firebase Cloud Messaging:** projeto criado no [Firebase Console](https://console.firebase.google.com) no plano Spark (gratuito), com migração para o plano pago Blaze prevista quando o volume de mídia ou de mensagens push ultrapassar a cota gratuita. As credenciais de administrador são geradas no console e injetadas como variáveis de ambiente na API hospedada no Render quando o envio de push for conectado. No estágio atual, a solução já modela a persistência de assinaturas Web Push na tabela `push_subscription`.
+- **ViaCEP e Nominatim/OpenStreetMap:** o back-end usa ViaCEP para normalizar CEPs brasileiros e Nominatim/OpenStreetMap para converter endereços em latitude e longitude, com cache e limitação de taxa para respeitar a política de uso do serviço. Para rotas até o estabelecimento, o front-end abre um link externo do Google Maps com as coordenadas já conhecidas, sem depender de Maps JavaScript API no bundle.
 - **Mercado Pago:** conta de desenvolvedor criada no [Mercado Pago Developers](https://www.mercadopago.com.br/developers). Durante o desenvolvimento usa-se o par de credenciais de teste, e no lançamento substitui-se pelas credenciais de produção. O webhook de notificação de pagamento é apontado para a URL pública do back-end no Render. A comissão por transação (RF-011) é descontada no momento da liquidação, sem custo fixo mensal.
 
 ### Front-end web — distribuição
@@ -372,7 +373,7 @@ A disponibilização pública ocorre assim que o produto atingir os critérios d
 | Banco de dados (PostgreSQL) | Render | Free Postgres | Zero |
 | Armazenamento de imagens | Firebase Storage | Spark | Zero |
 | Notificações push | Firebase Cloud Messaging | Spark | Zero |
-| Mapas e geocodificação | Google Maps Platform | Free monthly credit | Zero dentro da cota |
+| Mapas, geocodificação e rotas | ViaCEP + Nominatim/OpenStreetMap + links Google Maps | Gratuitos | Zero dentro das políticas de uso |
 | Gateway de pagamento | Mercado Pago | Conta padrão | Comissão por transação |
 | Front-end (SPA web) | Render Static Site ou Vercel | Free | Zero |
 | Distribuição | URL pública (deploy por push) | — | Zero |
@@ -451,6 +452,5 @@ Métrica: percentual de telas críticas (login, listagem/mapa, reserva, pagament
 | Segurança | Confidencialidade e integridade | transações criptografadas via HTTPS | 100% |
 | Segurança | Confidencialidade e integridade | incidentes de acesso não autorizado | zero por sprint |
 | Compatibilidade | Coexistência | telas críticas equivalentes nos principais navegadores | 100% |
-
 
 

@@ -317,7 +317,7 @@ Acesse o protótipo interativo pelo link abaixo:
 
 A jornada do usuário do FoodLoop foi desenvolvida com base no modelo AIDA, permitindo representar as etapas percorridas pelo consumidor desde o primeiro contato com a plataforma até o pós-uso do serviço. O objetivo é compreender como o usuário interage com a aplicação, identificando ações, pontos de contato e percepções ao longo da experiência.
 
-Na fase de conscientização, o usuário conhece o FoodLoop por meio de anúncios, redes sociais, influenciadores ou indicações, despertando curiosidade e interesse pela proposta do aplicativo. Em seguida, na etapa de interesse, o consumidor acessa a aplicação web pelo navegador, cria sua conta e começa a explorar as ofertas disponíveis.
+Na fase de conscientização, o usuário conhece o FoodLoop por meio de anúncios, redes sociais, influenciadores ou indicações, despertando curiosidade e interesse pela proposta da plataforma. Em seguida, na etapa de interesse, o consumidor acessa a aplicação web pelo navegador, cria sua conta e começa a explorar as ofertas disponíveis.
 
 Na fase de desejo, o usuário compara preços, avaliações, localização e produtos disponíveis, aumentando sua intenção de compra. Já na etapa de ação, ocorre a reserva ou compra do alimento excedente, seguida da retirada no estabelecimento parceiro.
 
@@ -330,13 +330,13 @@ Por fim, no pós-uso, o consumidor avalia a experiência, compartilha sua opini�
  
 Este tópico apresenta todas as interfaces do sistema FoodLoop em sua versão final, descrevendo a função de cada tela e evidenciando aquelas diretamente relacionadas aos processos de negócio modelados em BPMN, conforme documentado no item <a href="04-Modelagem-processos-negocio.md">Modelagem dos processos de negócio</a>.
  
-O aplicativo é estruturado para atender dois perfis distintos de usuário: o **consumidor**, que localiza e adquire produtos alimentícios com desconto, e o **parceiro** (estabelecimento comercial), que cadastra e gerencia anúncios de itens excedentes. As interfaces foram desenvolvidas para dispositivos móveis, com identidade visual coesa em paleta verde escuro, representando o posicionamento sustentável da plataforma. O conjunto completo compreende 12 telas funcionais e um conjunto de overlays de feedback ao usuário.
+A aplicação web é estruturada para atender dois perfis distintos de usuário: o **consumidor**, que localiza e adquire produtos alimentícios com desconto, e o **parceiro** (estabelecimento comercial), que cadastra e gerencia anúncios de itens excedentes. As interfaces foram desenvolvidas com abordagem responsiva e mobile-first, adaptando-se ao navegador em celulares, tablets e desktops, com identidade visual coesa em paleta verde escuro. O conjunto completo compreende 12 telas funcionais e um conjunto de overlays de feedback ao usuário.
  
 ---
  
 ### Tela principal do sistema
  
-A tela principal do sistema, exibida após a autenticação do consumidor, é a **tela de Listagem de Produtos**. Ela constitui o ponto central de navegação do aplicativo, reunindo busca, filtragem por categoria e visualização dos anúncios publicados pelos estabelecimentos cadastrados.
+A tela principal do sistema, exibida após a autenticação do consumidor, é a **tela de Listagem de Produtos**. Ela constitui o ponto central de navegação da aplicação, reunindo busca, filtragem por categoria e visualização dos anúncios publicados pelos estabelecimentos cadastrados.
  
 A interface é composta pelos seguintes elementos:
  
@@ -359,7 +359,7 @@ O Processo 1 modela o fluxo digital de aquisição de produtos excedentes pelo c
  
 **Tela 1.1 — Login do Consumidor**
  
-Tela exibida ao usuário já cadastrado que deseja autenticar-se na plataforma. Corresponde à **etapa 1 do Processo 1** (acesso ao aplicativo FoodLoop).
+Tela exibida ao usuário já cadastrado que deseja autenticar-se na plataforma. Corresponde à **etapa 1 do Processo 1** (acesso à aplicação FoodLoop).
  
 Elementos da interface:
  
