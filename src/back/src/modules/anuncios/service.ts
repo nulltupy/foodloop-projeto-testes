@@ -13,6 +13,7 @@ interface ListarParams {
   preco_max?: number;
   categoria?: string;
   id_estabelecimento?: number;
+  q?: string;
   pagina: number;
 }
 
@@ -45,11 +46,23 @@ function filtroEstabelecimento(id: number | undefined): Prisma.Sql {
   return id === undefined ? Prisma.empty : Prisma.sql`AND a.id_estabelecimento = ${BigInt(id)}`;
 }
 
+// Busca textual por nome do produto (p.nome) OU nome fantasia do
+// estabelecimento (e.nome_fantasia). Escapa os metacaracteres de LIKE
+// (%, _ e \) pra que o usuário procure literais. Prisma.sql binda o padrão
+// como parâmetro (sem injeção); o ESCAPE '\' fixa o char de escape.
+function filtroBusca(q: string | undefined): Prisma.Sql {
+  if (!q) return Prisma.empty;
+  const escapado = q.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+  const padrao = `%${escapado}%`;
+  return Prisma.sql`AND (p.nome ILIKE ${padrao} ESCAPE '\\' OR e.nome_fantasia ILIKE ${padrao} ESCAPE '\\')`;
+}
+
 export async function listarProximos(params: ListarParams) {
   const offset = (params.pagina - 1) * TAMANHO_PAGINA;
   const precoFiltro = filtroPrecoMax(params.preco_max);
   const catFiltro = filtroCategoria(params.categoria);
   const estabelecimentoFiltro = filtroEstabelecimento(params.id_estabelecimento);
+  const buscaFiltro = filtroBusca(params.q);
 
   // Subquery wraps the Haversine expression so the outer WHERE can filter by
   // the computed alias `distancia_km`. PG não aceita HAVING sem GROUP BY com
@@ -78,6 +91,7 @@ export async function listarProximos(params: ListarParams) {
         ${precoFiltro}
         ${catFiltro}
         ${estabelecimentoFiltro}
+        ${buscaFiltro}
     ) sub
     WHERE sub.distancia_km <= ${params.raio_km}
     ORDER BY sub.distancia_km ASC, sub.preco_promocional ASC
@@ -115,6 +129,7 @@ async function contarProximos(params: ListarParams): Promise<number> {
   const precoFiltro = filtroPrecoMax(params.preco_max);
   const catFiltro = filtroCategoria(params.categoria);
   const estabelecimentoFiltro = filtroEstabelecimento(params.id_estabelecimento);
+  const buscaFiltro = filtroBusca(params.q);
 
   const result = await prisma.$queryRaw<Array<{ total: bigint }>>`
     SELECT COUNT(*)::bigint AS total FROM (
@@ -135,6 +150,7 @@ async function contarProximos(params: ListarParams): Promise<number> {
         ${precoFiltro}
         ${catFiltro}
         ${estabelecimentoFiltro}
+        ${buscaFiltro}
     ) sub
     WHERE sub.distancia_km <= ${params.raio_km}
   `;
