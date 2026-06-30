@@ -6,7 +6,7 @@ on:
     paths:
       - 'src/front/**'
       - 'src/lib/**'
-      - 'render.yaml'
+      - 'src/render.yaml'
       - 'package.json'
       - 'package-lock.json'
 
