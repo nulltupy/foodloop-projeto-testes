@@ -11,6 +11,7 @@ import {
 import { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
 import { HttpError } from '../../shared/errors.js';
+import * as notificacoes from '../notificacoes/service.js';
 
 const JANELA_AVALIACAO_MS = 24 * 60 * 60 * 1000;
 
@@ -114,6 +115,7 @@ export async function criar(clienteId: number, input: CriarAvaliacaoRequest): Pr
         comentario: input.comentario?.trim() ? input.comentario.trim() : null,
       },
     });
+    await notificacoes.notificarNovaAvaliacao(Number(criada.id_estabelecimento), criada.nota);
     return shape(criada);
   } catch (e) {
     // uq_avaliacao_pedido: uma avaliação por pedido. Corrida ou repique vira 409.
