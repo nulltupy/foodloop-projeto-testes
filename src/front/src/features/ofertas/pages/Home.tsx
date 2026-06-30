@@ -275,18 +275,28 @@ export function Home() {
   const estabParam = estabelecimentoDoParam(searchParams);
   const [filtros, setFiltros] = useState<Filtros>(() => ({ ...FILTROS_PADRAO, estab: estabParam }));
   const [sheetAberto, setSheetAberto] = useState(false);
+  const [busca, setBusca] = useState('');
+  const [buscaDebounced, setBuscaDebounced] = useState('');
   const precoMax = Number(filtros.precoMax.replace(',', '.'));
   const origem = coords ?? CENTRO_BETIM;
+  const buscaTrim = buscaDebounced.trim();
 
   useEffect(() => {
     setFiltros((atual) => (atual.estab === estabParam ? atual : { ...atual, estab: estabParam }));
   }, [estabParam]);
+
+  // Debounce ~300ms pra não bombardear a API a cada tecla.
+  useEffect(() => {
+    const t = setTimeout(() => setBuscaDebounced(busca), 300);
+    return () => clearTimeout(t);
+  }, [busca]);
 
   const query: ListarAnunciosQuery = {
     lat: origem.latitude,
     lng: origem.longitude,
     raio_km: RAIO_BUSCA_KM,
     pagina: 1,
+    ...(buscaTrim ? { q: buscaTrim } : {}),
     ...(filtros.precoMax.trim() && Number.isFinite(precoMax) && precoMax > 0 ? { preco_max: precoMax } : {}),
     ...(filtros.categoria ? { categoria: filtros.categoria } : {}),
     ...(filtros.estab ? { id_estabelecimento: filtros.estab } : {}),
@@ -356,23 +366,55 @@ export function Home() {
         </div>
       )}
 
-      {/* Barra de filtro: um botão Filtrar + contagem de resultados. */}
+      {/* Barra de filtro: Filtrar + busca à esquerda, contagem à direita. */}
       <div className="mb-5 flex items-center justify-between gap-3">
-        <button
-          type="button"
-          onClick={() => setSheetAberto(true)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-canvas-line bg-canvas-card px-4 text-sm font-bold text-ink shadow-soft transition-colors hover:border-leaf-200"
-        >
-          <IconeFiltro />
-          Filtrar
-          {ativos > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-leaf px-1 text-xs font-extrabold text-white">
-              {ativos}
-            </span>
-          )}
-        </button>
+        <div className="flex flex-1 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSheetAberto(true)}
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-canvas-line bg-canvas-card px-4 text-sm font-bold text-ink shadow-soft transition-colors hover:border-leaf-200"
+          >
+            <IconeFiltro />
+            Filtrar
+            {ativos > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-leaf px-1 text-xs font-extrabold text-white">
+                {ativos}
+              </span>
+            )}
+          </button>
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder="Buscar produto ou estabelecimento"
+              aria-label="Buscar produto ou estabelecimento"
+              className="min-h-11 w-full rounded-full border border-canvas-line bg-canvas-card py-2.5 pl-4 pr-10 text-sm text-ink shadow-soft transition-colors placeholder:text-ink-mute/70 focus:border-leaf focus:outline-none focus:ring-2 focus:ring-leaf/25"
+            />
+            {busca && (
+              <button
+                type="button"
+                onClick={() => setBusca('')}
+                aria-label="Limpar busca"
+                className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-ink-mute transition-colors hover:bg-canvas hover:text-ink"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  aria-hidden="true"
+                >
+                  <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
         {!isLoading && data && (
-          <span className="text-sm font-semibold text-ink-mute">
+          <span className="shrink-0 text-sm font-semibold text-ink-mute">
             {ofertas.length} {ofertas.length === 1 ? 'oferta' : 'ofertas'}
           </span>
         )}
@@ -403,16 +445,28 @@ export function Home() {
         </ul>
       )}
 
-      {data && ofertas.length === 0 && (
-        <div className="card mx-auto mt-8 max-w-sm p-8 text-center">
-          <Marca className="mx-auto h-12 w-12" />
-          <p className="mt-4 text-lg font-extrabold text-ink">Nenhuma oferta por aqui</p>
-          <p className="mt-1 text-ink-soft">Tente limpar os filtros.</p>
-          <button type="button" onClick={() => aplicarFiltros(FILTROS_PADRAO)} className="btn btn-soft mt-5">
-            Limpar filtros
-          </button>
-        </div>
-      )}
+      {data &&
+        ofertas.length === 0 &&
+        (buscaTrim ? (
+          <div className="card mx-auto mt-8 max-w-sm p-8 text-center">
+            <Marca className="mx-auto h-12 w-12" />
+            <p className="mt-4 text-lg font-extrabold text-ink">Nenhuma oferta encontrada</p>
+            <p className="mt-1 text-ink-soft">Tente outro produto ou estabelecimento.</p>
+          </div>
+        ) : (
+          <div className="card mx-auto mt-8 max-w-sm p-8 text-center">
+            <Marca className="mx-auto h-12 w-12" />
+            <p className="mt-4 text-lg font-extrabold text-ink">Nenhuma oferta por aqui</p>
+            <p className="mt-1 text-ink-soft">Tente limpar os filtros.</p>
+            <button
+              type="button"
+              onClick={() => aplicarFiltros(FILTROS_PADRAO)}
+              className="btn btn-soft mt-5"
+            >
+              Limpar filtros
+            </button>
+          </div>
+        ))}
 
       <FiltroSheet
         aberto={sheetAberto}
