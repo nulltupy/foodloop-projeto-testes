@@ -15,7 +15,7 @@ const RAIO_BUSCA_KM = 5000;
 const CATEGORIAS = ['Padaria', 'Lanche', 'Refeição', 'Doce', 'Bebida', 'Hortifruti'];
 const PARAM_ESTABELECIMENTO = 'estabelecimento';
 const BUSCA_MAX = 80;
-type OrdemDistancia = 'asc' | 'desc';
+type Ordem = 'distancia-asc' | 'distancia-desc' | 'preco-asc' | 'preco-desc';
 
 function moeda(valor: number): string {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -160,13 +160,13 @@ function OfertaCard({ oferta, indice }: { oferta: AnuncioListItem; indice: numbe
 }
 
 interface Filtros {
-  ordemDistancia: OrdemDistancia;
+  ordem: Ordem;
   precoMax: string;
   categoria: string;
   estab: number | '';
 }
 
-const FILTROS_PADRAO: Filtros = { ordemDistancia: 'asc', precoMax: '', categoria: '', estab: '' };
+const FILTROS_PADRAO: Filtros = { ordem: 'distancia-asc', precoMax: '', categoria: '', estab: '' };
 
 function FiltroSheet({
   aberto,
@@ -225,14 +225,16 @@ function FiltroSheet({
         </label>
 
         <label className="block">
-          <span className="lbl">Distância</span>
+          <span className="lbl">Ordenar</span>
           <select
             className={seletor}
-            value={draft.ordemDistancia}
-            onChange={(e) => setDraft((d) => ({ ...d, ordemDistancia: e.target.value as OrdemDistancia }))}
+            value={draft.ordem}
+            onChange={(e) => setDraft((d) => ({ ...d, ordem: e.target.value as Ordem }))}
           >
-            <option value="asc">Distância ascendente</option>
-            <option value="desc">Distância descendente</option>
+            <option value="distancia-asc">Distância ↑</option>
+            <option value="distancia-desc">Distância ↓</option>
+            <option value="preco-asc">Preço ↑</option>
+            <option value="preco-desc">Preço ↓</option>
           </select>
         </label>
 
@@ -315,18 +317,27 @@ export function Home() {
     return [...mapa].map(([id, nome]) => ({ id, nome })).sort((a, b) => a.nome.localeCompare(b.nome));
   }, [data]);
 
-  // Estabelecimento e ordem desc são client-side; a API ordena por distância asc.
+  // Estabelecimento e ordenação são client-side; a API ordena por distância asc.
   const ofertas = useMemo(() => {
     const filtradas = filtros.estab
       ? (data ?? []).filter((a) => a.id_estabelecimento === filtros.estab)
       : (data ?? []);
-    return [...filtradas].sort((a, b) =>
-      filtros.ordemDistancia === 'asc' ? a.distancia_km - b.distancia_km : b.distancia_km - a.distancia_km,
-    );
-  }, [data, filtros.estab, filtros.ordemDistancia]);
+    return [...filtradas].sort((a, b) => {
+      switch (filtros.ordem) {
+        case 'distancia-asc':
+          return a.distancia_km - b.distancia_km;
+        case 'distancia-desc':
+          return b.distancia_km - a.distancia_km;
+        case 'preco-asc':
+          return a.preco_promocional - b.preco_promocional;
+        case 'preco-desc':
+          return b.preco_promocional - a.preco_promocional;
+      }
+    });
+  }, [data, filtros.estab, filtros.ordem]);
 
   const ativos =
-    (filtros.ordemDistancia !== FILTROS_PADRAO.ordemDistancia ? 1 : 0) +
+    (filtros.ordem !== FILTROS_PADRAO.ordem ? 1 : 0) +
     (filtros.precoMax.trim() ? 1 : 0) +
     (filtros.categoria ? 1 : 0) +
     (filtros.estab ? 1 : 0);
