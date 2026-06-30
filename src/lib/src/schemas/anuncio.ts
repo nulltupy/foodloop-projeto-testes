@@ -44,6 +44,14 @@ export const ListarAnunciosQuerySchema = z.object({
   preco_max: z.coerce.number().positive().optional(),
   categoria: z.string().optional(),
   id_estabelecimento: z.coerce.number().int().positive().optional(),
+  // Busca textual por nome de produto OU nome fantasia do estabelecimento.
+  // Trim + máx 80; vazio/só-espaço vira undefined (equivale a omitir).
+  q: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v && v.length > 0 ? v : undefined))
+    .pipe(z.string().max(80).optional()),
   pagina: z.coerce.number().int().positive().default(1),
 });
 export type ListarAnunciosQuery = z.infer<typeof ListarAnunciosQuerySchema>;

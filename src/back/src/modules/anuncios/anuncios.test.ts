@@ -137,6 +137,205 @@ describe('GET /api/v1/anuncios — filtros adicionais', () => {
   });
 });
 
+describe('GET /api/v1/anuncios — busca por q', () => {
+  it('filtra por nome do produto', async () => {
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Pão Francês' });
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Bolo de Fubá' });
+
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: 'pão' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].produto_nome).toBe('Pão Francês');
+    expect(res.body.meta.total).toBe(1);
+  });
+
+  it('filtra por nome do estabelecimento', async () => {
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeFantasia: 'Padaria Bom Pão' });
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeFantasia: 'Mercado Verde' });
+
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: 'bom pão' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].nome_fantasia).toBe('Padaria Bom Pão');
+    expect(res.body.meta.total).toBe(1);
+  });
+
+  it('busca é case-insensitive', async () => {
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Pão Francês' });
+
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: 'PÃO FRANCÊS' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].produto_nome).toBe('Pão Francês');
+  });
+
+  it('combina busca com filtro de raio', async () => {
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Pão Francês' });
+    await criarAnuncioParaTeste({ lat: -20.05, lng: -44.3, nomeProduto: 'Pão Integral' });
+
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 5, q: 'pão' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].produto_nome).toBe('Pão Francês');
+    expect(res.body.meta.total).toBe(1);
+  });
+
+  it('combina busca com preco_max', async () => {
+    await criarAnuncioParaTeste({
+      lat: BETIM_LAT,
+      lng: BETIM_LNG,
+      nomeProduto: 'Pão Francês',
+      precoPromocional: 10,
+    });
+    await criarAnuncioParaTeste({
+      lat: BETIM_LAT,
+      lng: BETIM_LNG,
+      nomeProduto: 'Pão Integral',
+      precoPromocional: 50,
+    });
+
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: 'pão', preco_max: 20 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].produto_nome).toBe('Pão Francês');
+  });
+
+  it('combina busca com id_estabelecimento', async () => {
+    const alvo = await criarAnuncioParaTeste({
+      lat: BETIM_LAT,
+      lng: BETIM_LNG,
+      nomeProduto: 'Pão Francês',
+      nomeFantasia: 'Padaria Bom Pão',
+    });
+    await criarAnuncioParaTeste({
+      lat: BETIM_LAT,
+      lng: BETIM_LNG,
+      nomeProduto: 'Pão Integral',
+      nomeFantasia: 'Outra Padaria',
+    });
+
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({
+        lat: BETIM_LAT,
+        lng: BETIM_LNG,
+        raio_km: 50,
+        q: 'pão',
+        id_estabelecimento: Number(alvo.estabelecimento.id),
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].nome_fantasia).toBe('Padaria Bom Pão');
+  });
+
+  it('combina busca com status/estoque/prazo (só ATIVO com estoque e prazo válido)', async () => {
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Pão Francês' });
+    await criarAnuncioParaTeste({
+      lat: BETIM_LAT,
+      lng: BETIM_LNG,
+      nomeProduto: 'Pão Integral',
+      status: 'ENCERRADO_COM_SOBRA',
+    });
+    await criarAnuncioParaTeste({
+      lat: BETIM_LAT,
+      lng: BETIM_LNG,
+      nomeProduto: 'Pão Doce',
+      quantidadeDisponivel: 0,
+    });
+    const expirado = await criarAnuncioParaTeste({
+      lat: BETIM_LAT,
+      lng: BETIM_LNG,
+      nomeProduto: 'Pão Velho',
+    });
+    await prisma.$executeRaw`
+      UPDATE anuncio
+      SET data_publicacao = NOW() - INTERVAL '2 hour',
+          prazo_retirada = NOW() - INTERVAL '1 hour'
+      WHERE id = ${expirado.anuncio.id}
+    `;
+
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: 'pão' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].produto_nome).toBe('Pão Francês');
+  });
+
+  it('q vazio ou só espaços equivale a omitir', async () => {
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Pão Francês' });
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Bolo de Fubá' });
+
+    const semQ = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50 });
+    const qVazio = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: '' });
+    const qEspacos = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: '   ' });
+
+    expect(semQ.body.meta.total).toBe(2);
+    expect(qVazio.body.meta.total).toBe(2);
+    expect(qEspacos.body.meta.total).toBe(2);
+  });
+
+  it('rejeita q com mais de 80 caracteres', async () => {
+    const res = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: 'a'.repeat(81) });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe(ErrorCode.VALIDACAO);
+  });
+
+  it('escapa metacaracteres de LIKE (% _ \\)', async () => {
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Promo 50% Off' });
+    // Sem escape, "50%" casaria como curinga e pegaria "Combo 50X".
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Combo 50X Especial' });
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Pão Francês' });
+    // Sem escape, "Pão_Francês" casaria "Pão Francês" (espaço) via _ curinga.
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Pão_Francês' });
+    await criarAnuncioParaTeste({ lat: BETIM_LAT, lng: BETIM_LNG, nomeProduto: 'Café \\ Especial' });
+
+    const resPct = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: '50%' });
+    expect(resPct.body.data).toHaveLength(1);
+    expect(resPct.body.data[0].produto_nome).toBe('Promo 50% Off');
+
+    const resUnd = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: 'Pão_Francês' });
+    expect(resUnd.body.data).toHaveLength(1);
+    expect(resUnd.body.data[0].produto_nome).toBe('Pão_Francês');
+
+    const resBs = await request(app)
+      .get('/api/v1/anuncios')
+      .query({ lat: BETIM_LAT, lng: BETIM_LNG, raio_km: 50, q: '\\' });
+    expect(resBs.body.data).toHaveLength(1);
+    expect(resBs.body.data[0].produto_nome).toBe('Café \\ Especial');
+  });
+});
+
 describe('GET /api/v1/anuncios — paginação', () => {
   it('pagina retorna meta correta', async () => {
     for (let i = 0; i < 25; i++) {
