@@ -56,7 +56,7 @@ services:
       paths:
         - src/front/**
         - src/lib/**
-        - render.yaml
+        - src/render.yaml
         - package.json
         - package-lock.json
     # --include=dev força devDependencies (vite, tsc, @vitejs/plugin-react).
