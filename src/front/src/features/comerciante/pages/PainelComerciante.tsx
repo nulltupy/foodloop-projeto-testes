@@ -114,6 +114,9 @@ export function PainelComerciante() {
           <NavLink to="/comerciante/loja" className={aba}>
             Loja
           </NavLink>
+          <NavLink to="/comerciante/avaliacoes" className={aba}>
+            Avaliações
+          </NavLink>
         </div>
       )}
 

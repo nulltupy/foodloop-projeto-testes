@@ -17,6 +17,7 @@ import { PainelComerciante } from '../features/comerciante/pages/PainelComercian
 import { PainelProdutos } from '../features/comerciante/pages/PainelProdutos';
 import { PainelPedidos } from '../features/comerciante/pages/PainelPedidos';
 import { PainelLoja } from '../features/comerciante/pages/PainelLoja';
+import { PainelAvaliacoes } from '../features/comerciante/pages/PainelAvaliacoes';
 import { Perfil } from '../features/perfil/pages/Perfil';
 
 // Raiz pública: visitante deslogado vê a landing; usuário autenticado vê a Home
@@ -55,6 +56,7 @@ export function App() {
               <Route path="pedidos" element={<Navigate to="/comerciante" replace />} />
               <Route path="cardapio" element={<PainelProdutos />} />
               <Route path="loja" element={<PainelLoja />} />
+              <Route path="avaliacoes" element={<PainelAvaliacoes />} />
             </Route>
           </Route>
 
