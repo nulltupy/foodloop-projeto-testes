@@ -46,6 +46,21 @@ export async function notificarNovoPedido(idEstabelecimento: number, idPedido: n
   });
 }
 
+export async function notificarNovaAvaliacao(idEstabelecimento: number, nota: number): Promise<void> {
+  await seguro(async () => {
+    const estab = await prisma.estabelecimento.findUnique({
+      where: { id: BigInt(idEstabelecimento) },
+      select: { id_comerciante: true },
+    });
+    if (!estab) return;
+    await emitir(estab.id_comerciante, {
+      titulo: 'Nova avaliação',
+      corpo: `Você recebeu uma avaliação de ${nota} estrela${nota > 1 ? 's' : ''}.`,
+      deepLink: '/comerciante/avaliacoes',
+    });
+  });
+}
+
 export async function notificarStatusPedido(
   idCliente: number,
   idPedido: number,
