@@ -40,6 +40,7 @@ async function seedPedido(status: StatusPedido = 'RECEBIDO') {
       valor_total: 15,
       codigo_retirada: codigo,
       status,
+      data_retirada: status === 'RETIRADO' ? new Date() : null,
       item_pedido: { create: { id_anuncio: anuncio.id, quantidade: 1, preco_unitario: 15 } },
     },
   });
@@ -61,6 +62,12 @@ function cancelar(pedidoId: number, token: string | null, body: unknown = {}) {
 
 function patchStatus(pedidoId: number, token: string | null, body: unknown) {
   const req = request(app).patch(`/api/v1/pedidos/${pedidoId}/status`);
+  if (token) req.set('Authorization', `Bearer ${token}`);
+  return req.send(body as object);
+}
+
+function postAvaliacao(pedidoId: number, token: string | null, body: unknown) {
+  const req = request(app).post(`/api/v1/pedidos/${pedidoId}/avaliacao`);
   if (token) req.set('Authorization', `Bearer ${token}`);
   return req.send(body as object);
 }
@@ -177,6 +184,81 @@ describe('POST /api/v1/pedidos — código de retirada canônico', () => {
 
     expect(res.status).toBe(201);
     expect(res.body.codigo_retirada).toMatch(ALFABETO_CANONICO);
+  });
+});
+
+describe('POST /api/v1/pedidos/:id/avaliacao', () => {
+  it('cliente avalia pedido retirado dentro de 24h e atualiza nota média', async () => {
+    const { pedidoId, clienteToken } = await seedPedido('RETIRADO');
+
+    const res = await postAvaliacao(pedidoId, clienteToken, {
+      nota: 5,
+      comentario: 'Retirada rápida e produto bom.',
+    });
+
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({
+      id_pedido: pedidoId,
+      nota: 5,
+      comentario: 'Retirada rápida e produto bom.',
+    });
+
+    const pedido = await prisma.pedido.findUniqueOrThrow({ where: { id: BigInt(pedidoId) } });
+    const estab = await prisma.estabelecimento.findUniqueOrThrow({
+      where: { id: pedido.id_estabelecimento },
+    });
+    expect(Number(estab.nota_media)).toBe(5);
+  });
+
+  it('bloqueia avaliação antes da retirada', async () => {
+    const { pedidoId, clienteToken } = await seedPedido('PRONTO_PARA_RETIRADA');
+
+    const res = await postAvaliacao(pedidoId, clienteToken, { nota: 4 });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe(ErrorCode.PEDIDO_NAO_ENTREGUE);
+  });
+
+  it('bloqueia avaliação duplicada do mesmo pedido', async () => {
+    const { pedidoId, clienteToken } = await seedPedido('RETIRADO');
+    await postAvaliacao(pedidoId, clienteToken, { nota: 5 });
+
+    const res = await postAvaliacao(pedidoId, clienteToken, { nota: 4 });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe(ErrorCode.AVALIACAO_DUPLICADA);
+  });
+
+  it('bloqueia avaliação depois de 24h da retirada', async () => {
+    const { pedidoId, clienteToken } = await seedPedido('RETIRADO');
+    await prisma.pedido.update({
+      where: { id: BigInt(pedidoId) },
+      data: { data_retirada: new Date(Date.now() - 25 * 60 * 60 * 1000) },
+    });
+
+    const res = await postAvaliacao(pedidoId, clienteToken, { nota: 4 });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe(ErrorCode.AVALIACAO_PRAZO_EXPIRADO);
+  });
+
+  it('lista avaliações públicas do estabelecimento sem expor dados completos do cliente', async () => {
+    const { pedidoId, clienteToken } = await seedPedido('RETIRADO');
+    await postAvaliacao(pedidoId, clienteToken, { nota: 5, comentario: 'Tudo certo.' });
+    const pedido = await prisma.pedido.findUniqueOrThrow({ where: { id: BigInt(pedidoId) } });
+
+    const res = await request(app).get(
+      `/api/v1/estabelecimentos/${Number(pedido.id_estabelecimento)}/avaliacoes`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0]).toMatchObject({
+      nota: 5,
+      comentario: 'Tudo certo.',
+      autor: { nome: 'Cliente P.' },
+    });
+    expect(res.body[0]).not.toHaveProperty('email');
   });
 });
 

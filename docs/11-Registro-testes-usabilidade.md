@@ -42,7 +42,7 @@ Além disso, a aplicação também alcançou um elevado nível de satisfação s
 
 Em relação ao tempo de conclusão de cada tarefa/cenário, observou-se uma discrepância significativa entre a média de tempo dos usuários e o tempo do especialista/desenvolvedor em todos os cenários. Essa diferença, até certo ponto, é esperada, dado que o desenvolvedor já possui conhecimento prévio de toda a interface da aplicação, do posicionamento dos elementos, da lógica de organização das páginas, etc.
 
-No entanto, considerando que a diferença foi expressiva (por exemplo, 113 segundos — média dos usuários — contra 25 segundos — especialista — no cenário três), e levando em conta os comentários feitos por alguns usuários, foram identificadas oportunidades para melhorias na usabilidade da aplicação.
+No entanto, considerando que a diferença foi expressiva (por exemplo, 113 segundos - média dos usuários - contra 25 segundos - especialista - no cenário três), e levando em conta os comentários feitos por alguns usuários, foram identificadas oportunidades para melhorias na usabilidade da aplicação.
 
 > **Links úteis**:
 > - [Ferramentas de testes de usabilidade](https://www.usability.gov/how-to-and-tools/resources/templates.html)

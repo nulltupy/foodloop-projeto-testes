@@ -43,7 +43,7 @@ describe('Tela de detalhe da oferta', () => {
     );
   });
 
-  it('desabilita "Reservar" quando o anúncio está esgotado', async () => {
+  it('desabilita "Reservar agora" quando o anúncio está esgotado', async () => {
     const base = db.anuncios.find((x) => x.id === 1)!;
     server.use(
       http.get('/api/v1/anuncios/1', () =>
@@ -51,13 +51,13 @@ describe('Tela de detalhe da oferta', () => {
       ),
     );
     renderDetalhe(1);
-    expect(await screen.findByRole('button', { name: /indisponível/i })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: /esgotado por enquanto/i })).toBeDisabled();
   });
 
   it('ao reservar, navega para o checkout', async () => {
     const a = anuncioDisponivel();
     renderDetalhe(a.id);
-    await userEvent.click(await screen.findByRole('button', { name: 'Reservar' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Reservar agora' }));
     expect(await screen.findByText('tela de checkout')).toBeInTheDocument();
   });
 });

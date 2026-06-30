@@ -1,0 +1,28 @@
+name: Deploy Front
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/front/**'
+      - 'src/lib/**'
+      - 'src/render.yaml'
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          HOOK: ${{ secrets.RENDER_FRONT_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "Deploy hook not configured yet — skipping. Set the secret when the front deploy service is provisioned."
+            exit 0
+          fi
+          curl -fsSL -X POST "$HOOK"

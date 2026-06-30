@@ -8,9 +8,10 @@ import {
 
 import { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
-import { geocodingEndereco } from '../geocoding/service.js';
+import { geocodingEnderecoComFallback } from '../geocoding/service.js';
 import * as notificacoes from '../notificacoes/service.js';
 import { HttpError } from '../../shared/errors.js';
+import { normalizarCep, queriesGeocoding } from './endereco.js';
 
 // Inclui o endereço — formato de retorno comum a getById/getMeu/criar/atualizar.
 const comEndereco = { endereco: true } as const;
@@ -39,18 +40,6 @@ function shape(e: EstabComEndereco): Estabelecimento {
   };
 }
 
-// Coluna é Char(9): normaliza para o formato com hífen (#####-###).
-function normalizarCep(cep: string): string {
-  const digitos = cep.replace(/\D/g, '');
-  return `${digitos.slice(0, 5)}-${digitos.slice(5, 8)}`;
-}
-
-function queryGeocoding(endereco: CreateEstabelecimentoRequest['endereco']): string {
-  return [endereco.rua, endereco.numero, endereco.bairro, endereco.cidade, endereco.estado, 'Brasil']
-    .filter((parte) => parte && parte.trim().length > 0)
-    .join(', ');
-}
-
 export async function getById(id: number): Promise<Estabelecimento | null> {
   const e = await prisma.estabelecimento.findUnique({ where: { id: BigInt(id) }, include: comEndereco });
   return e ? shape(e) : null;
@@ -69,8 +58,7 @@ export async function criar(
   input: CreateEstabelecimentoRequest,
 ): Promise<Estabelecimento> {
   // Checa antes de geocodificar: evita queimar uma chamada upstream e criar um
-  // endereço órfão quando o comerciante já tem estabelecimento (inclui o default
-  // lazy criado pelo fluxo de produtos).
+  // endereço órfão quando o comerciante já tem estabelecimento.
   const existente = await prisma.estabelecimento.findFirst({
     where: { id_comerciante: BigInt(comercianteId) },
     select: { id: true },
@@ -79,7 +67,7 @@ export async function criar(
     throw new HttpError(409, ErrorCode.ESTABELECIMENTO_JA_EXISTE, 'Comerciante já possui estabelecimento');
   }
 
-  const coords = await geocodingEndereco(queryGeocoding(input.endereco));
+  const coords = await geocodingEnderecoComFallback(queriesGeocoding(input.endereco));
 
   try {
     const criado = await prisma.$transaction(async (tx) => {
@@ -129,7 +117,7 @@ export async function atualizar(
   }
 
   // Geocodifica fora da transação quando o endereço muda.
-  const coords = patch.endereco ? await geocodingEndereco(queryGeocoding(patch.endereco)) : null;
+  const coords = patch.endereco ? await geocodingEnderecoComFallback(queriesGeocoding(patch.endereco)) : null;
 
   const atualizado = await prisma.$transaction(async (tx) => {
     if (patch.endereco && coords) {

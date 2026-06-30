@@ -3,6 +3,7 @@ import { ErrorCode, gerarCodigoRetirada, type StatusPedido, type TipoUsuario } f
 import type { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
 import { HttpError } from '../../shared/errors.js';
+import { elegibilidadeAvaliacao } from '../avaliacoes/service.js';
 import * as notificacoes from '../notificacoes/service.js';
 
 interface CriarParams {
@@ -134,7 +135,10 @@ export async function avancarStatus(
 
   const atualizado = await prisma.pedido.update({
     where: { id: pedido.id },
-    data: { status: novoStatus },
+    data: {
+      status: novoStatus,
+      ...(novoStatus === 'RETIRADO' ? { data_retirada: new Date() } : {}),
+    },
     include: { item_pedido: true },
   });
   const resultado = montar(atualizado);
@@ -224,6 +228,7 @@ interface PedidoWithItens {
   codigo_retirada: string;
   status: 'RECEBIDO' | 'EM_PREPARO' | 'PRONTO_PARA_RETIRADA' | 'RETIRADO' | 'CANCELADO';
   data_pedido: Date;
+  data_retirada: Date | null;
   item_pedido: Array<{
     id: bigint;
     id_anuncio: bigint;
@@ -242,6 +247,7 @@ function montar(p: PedidoWithItens) {
     status: p.status,
     codigo_retirada: p.codigo_retirada,
     data_pedido: p.data_pedido.toISOString(),
+    data_retirada: p.data_retirada?.toISOString() ?? null,
     itens: p.item_pedido.map((i) => ({
       id: Number(i.id),
       id_anuncio: Number(i.id_anuncio),
@@ -260,6 +266,7 @@ interface ListaFiltros {
 
 const includeCliente = {
   estabelecimento: true,
+  avaliacao: true,
   item_pedido: { include: { anuncio: { include: { produto: true } } } },
 } as const;
 
@@ -293,6 +300,11 @@ function shapeCliente(p: PedidoCliente) {
       id: Number(p.estabelecimento.id),
       nome_fantasia: p.estabelecimento.nome_fantasia,
     },
+    ...elegibilidadeAvaliacao({
+      status: p.status,
+      data_retirada: p.data_retirada,
+      avaliacao: p.avaliacao,
+    }),
     itens: shapeItens(p.item_pedido),
   };
 }

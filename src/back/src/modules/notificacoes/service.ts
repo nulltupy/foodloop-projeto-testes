@@ -41,7 +41,7 @@ export async function notificarNovoPedido(idEstabelecimento: number, idPedido: n
     await emitir(estab.id_comerciante, {
       titulo: 'Novo pedido',
       corpo: `Você recebeu o pedido #${idPedido}.`,
-      deepLink: '/comerciante/pedidos',
+      deepLink: '/comerciante',
     });
   });
 }
@@ -74,7 +74,7 @@ export async function notificarCancelamento(
       await emitir(estab.id_comerciante, {
         titulo: 'Pedido cancelado',
         corpo: `O cliente cancelou o pedido #${pedido.id}.`,
-        deepLink: '/comerciante/pedidos',
+        deepLink: '/comerciante',
       });
     } else {
       await emitir(BigInt(pedido.id_cliente), {

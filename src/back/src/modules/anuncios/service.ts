@@ -1,4 +1,4 @@
-import { type Anuncio, type CreateAnuncioRequest, ErrorCode } from '@foodloop/lib';
+import { type Anuncio, type CreateAnuncioRequest, ErrorCode, type UpdateAnuncioRequest } from '@foodloop/lib';
 
 import { Prisma } from '../../generated/prisma/client.js';
 import { prisma } from '../../db/client.js';
@@ -12,6 +12,7 @@ interface ListarParams {
   raio_km: number;
   preco_max?: number;
   categoria?: string;
+  id_estabelecimento?: number;
   pagina: number;
 }
 
@@ -40,10 +41,15 @@ function filtroCategoria(categoria: string | undefined): Prisma.Sql {
   return categoria === undefined ? Prisma.empty : Prisma.sql`AND p.categoria = ${categoria}`;
 }
 
+function filtroEstabelecimento(id: number | undefined): Prisma.Sql {
+  return id === undefined ? Prisma.empty : Prisma.sql`AND a.id_estabelecimento = ${BigInt(id)}`;
+}
+
 export async function listarProximos(params: ListarParams) {
   const offset = (params.pagina - 1) * TAMANHO_PAGINA;
   const precoFiltro = filtroPrecoMax(params.preco_max);
   const catFiltro = filtroCategoria(params.categoria);
+  const estabelecimentoFiltro = filtroEstabelecimento(params.id_estabelecimento);
 
   // Subquery wraps the Haversine expression so the outer WHERE can filter by
   // the computed alias `distancia_km`. PG não aceita HAVING sem GROUP BY com
@@ -71,6 +77,7 @@ export async function listarProximos(params: ListarParams) {
         AND a.prazo_retirada > NOW()
         ${precoFiltro}
         ${catFiltro}
+        ${estabelecimentoFiltro}
     ) sub
     WHERE sub.distancia_km <= ${params.raio_km}
     ORDER BY sub.distancia_km ASC, sub.preco_promocional ASC
@@ -107,6 +114,7 @@ export async function listarProximos(params: ListarParams) {
 async function contarProximos(params: ListarParams): Promise<number> {
   const precoFiltro = filtroPrecoMax(params.preco_max);
   const catFiltro = filtroCategoria(params.categoria);
+  const estabelecimentoFiltro = filtroEstabelecimento(params.id_estabelecimento);
 
   const result = await prisma.$queryRaw<Array<{ total: bigint }>>`
     SELECT COUNT(*)::bigint AS total FROM (
@@ -126,6 +134,7 @@ async function contarProximos(params: ListarParams): Promise<number> {
         AND a.prazo_retirada > NOW()
         ${precoFiltro}
         ${catFiltro}
+        ${estabelecimentoFiltro}
     ) sub
     WHERE sub.distancia_km <= ${params.raio_km}
   `;
@@ -203,6 +212,71 @@ export async function criar(input: CreateAnuncioRequest, userId: number): Promis
     },
   });
   return shapeAnuncio(novo);
+}
+
+export async function atualizar(id: number, input: UpdateAnuncioRequest, userId: number): Promise<Anuncio> {
+  const estab = await prisma.estabelecimento.findFirst({
+    where: { id_comerciante: BigInt(userId) },
+    select: { id: true },
+  });
+  if (!estab) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Estabelecimento não encontrado');
+  }
+
+  const atual = await prisma.anuncio.findUnique({
+    where: { id: BigInt(id) },
+    select: {
+      id: true,
+      id_produto: true,
+      id_estabelecimento: true,
+      quantidade_inicial: true,
+      quantidade_disponivel: true,
+      status: true,
+    },
+  });
+  if (!atual) {
+    throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Anúncio não encontrado');
+  }
+  if (atual.id_estabelecimento !== estab.id) {
+    throw new HttpError(403, ErrorCode.PERMISSAO_NEGADA, 'Anúncio não pertence ao seu estabelecimento');
+  }
+  if (atual.status !== 'ATIVO') {
+    throw new HttpError(409, ErrorCode.ANUNCIO_NAO_ATIVO, 'Anúncio não está ativo');
+  }
+
+  let idProduto = atual.id_produto;
+  if (input.id_produto !== undefined) {
+    const produto = await prisma.produto.findUnique({
+      where: { id: BigInt(input.id_produto) },
+      select: { id: true, id_estabelecimento: true },
+    });
+    if (!produto) {
+      throw new HttpError(404, ErrorCode.RECURSO_NAO_ENCONTRADO, 'Produto não encontrado');
+    }
+    if (produto.id_estabelecimento !== estab.id) {
+      throw new HttpError(403, ErrorCode.PERMISSAO_NEGADA, 'Produto não pertence ao seu estabelecimento');
+    }
+    idProduto = produto.id;
+  }
+
+  const quantidadeInicial = input.quantidade_inicial ?? atual.quantidade_inicial;
+  const reservados = Math.max(0, atual.quantidade_inicial - atual.quantidade_disponivel);
+  const quantidadeDisponivel =
+    input.quantidade_inicial === undefined
+      ? undefined
+      : Math.max(0, Math.min(input.quantidade_inicial, quantidadeInicial - reservados));
+
+  const atualizado = await prisma.anuncio.update({
+    where: { id: BigInt(id) },
+    data: {
+      id_produto: idProduto,
+      preco_promocional: input.preco_promocional,
+      quantidade_inicial: input.quantidade_inicial,
+      quantidade_disponivel: quantidadeDisponivel,
+      prazo_retirada: input.prazo_retirada ? new Date(input.prazo_retirada) : undefined,
+    },
+  });
+  return shapeAnuncio(atualizado);
 }
 
 export async function getById(id: number) {

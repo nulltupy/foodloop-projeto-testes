@@ -50,7 +50,7 @@ export function SinoNotificacoes() {
         aria-haspopup="menu"
         aria-expanded={aberto}
         aria-label={naoLidas > 0 ? `Notificações (${naoLidas} não lidas)` : 'Notificações'}
-        className="relative flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface-100"
+        className="relative flex h-11 w-11 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-canvas hover:text-ink"
       >
         <svg
           width="22"
@@ -61,62 +61,70 @@ export function SinoNotificacoes() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-ink-700"
           aria-hidden="true"
         >
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
         {naoLidas > 0 && (
-          <span className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger-500 px-1 text-xs font-semibold text-white">
+          <span className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-citrus px-1 text-xs font-bold text-ink">
             {naoLidas > 9 ? '9+' : naoLidas}
           </span>
         )}
       </button>
 
       {aberto && (
-        <div
-          role="menu"
-          className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-surface-200 bg-white shadow-lg"
-        >
-          <div className="flex items-center justify-between gap-2 border-b border-surface-200 p-3">
-            <p className="font-medium text-ink-900">Notificações</p>
-            {naoLidas > 0 && (
-              <button
-                type="button"
-                onClick={() => lerTodas.mutate()}
-                disabled={lerTodas.isPending}
-                className="text-sm font-medium text-brand-700 disabled:opacity-60"
-              >
-                Marcar todas como lidas
-              </button>
-            )}
-          </div>
-
-          <ul className="max-h-96 overflow-auto">
-            {itens.length === 0 && (
-              <li className="p-4 text-center text-sm text-ink-500">Nenhuma notificação.</li>
-            )}
-            {itens.map((n) => (
-              <li key={n.id}>
+        <>
+          <button
+            type="button"
+            aria-hidden="true"
+            tabIndex={-1}
+            onClick={() => setAberto(false)}
+            className="fixed inset-0 z-0 cursor-default"
+          />
+          <div
+            role="menu"
+            className="absolute right-0 z-10 mt-2 w-80 max-w-[calc(100vw-2rem)] animate-rise overflow-hidden rounded-2xl border border-canvas-line bg-canvas-card shadow-card"
+          >
+            <div className="flex items-center justify-between gap-2 border-b border-canvas-line px-4 py-3">
+              <p className="font-bold text-ink">Notificações</p>
+              {naoLidas > 0 && (
                 <button
                   type="button"
-                  onClick={() => abrir(n)}
-                  className={`flex w-full flex-col gap-0.5 border-b border-surface-100 p-3 text-left hover:bg-surface-50 ${
-                    n.lida ? '' : 'bg-brand-50/50'
-                  }`}
+                  onClick={() => lerTodas.mutate()}
+                  disabled={lerTodas.isPending}
+                  className="text-sm font-semibold text-leaf-dark disabled:opacity-60"
                 >
-                  <span className="flex items-center gap-2">
-                    {!n.lida && <span className="h-2 w-2 shrink-0 rounded-full bg-brand-500" />}
-                    <span className="font-medium text-ink-900">{n.titulo}</span>
-                  </span>
-                  <span className="text-sm text-ink-700">{n.corpo}</span>
-                  <span className="text-xs text-ink-500">{dataHora(n.data_envio)}</span>
+                  Marcar todas
                 </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+              )}
+            </div>
+
+            <ul className="max-h-96 overflow-auto">
+              {itens.length === 0 && (
+                <li className="px-4 py-6 text-center text-sm text-ink-mute">Nenhuma notificação.</li>
+              )}
+              {itens.map((n) => (
+                <li key={n.id}>
+                  <button
+                    type="button"
+                    onClick={() => abrir(n)}
+                    className={`flex w-full flex-col gap-0.5 border-b border-canvas-line px-4 py-3 text-left transition-colors hover:bg-canvas ${
+                      n.lida ? '' : 'bg-leaf-50/60'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      {!n.lida && <span className="h-2 w-2 shrink-0 rounded-full bg-citrus" />}
+                      <span className="font-bold text-ink">{n.titulo}</span>
+                    </span>
+                    <span className="text-sm text-ink-soft">{n.corpo}</span>
+                    <span className="text-xs text-ink-mute">{dataHora(n.data_envio)}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
     </div>
   );

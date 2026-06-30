@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RegisterRequestSchema } from './auth.js';
+import { RegisterComercianteRequestSchema, RegisterRequestSchema } from './auth.js';
 
 describe('RegisterRequestSchema', () => {
   const baseCliente = {
@@ -26,6 +26,32 @@ describe('RegisterRequestSchema', () => {
       tipo: 'comerciante',
       cnpj: '12345678000190',
     });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('RegisterComercianteRequestSchema', () => {
+  it('aceita estabelecimento sem horário de funcionamento', () => {
+    const result = RegisterComercianteRequestSchema.safeParse({
+      nome: 'Comerciante',
+      email: 'comerciante@exemplo.com',
+      senha: 'segredo123',
+      telefone: '+5531999997777',
+      cnpj: '12345678000191',
+      estabelecimento: {
+        nome_fantasia: 'Padaria Exemplo',
+        descricao: 'Pães do dia',
+        endereco: {
+          rua: 'Rua Um',
+          numero: '100',
+          bairro: 'Centro',
+          cidade: 'Betim',
+          estado: 'MG',
+          cep: '32600-000',
+        },
+      },
+    });
+
     expect(result.success).toBe(true);
   });
 });

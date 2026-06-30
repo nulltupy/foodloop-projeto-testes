@@ -10,13 +10,22 @@ beforeEach(() => {
 });
 
 describe('App shell', () => {
-  it('redireciona para o login ao acessar / sem sessão', () => {
+  it('mostra a landing pública ao acessar / sem sessão', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <App />
       </MemoryRouter>,
     );
-    expect(screen.getByRole('heading', { name: /entrar/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /comida boa que sobrou/i })).toBeInTheDocument();
+  });
+
+  it('redireciona rota protegida para o login sem sessão', () => {
+    render(
+      <MemoryRouter initialEntries={['/pedidos']}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('heading', { name: /que bom te ver/i })).toBeInTheDocument();
   });
 
   it('imports @foodloop/lib without throwing', async () => {

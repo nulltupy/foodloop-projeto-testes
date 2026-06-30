@@ -58,7 +58,7 @@ describe('Tela de checkout', () => {
     expect(await screen.findByText(produto.nome, { exact: false })).toBeInTheDocument();
     expect(screen.getByText('Total')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: /reservar e pagar presencialmente/i }));
+    await userEvent.click(screen.getByRole('button', { name: /reservar pedido/i }));
     expect(await screen.findByText('confirmação do pedido')).toBeInTheDocument();
   });
 
@@ -70,9 +70,9 @@ describe('Tela de checkout', () => {
       ),
     );
     renderCheckout(`?anuncio=${a.id}`);
-    await screen.findByRole('button', { name: /reservar e pagar presencialmente/i });
+    await screen.findByRole('button', { name: /reservar pedido/i });
 
-    await userEvent.click(screen.getByRole('button', { name: /reservar e pagar presencialmente/i }));
+    await userEvent.click(screen.getByRole('button', { name: /reservar pedido/i }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/não está mais disponível/i);
   });
 });

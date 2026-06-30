@@ -38,7 +38,7 @@ Além disso, o projeto busca incentivar práticas de consumo mais conscientes e 
 
 ### Deploy do back
 
-O deploy é declarativo via [`render.yaml`](./render.yaml) na raiz e disparado
+O deploy é declarativo via [`render.yaml`](./src/render.yaml) em `src/` e disparado
 pelo CI (`.github/workflows/deploy-back.yml`) sempre que um commit em `main`
 toca `src/back/**` ou `src/lib/**`. O workflow chama o Deploy Hook do Render
 (secret `RENDER_BACK_DEPLOY_HOOK`); se o secret não estiver configurado, o
@@ -52,16 +52,16 @@ curl -fsSL -X POST "$RENDER_BACK_DEPLOY_HOOK"
 
 ### Deploy do front
 
-O front é um Render Static Site declarado no mesmo [`render.yaml`](./render.yaml).
+O front é um Render Static Site declarado no mesmo [`render.yaml`](./src/render.yaml).
 Reaproveita a integração GitHub já autorizada pela organização — sem novo app,
 sem token de API, sem secret no GitHub Actions. Build e publicação rodam direto
 no Render (`autoDeployTrigger: commit` + `buildFilter`); cada commit em `main`
-que toque `src/front/**`, `src/lib/**`, `render.yaml`, `package.json` ou
+que toque `src/front/**`, `src/lib/**`, `src/render.yaml`, `package.json` ou
 `package-lock.json` dispara um redeploy automático.
 
 Setup único (na primeira vez que o Blueprint subir):
 
-1. Render dashboard → Blueprints → `foodloop` → **Sync** (lê o `render.yaml` da
+1. Render dashboard → Blueprints → `foodloop` → **Sync** (lê o `src/render.yaml` da
    `main` e cria o serviço `foodloop-front`). Se o Blueprint ainda não existir,
    criar via New → Blueprint apontando para este repo.
 2. Aguardar o primeiro build em `foodloop-front` → Logs (~2–3 min).
@@ -140,7 +140,7 @@ Os pacotes vivem em `src/back`, `src/front` e `src/lib` (este último contém c�
 
 ```bash
 # 1. Subir o Postgres local (porta 5433 do host)
-docker compose -f docker-compose.dev.yml up -d
+docker compose -f src/docker-compose.dev.yml up -d
 
 # 2. Configurar variáveis de ambiente do back
 cp src/back/.env.example src/back/.env
@@ -175,14 +175,14 @@ Detalhes do front (scripts, layout, stack) em [`src/front/README.md`](src/front/
 
 Workflows em `.github/workflows/`:
 
-| Arquivo           | Quando roda                                           | O que faz                                                                                                                                                 |
-| ----------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ci.yml`          | PR + push em `main`                                   | Detecta diffs por path; roda lint+test+build dos workspaces afetados em paralelo; converge em `ci-success` — único `required check` em branch protection. |
-| `deploy-back.yml` | Push em `main` afetando `src/back/**` ou `src/lib/**` | Aciona o deploy hook do Render. Pula se o secret `RENDER_BACK_DEPLOY_HOOK` ainda não estiver configurado.                                                 |
-| `keep-alive.yml`  | Cron a cada 10 min, 20-02 UTC (17h-23h BR)            | Pinga `/health` para combater cold start. Pula se `vars.BACK_HEALTH_URL` ainda não estiver setado.                                                        |
-| `db-migrate.yml`  | `workflow_dispatch` manual                            | Aplica `prisma migrate deploy` em prod. Exige digitar `MIGRATE` como input e passa por `environment: production` (required reviewers).                    |
-| `seed-prod.yml`   | `workflow_dispatch` manual                            | Roda `npm run -w src/back seed` contra `PROD_DATABASE_URL`. Exige digitar `SEED` como input. Apaga e recria todos os dados de demo (TRUNCATE CASCADE).    |
-| `e2e.yml`         | `workflow_dispatch` manual                            | Stub até o card de Playwright entrar. `on.schedule` está comentado.                                                                                       |
+| Arquivo           | Quando roda                                           | O que faz                                                                                                                                                      |
+| ----------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`          | PR + push em `main`                                   | Detecta diffs por path; roda lint+test+build dos workspaces afetados em paralelo; converge em `ci-success` — único `required check` em branch protection.      |
+| `deploy-back.yml` | Push em `main` afetando `src/back/**` ou `src/lib/**` | Aplica `prisma migrate deploy` em prod e, se passar, aciona o deploy hook do Render. Pula o deploy se `RENDER_BACK_DEPLOY_HOOK` ainda não estiver configurado. |
+| `keep-alive.yml`  | Cron a cada 10 min, 20-02 UTC (17h-23h BR)            | Pinga `/health` para combater cold start. Pula se `vars.BACK_HEALTH_URL` ainda não estiver setado.                                                             |
+| `db-migrate.yml`  | `workflow_dispatch` manual                            | Aplica `prisma migrate deploy` em prod. Exige digitar `MIGRATE` como input e passa por `environment: production` (required reviewers).                         |
+| `seed-prod.yml`   | `workflow_dispatch` manual                            | Roda `npm run -w src/back seed` contra `PROD_DATABASE_URL`. Exige digitar `SEED` como input. Apaga e recria todos os dados de demo (TRUNCATE CASCADE).         |
+| `e2e.yml`         | `workflow_dispatch` manual                            | Stub até o card de Playwright entrar. `on.schedule` está comentado.                                                                                            |
 
 **Secrets/variables que o maintainer precisa configurar** (Settings → Secrets and variables → Actions):
 

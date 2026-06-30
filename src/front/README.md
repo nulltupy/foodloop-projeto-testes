@@ -70,7 +70,7 @@ src/front/
 
 - **React 19, não 18.** Prisma 7 do back puxa `react@19` que sobe ao hoist do monorepo. Front também usa 19 para evitar duplicidade no jsdom dos testes.
 - **Tailwind v3.** Plan B do card mencionava v4; a v3 mantém a config previsível com `postcss-load-config`.
-- **MSW opcional.** Por padrão o front fala com a API real (`VITE_USE_MSW=false`). Defina `VITE_USE_MSW=true` para rodar contra os handlers do Mock Service Worker em `src/mocks/` (sem precisar do back).
+- **MSW só nos testes.** Em desenvolvimento o front fala com a API real configurada em `VITE_API_URL`; os handlers em `src/mocks/` ficam restritos ao Vitest.
 
 ## Segurança — trade-offs conhecidos
 

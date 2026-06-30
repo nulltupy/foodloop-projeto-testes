@@ -2,13 +2,23 @@ import { ErrorCode } from '@foodloop/lib';
 import bcrypt from 'bcryptjs';
 import type { Express } from 'express';
 import request from 'supertest';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { buildApp } from '../../app.js';
 import { prisma } from '../../db/client.js';
 import { verifyAccessToken } from '../../shared/jwt.js';
+import { geocodingEnderecoComFallback } from '../geocoding/service.js';
+
+vi.mock('../geocoding/service.js', () => ({ geocodingEnderecoComFallback: vi.fn() }));
+const geoMock = vi.mocked(geocodingEnderecoComFallback);
 
 const app = buildApp();
+
+const COORDS = {
+  latitude: -19.9676,
+  longitude: -44.1986,
+  endereco_normalizado: 'Av. Amazonas, Centro, Betim, MG',
+};
 
 const clienteValido = {
   nome: 'Cliente Teste',
@@ -26,6 +36,24 @@ const comercianteValido = {
   tipo: 'comerciante' as const,
   cnpj: '12345678000190',
 };
+
+const estabelecimentoValido = {
+  nome_fantasia: 'Padaria Teste',
+  descricao: 'Pães do dia',
+  endereco: {
+    rua: 'Avenida Amazonas',
+    numero: '100',
+    bairro: 'Centro',
+    cidade: 'Betim',
+    estado: 'MG',
+    cep: '32600-000',
+  },
+};
+
+beforeEach(() => {
+  geoMock.mockReset();
+  geoMock.mockResolvedValue(COORDS);
+});
 
 describe('POST /api/v1/auth/register', () => {
   it('cadastra cliente e devolve usuario + token', async () => {
@@ -114,6 +142,37 @@ describe('POST /api/v1/auth/register', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe(ErrorCode.VALIDACAO);
+  });
+});
+
+describe('POST /api/v1/auth/register-comerciante', () => {
+  it('cadastra comerciante e estabelecimento sem exigir horário', async () => {
+    const res = await request(app).post('/api/v1/auth/register-comerciante').send({
+      nome: 'Comerciante com Loja',
+      email: 'comerciante-loja@teste.com',
+      senha: 'senha-forte-123',
+      telefone: '+5531999990003',
+      cnpj: '12345678000191',
+      estabelecimento: estabelecimentoValido,
+    });
+
+    expect(res.status).toBe(201);
+    expect(res.body.usuario.tipo).toBe('comerciante');
+    expect(typeof res.body.token).toBe('string');
+
+    const estabelecimento = await prisma.estabelecimento.findFirst({
+      where: { id_comerciante: BigInt(res.body.usuario.id) },
+      include: { endereco: true },
+    });
+    expect(estabelecimento).not.toBeNull();
+    expect(estabelecimento).toMatchObject({
+      nome_fantasia: 'Padaria Teste',
+      descricao: 'Pães do dia',
+      horario_funcionamento: null,
+      ativo: true,
+    });
+    expect(estabelecimento?.endereco.cep).toBe('32600-000');
+    expect(geoMock).toHaveBeenCalledOnce();
   });
 });
 

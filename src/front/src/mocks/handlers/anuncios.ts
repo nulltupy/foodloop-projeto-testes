@@ -1,5 +1,10 @@
 import { http, HttpResponse } from 'msw';
-import { CreateAnuncioRequestSchema, ErrorCode, ListarAnunciosQuerySchema } from '@foodloop/lib';
+import {
+  CreateAnuncioRequestSchema,
+  ErrorCode,
+  ListarAnunciosQuerySchema,
+  UpdateAnuncioRequestSchema,
+} from '@foodloop/lib';
 import type { Anuncio, AnuncioListItem } from '@foodloop/lib';
 import { db, distanciaKm, usuarioPorAuth } from '../db';
 
@@ -90,6 +95,9 @@ export const anunciosHandlers = [
         return produto?.categoria === q.categoria;
       });
     }
+    if (q.id_estabelecimento !== undefined) {
+      itens = itens.filter((li) => li.id_estabelecimento === q.id_estabelecimento);
+    }
 
     itens.sort((a, b) => a.distancia_km - b.distancia_km);
 
@@ -106,6 +114,40 @@ export const anunciosHandlers = [
     const id = Number(params.id);
     const anuncio = db.anuncios.find((a) => a.id === id);
     if (!anuncio) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Anúncio não encontrado', 404);
+    return HttpResponse.json(anuncio);
+  }),
+
+  http.patch('/api/v1/anuncios/:id', async ({ request, params }) => {
+    const usuario = usuarioPorAuth(request.headers.get('Authorization'));
+    if (!usuario || usuario.tipo !== 'comerciante' || !usuario.id_estabelecimento) {
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Acesso restrito ao comerciante', 403);
+    }
+    const id = Number(params.id);
+    const anuncio = db.anuncios.find((a) => a.id === id);
+    if (!anuncio) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Anúncio não encontrado', 404);
+    if (anuncio.id_estabelecimento !== usuario.id_estabelecimento) {
+      return erro(ErrorCode.PERMISSAO_NEGADA, 'Anúncio não é seu', 403);
+    }
+    if (anuncio.status !== 'ATIVO') return erro(ErrorCode.ANUNCIO_NAO_ATIVO, 'Anúncio não está ativo', 409);
+
+    const parsed = UpdateAnuncioRequestSchema.safeParse(await request.json());
+    if (!parsed.success) return erro(ErrorCode.VALIDACAO, 'Dados inválidos', 400);
+    const d = parsed.data;
+    if (d.id_produto !== undefined) {
+      const produto = db.produtos.find((p) => p.id === d.id_produto);
+      if (!produto) return erro(ErrorCode.RECURSO_NAO_ENCONTRADO, 'Produto não encontrado', 404);
+      if (produto.id_estabelecimento !== usuario.id_estabelecimento) {
+        return erro(ErrorCode.PERMISSAO_NEGADA, 'Produto não é seu', 403);
+      }
+      anuncio.id_produto = d.id_produto;
+    }
+    if (d.preco_promocional !== undefined) anuncio.preco_promocional = d.preco_promocional;
+    if (d.quantidade_inicial !== undefined) {
+      const reservados = Math.max(0, anuncio.quantidade_inicial - anuncio.quantidade_disponivel);
+      anuncio.quantidade_inicial = d.quantidade_inicial;
+      anuncio.quantidade_disponivel = Math.max(0, d.quantidade_inicial - reservados);
+    }
+    if (d.prazo_retirada !== undefined) anuncio.prazo_retirada = d.prazo_retirada;
     return HttpResponse.json(anuncio);
   }),
 ];

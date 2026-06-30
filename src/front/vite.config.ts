@@ -6,7 +6,7 @@ export default defineConfig({
   server: { port: 5173, strictPort: true },
   test: {
     environment: 'jsdom',
-    // Alinha a origem do jsdom ao baseUrl do api client para o MSW casar as rotas.
+    // Alinha a origem do jsdom ao baseUrl usado pelos handlers dos testes.
     environmentOptions: { jsdom: { url: 'http://localhost:3010' } },
     setupFiles: ['./src/test/setup.ts'],
     globals: true,

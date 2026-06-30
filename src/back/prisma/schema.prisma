@@ -1,9 +1,9 @@
 generator client {
-  provider             = "prisma-client"
-  output               = "../src/generated/prisma"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
   // Sem isso, Prisma 7 emite imports extensionless (`from './enums'`) que
   // o tsx aceita em dev mas o Node ESM strict rejeita em prod.
-  importFileExtension  = "js"
+  importFileExtension = "js"
 }
 
 datasource db {
@@ -32,16 +32,29 @@ model anuncio {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model avaliacao {
-  id                 BigInt          @id @default(autoincrement())
-  id_pedido          BigInt          @unique(map: "uq_avaliacao_pedido")
-  id_estabelecimento BigInt
-  nota               Int             @db.SmallInt
-  comentario         String?         @db.VarChar(500)
-  data_avaliacao     DateTime        @default(now()) @db.Timestamp(6)
-  estabelecimento    estabelecimento @relation(fields: [id_estabelecimento], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_avaliacao_estabelecimento")
-  pedido             pedido          @relation(fields: [id_pedido], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_avaliacao_pedido")
+  id                   BigInt                 @id @default(autoincrement())
+  id_pedido            BigInt                 @unique(map: "uq_avaliacao_pedido")
+  id_estabelecimento   BigInt
+  nota                 Int                    @db.SmallInt
+  comentario           String?                @db.VarChar(500)
+  data_avaliacao       DateTime               @default(now()) @db.Timestamp(6)
+  estabelecimento      estabelecimento        @relation(fields: [id_estabelecimento], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_avaliacao_estabelecimento")
+  pedido               pedido                 @relation(fields: [id_pedido], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_avaliacao_pedido")
+  comentario_avaliacao comentario_avaliacao[]
 
   @@index([id_estabelecimento], map: "idx_avaliacao_estabelecimento")
+}
+
+model comentario_avaliacao {
+  id              BigInt    @id @default(autoincrement())
+  id_avaliacao    BigInt
+  id_usuario      BigInt
+  comentario      String    @db.VarChar(500)
+  data_comentario DateTime  @default(now()) @db.Timestamp(6)
+  avaliacao       avaliacao @relation(fields: [id_avaliacao], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_comentario_avaliacao")
+  usuario         usuario   @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_comentario_usuario")
+
+  @@index([id_avaliacao], map: "idx_comentario_avaliacao")
 }
 
 model cliente {
@@ -69,6 +82,21 @@ model device_token {
   usuario       usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_device_token_usuario")
 
   @@index([id_usuario], map: "idx_device_token_usuario")
+}
+
+model push_subscription {
+  id              BigInt    @id @default(autoincrement())
+  id_usuario      BigInt
+  endpoint        String    @unique(map: "uq_push_subscription_endpoint") @db.VarChar(2048)
+  p256dh          String    @db.VarChar(255)
+  auth            String    @db.VarChar(255)
+  user_agent      String?   @db.VarChar(255)
+  expiration_time DateTime? @db.Timestamp(6)
+  data_registro   DateTime  @default(now()) @db.Timestamp(6)
+  ultimo_envio_ok DateTime? @db.Timestamp(6)
+  usuario         usuario   @relation(fields: [id_usuario], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_push_subscription_usuario")
+
+  @@index([id_usuario], map: "idx_push_subscription_usuario")
 }
 
 model endereco {
@@ -159,6 +187,7 @@ model pedido {
   cancelado_por       origem_cancelamento?
   motivo_cancelamento String?
   data_cancelamento   DateTime?            @db.Timestamp(6)
+  data_retirada        DateTime?            @db.Timestamp(6)
   avaliacao           avaliacao?
   item_pedido         item_pedido[]
   pagamento           pagamento?
@@ -206,10 +235,12 @@ model usuario {
   data_cadastro           DateTime                 @default(now()) @db.Timestamp(6)
   ativo                   Boolean                  @default(true)
   cliente                 cliente?
+  comentario_avaliacao    comentario_avaliacao[]
   comerciante             comerciante?
   device_token            device_token[]
   notificacao             notificacao[]
   preferencia_notificacao preferencia_notificacao?
+  push_subscription       push_subscription[]
 
   @@index([email], map: "idx_usuario_email")
   @@index([tipo], map: "idx_usuario_tipo")

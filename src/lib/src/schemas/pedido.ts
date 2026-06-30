@@ -29,6 +29,7 @@ export const PedidoSchema = z.object({
   status: StatusPedidoSchema,
   codigo_retirada: z.string().length(8),
   data_pedido: z.string().datetime(),
+  data_retirada: z.string().datetime().nullable().optional(),
   itens: z.array(ItemPedidoSchema),
 });
 export type Pedido = z.infer<typeof PedidoSchema>;
@@ -60,6 +61,17 @@ export const PedidoClienteListItemSchema = PedidoListaBaseSchema.extend({
     id: z.number().int().positive(),
     nome_fantasia: z.string(),
   }),
+  data_retirada: z.string().datetime().nullable().optional(),
+  avaliacao: z
+    .object({
+      id: z.number().int().positive(),
+      nota: z.number().int().min(1).max(5),
+      comentario: z.string().max(500).nullable().optional(),
+      data_avaliacao: z.string().datetime(),
+    })
+    .nullable(),
+  pode_avaliar: z.boolean(),
+  avaliacao_expira_em: z.string().datetime().nullable(),
 });
 export type PedidoClienteListItem = z.infer<typeof PedidoClienteListItemSchema>;
 

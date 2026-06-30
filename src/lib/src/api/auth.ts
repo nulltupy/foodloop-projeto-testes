@@ -3,12 +3,18 @@ import {
   AuthResponseSchema,
   type AuthResponse,
   type LoginRequest,
+  type RegisterComercianteRequest,
   type RegisterRequest,
 } from '../schemas/auth.js';
 import { UsuarioSchema, type UpdateUsuarioRequest, type Usuario } from '../schemas/usuario.js';
 
 export async function register(data: RegisterRequest): Promise<AuthResponse> {
   const r = await getApiClient().post('/api/v1/auth/register', data);
+  return AuthResponseSchema.parse(r.data);
+}
+
+export async function registerComerciante(data: RegisterComercianteRequest): Promise<AuthResponse> {
+  const r = await getApiClient().post('/api/v1/auth/register-comerciante', data);
   return AuthResponseSchema.parse(r.data);
 }
 

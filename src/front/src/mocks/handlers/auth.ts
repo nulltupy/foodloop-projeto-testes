@@ -1,5 +1,11 @@
 import { http, HttpResponse } from 'msw';
-import { ErrorCode, LoginRequestSchema, RegisterRequestSchema } from '@foodloop/lib';
+import {
+  ErrorCode,
+  LoginRequestSchema,
+  RegisterComercianteRequestSchema,
+  RegisterRequestSchema,
+} from '@foodloop/lib';
+import type { Endereco } from '@foodloop/lib';
 import { abrirSessao, db, usuarioPorAuth } from '../db';
 
 function erro(code: string, message: string, status: number) {
@@ -27,6 +33,48 @@ export const authHandlers = [
     const token = abrirSessao(id);
     return HttpResponse.json(
       { usuario: { id, nome: data.nome, email: data.email, tipo: data.tipo }, token },
+      { status: 201 },
+    );
+  }),
+
+  http.post('/api/v1/auth/register-comerciante', async ({ request }) => {
+    const parsed = RegisterComercianteRequestSchema.safeParse(await request.json());
+    if (!parsed.success) return erro(ErrorCode.VALIDACAO, 'Dados inválidos', 400);
+    const data = parsed.data;
+    if (db.usuarios.some((u) => u.email === data.email || u.cnpj === data.cnpj)) {
+      return erro(ErrorCode.CADASTRO_DUPLICADO, 'E-mail ou CNPJ já cadastrado', 409);
+    }
+
+    const idUsuario = db.proximoId.usuario++;
+    const idEstabelecimento = db.estabelecimentos.length + 1;
+    const endereco: Endereco = {
+      id: idEstabelecimento,
+      ...data.estabelecimento.endereco,
+      latitude: -23.55,
+      longitude: -46.63,
+    };
+    db.estabelecimentos.push({
+      id: idEstabelecimento,
+      nome_fantasia: data.estabelecimento.nome_fantasia,
+      descricao: data.estabelecimento.descricao ?? null,
+      horario_funcionamento: data.estabelecimento.horario_funcionamento ?? null,
+      nota_media: null,
+      ativo: true,
+      endereco,
+    });
+    db.usuarios.push({
+      id: idUsuario,
+      nome: data.nome,
+      email: data.email,
+      senha: data.senha,
+      telefone: data.telefone,
+      tipo: 'comerciante',
+      cnpj: data.cnpj,
+      id_estabelecimento: idEstabelecimento,
+    });
+    const token = abrirSessao(idUsuario);
+    return HttpResponse.json(
+      { usuario: { id: idUsuario, nome: data.nome, email: data.email, tipo: 'comerciante' }, token },
       { status: 201 },
     );
   }),

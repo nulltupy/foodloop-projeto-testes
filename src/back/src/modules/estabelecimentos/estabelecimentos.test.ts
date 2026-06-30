@@ -9,11 +9,11 @@ import { HttpError } from '../../shared/errors.js';
 import { signAccessToken } from '../../shared/jwt.js';
 
 import { criarAnuncioParaTeste } from '../anuncios/test-helpers.js';
-import { geocodingEndereco } from '../geocoding/service.js';
+import { geocodingEnderecoComFallback } from '../geocoding/service.js';
 
 // Geocoding mockado: testa o CRUD sem rede nem o limiter (1,1s) do Nominatim.
-vi.mock('../geocoding/service.js', () => ({ geocodingEndereco: vi.fn() }));
-const geoMock = vi.mocked(geocodingEndereco);
+vi.mock('../geocoding/service.js', () => ({ geocodingEnderecoComFallback: vi.fn() }));
+const geoMock = vi.mocked(geocodingEnderecoComFallback);
 
 const app = buildApp();
 

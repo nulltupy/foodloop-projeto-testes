@@ -1,5 +1,6 @@
 import { anunciosHandlers } from './anuncios';
 import { authHandlers } from './auth';
+import { avaliacoesHandlers } from './avaliacoes';
 import { estabelecimentosHandlers } from './estabelecimentos';
 import { notificacoesHandlers } from './notificacoes';
 import { pedidosHandlers } from './pedidos';
@@ -16,4 +17,5 @@ export const handlers = [
   ...produtosHandlers,
   ...pedidosHandlers,
   ...notificacoesHandlers,
+  ...avaliacoesHandlers,
 ];
