@@ -2,19 +2,19 @@
 
 ##  Visão geral
 
-A solução do FoodLoop adota uma arquitetura cliente-servidor baseada em três camadas principais: um aplicativo mobile multiplataforma no lado do cliente, uma API REST no lado do servidor e um banco de dados relacional responsável pela persistência das informações. A comunicação entre as camadas é realizada por meio do protocolo HTTPS, com troca de mensagens no formato JSON, e a autenticação dos usuários é mediada por tokens JWT.
+A solução do FoodLoop adota uma arquitetura **cliente-servidor** baseada em três camadas principais: uma **aplicação web responsiva** no lado do cliente, uma **API REST** no lado do servidor e um **banco de dados relacional** responsável pela persistência das informações. A comunicação entre as camadas é realizada por meio do protocolo **HTTPS**, com troca de mensagens no formato **JSON**, e a autenticação dos usuários é mediada por **tokens JWT**.
 
 Adicionalmente, a solução integra-se a um conjunto de serviços externos especializados — pagamento, geolocalização, armazenamento de mídia e notificações push — que ampliam as capacidades do sistema sem demandar desenvolvimento próprio dessas funcionalidades. Tal abordagem reduz a complexidade do back-end, encurta o ciclo de desenvolvimento e aumenta a confiabilidade dos componentes não centrais ao domínio do negócio.
 
 ##  Componentes da solução
 
-###  Front-end (aplicativo mobile)
+###  Front-end (aplicação web)
 
-O aplicativo é desenvolvido em React Native, framework que permite a construção de uma única base de código compilada simultaneamente para os sistemas operacionais Android e iOS. Essa escolha reduz o esforço de desenvolvimento e manutenção e garante consistência visual entre as plataformas. O aplicativo atende aos dois perfis de usuário (cliente e comerciante), com telas e fluxos diferenciados de acordo com o tipo de conta autenticada.
+A aplicação cliente é uma **SPA (Single Page Application) web responsiva**, desenvolvida em **React com Vite e TypeScript**, que roda em qualquer navegador moderno a partir de uma única base de código. O layout segue a abordagem *mobile-first*, adaptando-se a celulares, tablets e desktops sem necessidade de instalação. A aplicação atende aos dois perfis de usuário (cliente e comerciante), com telas e fluxos diferenciados de acordo com o tipo de conta autenticada.
 
 ###  Back-end (API REST)
 
-O back-end é implementado em Node.js com o framework Express, expondo uma API REST que recebe requisições do aplicativo mobile e devolve respostas em JSON. A API é responsável pelas regras de negócio do FoodLoop, incluindo gestão de usuários, de estabelecimentos parceiros, de anúncios de excedente, de pedidos, de pagamentos e de avaliações. A autenticação dos usuários é tratada por um módulo dedicado, baseado no padrão JWT (JSON Web Token), garantindo que cada requisição seja validada antes de acessar recursos protegidos.
+O back-end é implementado em **Node.js com o framework Express**, expondo uma **API REST** que recebe requisições da aplicação web e devolve respostas em JSON. A API é responsável pelas regras de negócio do FoodLoop, incluindo gestão de usuários, de estabelecimentos parceiros, de anúncios de excedente, de pedidos, de pagamentos e de avaliações. A autenticação dos usuários é tratada por um módulo dedicado, baseado no padrão **JWT (JSON Web Token)**, garantindo que cada requisição seja validada antes de acessar recursos protegidos.
 
 ###  Banco de dados
 
@@ -26,23 +26,24 @@ A solução delega funcionalidades especializadas a serviços externos consolida
 
 - **Firebase Storage** — armazenamento de imagens dos produtos anunciados e das fotos de perfil de usuários e comércios;
 - **Mercado Pago** — gateway de pagamento responsável pelo processamento das transações financeiras (cartão de crédito e PIX);
-- **Google Maps API** — fornecimento dos mapas, da geolocalização do cliente e das rotas até os estabelecimentos parceiros;
-- **Firebase Cloud Messaging (FCM)** — envio de notificações push ao aplicativo, utilizadas para alertar clientes sobre novos anúncios próximos e o status de seus pedidos, bem como para informar comerciantes sobre novas reservas.
+- **ViaCEP e Nominatim/OpenStreetMap** — resolução de CEPs e endereços em coordenadas geográficas para cadastro e busca por proximidade;
+- **Google Maps** — abertura de rotas por link externo a partir das coordenadas dos estabelecimentos;
+- **Firebase Cloud Messaging (FCM)** — serviço previsto para entrega de notificações push; a base de persistência de assinaturas Web Push já é modelada no banco e nos schemas compartilhados.
 
 ##  Ambiente de hospedagem
 
 O back-end e o banco de dados são hospedados na plataforma **Render**, serviço de cloud que oferece **plano gratuito** suficiente para o ciclo de desenvolvimento e para a apresentação do projeto. A plataforma fornece deploy automatizado a partir do repositório Git, certificado SSL nativo e gerenciamento simplificado de variáveis de ambiente, reduzindo a complexidade operacional do projeto.
 
-Os serviços externos (Firebase Storage, Firebase Cloud Messaging, Google Maps API e Mercado Pago) são consumidos diretamente de seus respectivos provedores, dispensando hospedagem própria. O aplicativo mobile, por sua vez, é executado nos dispositivos dos próprios usuários finais, distribuído por meio das lojas oficiais (Google Play Store e Apple App Store) ao final do ciclo de desenvolvimento.
+Os serviços externos (Firebase Storage, Firebase Cloud Messaging, ViaCEP, Nominatim/OpenStreetMap, Google Maps e Mercado Pago) são consumidos diretamente de seus respectivos provedores, dispensando hospedagem própria. A aplicação web, por sua vez, é entregue ao navegador dos usuários finais a partir de uma URL pública, sem necessidade de instalação por lojas de aplicativos.
 
 ##  Fluxo de comunicação entre os componentes
 
-1. O usuário (cliente ou comerciante) interage com o **aplicativo mobile**;
-2. O aplicativo envia requisições **HTTPS** à **API REST**, transportando dados em formato **JSON**;
+1. O usuário (cliente ou comerciante) interage com a **aplicação web** no navegador;
+2. A aplicação envia requisições **HTTPS** à **API REST**, transportando dados em formato **JSON**;
 3. A API valida o **token JWT** da requisição, processa a regra de negócio e consulta ou atualiza o **banco de dados PostgreSQL**;
-4. Quando necessário, a API comunica-se com os **serviços externos** (Mercado Pago para pagamento, Firebase Storage para imagens, Firebase Cloud Messaging para envio de push);
-5. O aplicativo também consome diretamente a **Google Maps API** para apresentar o mapa e a geolocalização;
-6. A API devolve a resposta em **JSON**, e o aplicativo atualiza a interface apresentada ao usuário.
+4. Quando necessário, a API comunica-se com os **serviços externos** (Mercado Pago para pagamento, Firebase Storage para imagens, Firebase Cloud Messaging para envio de push, ViaCEP e Nominatim/OpenStreetMap para geocoding);
+5. A aplicação usa as coordenadas retornadas pela API e pode abrir rotas em link externo do **Google Maps**;
+6. A API devolve a resposta em **JSON**, e a aplicação atualiza a interface apresentada ao usuário.
 
 **Diagrama de arquitetura da solução FoodLoop**
 
@@ -53,7 +54,7 @@ Os serviços externos (Firebase Storage, Firebase Cloud Messaging, Google Maps A
 
 A arquitetura proposta atende aos seguintes critérios:
 
-- **Multiplataforma com baixo custo de desenvolvimento:** o uso de React Native permite cobrir Android e iOS com uma única base de código;
+- **Multiplataforma com baixo custo de desenvolvimento:** a aplicação web responsiva roda em qualquer dispositivo com navegador (desktop, tablet e celular) a partir de uma única base de código, sem instalação por lojas;
 - **Escalabilidade horizontal do back-end:** a separação entre front-end, back-end e banco viabiliza a evolução independente de cada camada;
 - **Confiabilidade em funções não centrais:** a delegação de pagamento, mapas, armazenamento e notificações a provedores especializados elimina riscos técnicos significativos e reduz o esforço de desenvolvimento;
 - **Custo zero na fase acadêmica:** todos os serviços propostos oferecem planos gratuitos compatíveis com o porte do projeto.
@@ -304,30 +305,31 @@ A escolha do conjunto de tecnologias do FoodLoop priorizou três critérios: **a
 
 | **Camada / Dimensão** | **Tecnologia** | **Função no projeto** |
 | --- | --- | --- |
-| Front-end (mobile) | React Native via Expo (managed workflow) | Aplicativo multiplataforma Android e iOS a partir de uma única base de código |
-| Front-end (build/distribuição) | EAS Build (Expo Application Services) | Geração de APK/IPA na nuvem, sem necessidade de Mac para iOS |
-| Front-end (navegação) | React Navigation | Pilha de telas, abas e navegação por perfil de usuário |
+| Front-end (build) | Vite + React + TypeScript | SPA web responsiva (mobile-first) a partir de uma única base de código |
+| Front-end (estilo/UI) | Tailwind CSS | Estilização utilitária mobile-first e design system do projeto |
+| Front-end (navegação) | React Router | Roteamento de telas e navegação por perfil de usuário |
+| Front-end (estado/dados) | TanStack Query + Zustand | Cache de dados da API e estado global do cliente |
 | Front-end (HTTP) | Axios | Cliente HTTP para consumo da API REST |
-| Front-end (mapa) | react-native-maps + Google Maps SDK | Mapa nativo e marcadores de estabelecimentos próximos |
-| Front-end (push) | Expo Notifications + Firebase Cloud Messaging | Recebimento de notificações de status de pedido e novos anúncios |
-| Front-end (armazenamento local) | AsyncStorage | Persistência do token JWT e preferências locais |
+| Front-end (mapa/rota) | Links externos do Google Maps | Abertura de rota no navegador a partir das coordenadas do estabelecimento |
+| Front-end (push) | Web Push API + Firebase Cloud Messaging (planejado para entrega) | Base para assinatura Web Push no navegador e recebimento futuro de notificações de status de pedido e novos anúncios |
+| Front-end (armazenamento local) | Web Storage (localStorage) | Persistência do token JWT e preferências locais |
 | Back-end | Node.js LTS (v20) + Express | Servidor HTTP que expõe a API REST do FoodLoop |
 | Back-end (autenticação) | jsonwebtoken + bcrypt | Emissão e verificação de tokens JWT e hash seguro de senhas |
 | Back-end (banco) | Driver `pg` ou Prisma ORM | Acesso ao PostgreSQL a partir do Node.js |
-| Back-end (integrações) | firebase-admin, mercadopago, @googlemaps/google-maps-services-js | SDKs oficiais para FCM, gateway de pagamento e API do Google Maps |
+| Back-end (integrações) | `fetch`, Bottleneck e SDKs de provedores quando aplicável | Consulta a ViaCEP/Nominatim para geocoding, integração planejada com FCM e gateway de pagamento |
 | Back-end (qualidade) | helmet, cors, express-rate-limit | Cabeçalhos de segurança, controle de origem e limitação de requisições |
 | Banco de dados | PostgreSQL 16 | SGBD relacional para usuários, ofertas, pedidos, pagamentos e avaliações |
 | Serviços externos | Firebase Storage | Armazenamento de imagens de produtos e fotos de perfil |
-| Serviços externos | Firebase Cloud Messaging | Entrega de notificações push aos dispositivos |
+| Serviços externos | Firebase Cloud Messaging | Entrega planejada de notificações push Web; assinaturas persistidas em `push_subscription` |
 | Serviços externos | Mercado Pago (Checkout Pro) | Processamento de pagamentos via cartão de crédito e PIX |
-| Serviços externos | Google Maps Platform | Mapa, geocodificação reversa e cálculo de proximidade |
+| Serviços externos | ViaCEP + Nominatim/OpenStreetMap + Google Maps | Geocoding de CEP/endereço, cálculo de proximidade e abertura de rotas por link externo |
 | Hospedagem (back + banco) | Render (free tier) | Web service Node.js e banco PostgreSQL gerenciado |
 | Hospedagem (storage e push) | Firebase (plano Spark, gratuito) | Storage e FCM consumidos diretamente do Google |
-| IDE | Visual Studio Code | Desenvolvimento mobile e back-end |
+| IDE | Visual Studio Code | Desenvolvimento front-end e back-end |
 | Versionamento | Git + GitHub | Controle de versão e CI/CD via integração com Render |
 | Teste de API | Postman ou Insomnia | Validação manual de endpoints durante o desenvolvimento |
-| Emulador | Android Studio (AVD) e Expo Go em dispositivo físico | Execução do app durante o desenvolvimento |
-| Distribuição | Google Play Store e Apple App Store | Publicação pública do aplicativo após validação do MVP em campo |
+| Navegadores | Chrome, Firefox, Safari e Edge (DevTools, modo responsivo) | Execução e depuração da aplicação web durante o desenvolvimento |
+| Distribuição | Render Static Site ou Vercel (deploy por push) | Publicação pública da aplicação web por meio de URL acessível no navegador |
 | Padronização de código | ESLint + Prettier | Linting e formatação consistente em todo o repositório |
 | Documentação | Markdown no repositório GitHub | Documentos do projeto e diagramas Mermaid renderizados nativamente |
 
@@ -353,15 +355,15 @@ A configuração do serviço é descrita por um arquivo `render.yaml` versionado
 
 Os serviços abaixo são consumidos diretamente de seus provedores, sem qualquer infraestrutura mantida pela equipe:
 
-- **Firebase Storage e Firebase Cloud Messaging:** projeto criado no [Firebase Console](https://console.firebase.google.com) no plano Spark (gratuito), com migração para o plano pago Blaze prevista quando o volume de mídia ou de mensagens push ultrapassar a cota gratuita. As credenciais de administrador são geradas no console e injetadas como variáveis de ambiente na API hospedada no Render. O `google-services.json` (Android) e o `GoogleService-Info.plist` (iOS) ficam no projeto Expo do front-end.
-- **Google Maps Platform:** chave de API gerada no [Google Cloud Console](https://console.cloud.google.com) com a cota gratuita mensal de 200 dólares em uso. As APIs habilitadas são Maps SDK for Android, Maps SDK for iOS e Geocoding API. A chave é restringida por aplicativo (SHA-1 do APK e bundle id do iOS) para evitar uso indevido.
+- **Firebase Storage e Firebase Cloud Messaging:** projeto criado no [Firebase Console](https://console.firebase.google.com) no plano Spark (gratuito), com migração para o plano pago Blaze prevista quando o volume de mídia ou de mensagens push ultrapassar a cota gratuita. As credenciais de administrador são geradas no console e injetadas como variáveis de ambiente na API hospedada no Render quando o envio de push for conectado. No estágio atual, a solução já modela a persistência de assinaturas Web Push na tabela `push_subscription`.
+- **ViaCEP e Nominatim/OpenStreetMap:** o back-end usa ViaCEP para normalizar CEPs brasileiros e Nominatim/OpenStreetMap para converter endereços em latitude e longitude, com cache e limitação de taxa para respeitar a política de uso do serviço. Para rotas até o estabelecimento, o front-end abre um link externo do Google Maps com as coordenadas já conhecidas, sem depender de Maps JavaScript API no bundle.
 - **Mercado Pago:** conta de desenvolvedor criada no [Mercado Pago Developers](https://www.mercadopago.com.br/developers). Durante o desenvolvimento usa-se o par de credenciais de teste, e no lançamento substitui-se pelas credenciais de produção. O webhook de notificação de pagamento é apontado para a URL pública do back-end no Render. A comissão por transação (RF-011) é descontada no momento da liquidação, sem custo fixo mensal.
 
-### Aplicativo mobile — distribuição
+### Front-end web — distribuição
 
-Durante o desenvolvimento, o aplicativo roda em dispositivos físicos via app **Expo Go** ou via **development build** gerado pelo EAS Build. Para a fase de validação com usuários reais (clientes da Couto Lanches e do primeiro grupo de estabelecimentos parceiros), o EAS Build gera APKs Android distribuídos por link direto e builds iOS via TestFlight, permitindo rodadas rápidas de feedback antes da publicação pública.
+Durante o desenvolvimento, o front-end roda localmente no servidor de desenvolvimento do **Vite** e é acessado pelo navegador. Para a fase de validação com usuários reais (clientes da Couto Lanches e do primeiro grupo de estabelecimentos parceiros), a SPA é publicada em um host de site estático (**Render Static Site** ou **Vercel**) com deploy automático a cada `git push`, permitindo rodadas rápidas de feedback por meio de uma URL pública — sem instalação e sem dependência de lojas de aplicativos.
 
-A publicação na Google Play Store e na Apple App Store ocorre quando o produto atingir os critérios de prontidão definidos pela equipe (estabilidade, completude dos RFs de alta prioridade e cobertura mínima das duas plataformas). As contas de desenvolvedor já estão dimensionadas no orçamento do produto: 25 dólares de taxa única na Google Play Console e 99 dólares anuais na Apple Developer Program.
+A disponibilização pública ocorre assim que o produto atingir os critérios de prontidão definidos pela equipe (estabilidade, completude dos RFs de alta prioridade e responsividade nas principais resoluções). Como a entrega é via web, não há custos de taxas de loja nem ciclos de revisão de aplicativos.
 
 ### Resumo da topologia de hospedagem
 
@@ -371,10 +373,10 @@ A publicação na Google Play Store e na Apple App Store ocorre quando o produto
 | Banco de dados (PostgreSQL) | Render | Free Postgres | Zero |
 | Armazenamento de imagens | Firebase Storage | Spark | Zero |
 | Notificações push | Firebase Cloud Messaging | Spark | Zero |
-| Mapas e geocodificação | Google Maps Platform | Free monthly credit | Zero dentro da cota |
+| Mapas, geocodificação e rotas | ViaCEP + Nominatim/OpenStreetMap + links Google Maps | Gratuitos | Zero dentro das políticas de uso |
 | Gateway de pagamento | Mercado Pago | Conta padrão | Comissão por transação |
-| Build do aplicativo | EAS Build (Expo) | Free | 30 builds/mês gratuitos |
-| Distribuição de teste | Link interno do EAS | — | Zero |
+| Front-end (SPA web) | Render Static Site ou Vercel | Free | Zero |
+| Distribuição | URL pública (deploy por push) | — | Zero |
 
 ## Qualidade de software
 
@@ -383,7 +385,7 @@ A publicação na Google Play Store e na Apple App Store ocorre quando o produto
 
 Para orientar o desenvolvimento do FoodLoop, a equipe selecionou subcaracterísticas da norma ISO/IEC 25010 que dialogam diretamente com os requisitos funcionais e não funcionais do projeto. A norma define oito características (Adequação Funcional, Eficiência de Desempenho, Compatibilidade, Usabilidade, Confiabilidade, Segurança, Manutenibilidade e Portabilidade) e trinta subcaracterísticas no total.
 
-Foram escolhidas seis características e sete subcaracterísticas, cobrindo o que se considera essencial para um aplicativo mobile que envolve transações financeiras, geolocalização em tempo real e disponibilidade nos horários comerciais críticos. Cada subcaracterística está vinculada a um ou mais requisitos do projeto, com uma métrica concreta que permitirá à equipe avaliar o atendimento da qualidade ao longo das sprints.
+Foram escolhidas seis características e sete subcaracterísticas, cobrindo o que se considera essencial para uma aplicação web que envolve transações financeiras, geolocalização em tempo real e disponibilidade nos horários comerciais críticos. Cada subcaracterística está vinculada a um ou mais requisitos do projeto, com uma métrica concreta que permitirá à equipe avaliar o atendimento da qualidade ao longo das sprints.
 
 ## Subcaracterísticas selecionadas
 
@@ -429,11 +431,11 @@ Métrica: percentual de transações financeiras transmitidas via HTTPS com crip
 
 ### Compatibilidade — Coexistência
 
-O RNF-001 determina que o aplicativo será construído em React Native, com publicação simultânea nas lojas Android e iOS. A subcaracterística de coexistência cobre a necessidade de o app operar bem ao lado de outros aplicativos no dispositivo, sem competir por recursos a ponto de degradar a experiência.
+O RNF-001 determina que o produto será uma aplicação web responsiva, acessível por navegador em desktop e em dispositivos móveis. A subcaracterística de coexistência cobre a necessidade de a aplicação operar bem nos diferentes navegadores e ao lado de outras abas e aplicações, sem competir por recursos a ponto de degradar a experiência.
 
-Requisitos amarrados: RNF-001 (compatibilidade Android e iOS via React Native).
+Requisitos amarrados: RNF-001 (aplicação web responsiva compatível com os principais navegadores).
 
-Métrica: percentual de telas críticas (login, mapa, reserva, pagamento e avaliação) renderizadas corretamente nos dois sistemas operacionais, em pelo menos um dispositivo de cada gama (entrada e intermediário) por SO. Meta: 100% de equivalência funcional e visual nas telas críticas.
+Métrica: percentual de telas críticas (login, listagem/mapa, reserva, pagamento e avaliação) renderizadas corretamente nos principais navegadores (Chrome, Firefox, Safari e Edge), em resoluções de celular e de desktop. Meta: 100% de equivalência funcional e visual nas telas críticas.
 
 ## Síntese das métricas
 
@@ -449,7 +451,5 @@ Métrica: percentual de telas críticas (login, mapa, reserva, pagamento e avali
 | Confiabilidade | Disponibilidade | uptime das 18h às 22h | maior ou igual a 99% |
 | Segurança | Confidencialidade e integridade | transações criptografadas via HTTPS | 100% |
 | Segurança | Confidencialidade e integridade | incidentes de acesso não autorizado | zero por sprint |
-| Compatibilidade | Coexistência | telas críticas equivalentes em Android e iOS | 100% |
-
-
+| Compatibilidade | Coexistência | telas críticas equivalentes nos principais navegadores | 100% |
 
