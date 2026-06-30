@@ -7,6 +7,8 @@ import { dataHora } from '../../../lib/format';
 
 const CHAVE = ['notificacoes'];
 
+type DadosLista = { itens: Notificacao[]; naoLidas: number };
+
 export function SinoNotificacoes() {
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -24,13 +26,46 @@ export function SinoNotificacoes() {
   function invalidar() {
     void qc.invalidateQueries({ queryKey: CHAVE });
   }
+
+  // Atualiza o cache na hora (otimista): o lido reflete sem esperar o refetch (sem F5).
+  function aplicarLocal(transform: (d: DadosLista) => DadosLista) {
+    const anterior = qc.getQueryData<DadosLista>(CHAVE);
+    if (anterior) qc.setQueryData<DadosLista>(CHAVE, transform(anterior));
+    return anterior;
+  }
+
   const marcar = useMutation({
     mutationFn: (id: number) => api.notificacoes.marcarLida(id),
-    onSuccess: invalidar,
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: CHAVE });
+      return {
+        anterior: aplicarLocal((d) => ({
+          itens: d.itens.map((n) => (n.id === id ? { ...n, lida: true } : n)),
+          naoLidas: d.itens.some((n) => n.id === id && !n.lida) ? Math.max(0, d.naoLidas - 1) : d.naoLidas,
+        })),
+      };
+    },
+    onError: (_e, _id, ctx) => {
+      if (ctx?.anterior) qc.setQueryData(CHAVE, ctx.anterior);
+    },
+    onSettled: invalidar,
   });
+
   const lerTodas = useMutation({
     mutationFn: () => api.notificacoes.lerTodas(),
-    onSuccess: invalidar,
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: CHAVE });
+      return {
+        anterior: aplicarLocal((d) => ({
+          itens: d.itens.map((n) => ({ ...n, lida: true })),
+          naoLidas: 0,
+        })),
+      };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.anterior) qc.setQueryData(CHAVE, ctx.anterior);
+    },
+    onSettled: invalidar,
   });
 
   function abrir(n: Notificacao) {
