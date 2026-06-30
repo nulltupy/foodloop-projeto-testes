@@ -14,6 +14,7 @@ const CENTRO_BETIM = { latitude: -19.954, longitude: -44.199 };
 const RAIO_BUSCA_KM = 5000;
 const CATEGORIAS = ['Padaria', 'Lanche', 'Refeição', 'Doce', 'Bebida', 'Hortifruti'];
 const PARAM_ESTABELECIMENTO = 'estabelecimento';
+const BUSCA_MAX = 80;
 type OrdemDistancia = 'asc' | 'desc';
 
 function moeda(valor: number): string {
@@ -367,8 +368,8 @@ export function Home() {
       )}
 
       {/* Barra de filtro: Filtrar + busca à esquerda, contagem à direita. */}
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <div className="flex flex-1 items-center gap-2">
+      <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           <button
             type="button"
             onClick={() => setSheetAberto(true)}
@@ -382,11 +383,12 @@ export function Home() {
               </span>
             )}
           </button>
-          <div className="relative flex-1">
+          <div className="relative min-w-0 flex-1">
             <input
               type="text"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
+              maxLength={BUSCA_MAX}
               placeholder="Buscar produto ou estabelecimento"
               aria-label="Buscar produto ou estabelecimento"
               className="min-h-11 w-full rounded-full border border-canvas-line bg-canvas-card py-2.5 pl-4 pr-10 text-sm text-ink shadow-soft transition-colors placeholder:text-ink-mute/70 focus:border-leaf focus:outline-none focus:ring-2 focus:ring-leaf/25"
@@ -414,7 +416,7 @@ export function Home() {
           </div>
         </div>
         {!isLoading && data && (
-          <span className="shrink-0 text-sm font-semibold text-ink-mute">
+          <span className="self-end text-sm font-semibold text-ink-mute sm:shrink-0 sm:self-auto">
             {ofertas.length} {ofertas.length === 1 ? 'oferta' : 'ofertas'}
           </span>
         )}

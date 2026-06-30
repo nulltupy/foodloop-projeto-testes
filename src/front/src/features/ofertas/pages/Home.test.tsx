@@ -104,7 +104,10 @@ describe('Home — busca por produto ou estabelecimento', () => {
     renderHome();
     await screen.findAllByRole('link');
 
-    await userEvent.type(screen.getByPlaceholderText('Buscar produto ou estabelecimento'), 'pão');
+    const busca = screen.getByPlaceholderText('Buscar produto ou estabelecimento');
+    expect(busca).toHaveAttribute('maxLength', '80');
+
+    await userEvent.type(busca, 'pão');
 
     await waitFor(() => {
       expect(vi.mocked(api.anuncios.listar).mock.calls.some((args) => args[0].q === 'pão')).toBe(true);
