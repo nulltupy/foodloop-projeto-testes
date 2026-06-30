@@ -6,7 +6,7 @@ import type { PedidoClienteListItem, StatusPedido } from '@foodloop/lib';
 import { BADGE_STATUS, ehAtivo, ROTULO_STATUS } from '../status';
 import { dataHora, moeda } from '../../../lib/format';
 import { mensagemErro } from '../../../lib/erros';
-import { Marca } from '../../../components/ui/Marca';
+import { LogoBig } from '../../../components/ui/Logo';
 import { NotaEstrelas } from '../../../components/ui/NotaEstrelas';
 import { FormAvaliacao } from '../../avaliacoes/components/FormAvaliacao';
 
@@ -107,7 +107,7 @@ export function MeusPedidos() {
       )}
       {pedidosQ.data && pedidos.length === 0 && (
         <div className="card mx-auto mt-10 max-w-sm p-8 text-center">
-          <Marca className="mx-auto h-12 w-12" />
+          <LogoBig className="mx-auto h-16 w-auto" />
           <p className="mt-4 text-lg font-extrabold text-ink">Nenhum pedido ainda</p>
           <p className="mt-1 text-ink-soft">Que tal resgatar algo gostoso pertinho de você?</p>
           <Link to="/" className="btn btn-primary mt-5">

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, LoginRequestSchema, type LoginRequest } from '@foodloop/lib';
 import { useAuthStore } from '../store';
-import { Marca } from '../../../components/ui/Marca';
+import { LogoBig } from '../../../components/ui/Logo';
 
 export function Login() {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export function Login() {
     <main className="mx-auto flex min-h-[calc(100vh-4.5rem)] w-full max-w-md flex-col justify-center p-6">
       <div className="card animate-rise p-7 sm:p-9">
         <div className="text-center">
-          <Marca className="mx-auto h-14 w-14" />
+          <LogoBig className="mx-auto h-20 w-auto" />
           <h1 className="mt-4 text-3xl font-extrabold text-ink">Que bom te ver</h1>
           <p className="mt-1.5 text-ink-soft">Entre e resgate comida boa pertinho de você.</p>
         </div>
