@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
 import { NotaEstrelas } from '../../../components/ui/NotaEstrelas';
-import { Marca } from '../../../components/ui/Marca';
+import { LogoSmall } from '../../../components/ui/Logo';
 
 function moeda(valor: number): string {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -90,7 +90,7 @@ export function OfertaDetalhe() {
             <img src={produto.imagem} alt={produto.nome} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <Marca className="h-14 w-14" />
+              <LogoSmall className="h-16 w-16" />
             </div>
           )}
           {off > 0 && (

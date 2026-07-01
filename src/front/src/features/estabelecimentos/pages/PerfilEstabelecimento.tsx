@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
 import type { Endereco } from '@foodloop/lib';
-import { Marca } from '../../../components/ui/Marca';
+import { LogoSmall } from '../../../components/ui/Logo';
 import { NotaEstrelas } from '../../../components/ui/NotaEstrelas';
 import { AvaliacoesEstabelecimento } from '../../avaliacoes/components/AvaliacoesEstabelecimento';
 
@@ -137,7 +137,7 @@ export function PerfilEstabelecimento() {
 
       <header className="flex flex-col gap-5 border-b border-canvas-line pb-6 sm:flex-row sm:items-center">
         <div className="grid h-24 w-24 shrink-0 place-items-center rounded-2xl border border-canvas-line bg-leaf-50">
-          <Marca className="h-12 w-12 opacity-85" />
+          <LogoSmall className="h-14 w-14 opacity-85" />
         </div>
 
         <div className="min-w-0 flex-1">

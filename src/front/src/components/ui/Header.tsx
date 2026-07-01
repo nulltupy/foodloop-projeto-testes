@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../features/auth/store';
 import { SinoNotificacoes } from '../../features/notificacoes/components/SinoNotificacoes';
-import { Marca } from './Marca';
+import { LogoSmall } from './Logo';
 
 // Iniciais do nome para o avatar (ex.: "Maria Silva" -> "MS").
 function iniciais(nome: string): string {
@@ -37,7 +37,7 @@ export function Header() {
     <header className="sticky top-0 z-30 border-b border-canvas-line bg-canvas-card/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3">
         <Link to={inicio} className="flex items-center gap-2" aria-label="FoodLoop — início">
-          <Marca className="h-9 w-9" />
+          <LogoSmall className="h-9 w-9" />
           <span className="text-xl font-extrabold text-leaf-dark">
             FoodLoop<span className="text-citrus">.</span>
           </span>

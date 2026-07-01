@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
 import type { AnuncioListItem, ListarAnunciosQuery } from '@foodloop/lib';
 import { useGeoCoords } from '../hooks/useGeoCoords';
-import { Marca } from '../../../components/ui/Marca';
+import { LogoBig, LogoSmall } from '../../../components/ui/Logo';
 import { NotaEstrelas } from '../../../components/ui/NotaEstrelas';
 import { Sheet } from '../../../components/ui/Sheet';
 
@@ -109,7 +109,7 @@ function OfertaCard({ oferta, indice }: { oferta: AnuncioListItem; indice: numbe
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <Marca className="h-11 w-11 opacity-80" />
+            <LogoSmall className="h-12 w-12 opacity-80" />
           </div>
         )}
         {off > 0 && (
@@ -462,13 +462,13 @@ export function Home() {
         ofertas.length === 0 &&
         (buscaTrim ? (
           <div className="card mx-auto mt-8 max-w-sm p-8 text-center">
-            <Marca className="mx-auto h-12 w-12" />
+            <LogoBig className="mx-auto h-16 w-auto" />
             <p className="mt-4 text-lg font-extrabold text-ink">Nenhuma oferta encontrada</p>
             <p className="mt-1 text-ink-soft">Tente outro produto ou estabelecimento.</p>
           </div>
         ) : (
           <div className="card mx-auto mt-8 max-w-sm p-8 text-center">
-            <Marca className="mx-auto h-12 w-12" />
+            <LogoBig className="mx-auto h-16 w-auto" />
             <p className="mt-4 text-lg font-extrabold text-ink">Nenhuma oferta por aqui</p>
             <p className="mt-1 text-ink-soft">Tente limpar os filtros.</p>
             <button
