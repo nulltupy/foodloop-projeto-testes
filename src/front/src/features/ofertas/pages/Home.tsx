@@ -109,7 +109,7 @@ function OfertaCard({ oferta, indice }: { oferta: AnuncioListItem; indice: numbe
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <LogoSmall className="h-12 w-12 opacity-80" />
+            <LogoSmall className="h-[94px] w-[94px] opacity-80" />
           </div>
         )}
         {off > 0 && (
@@ -462,13 +462,13 @@ export function Home() {
         ofertas.length === 0 &&
         (buscaTrim ? (
           <div className="card mx-auto mt-8 max-w-sm p-8 text-center">
-            <LogoBig className="mx-auto h-16 w-auto" />
+            <LogoBig className="mx-auto h-[125px] w-auto" />
             <p className="mt-4 text-lg font-extrabold text-ink">Nenhuma oferta encontrada</p>
             <p className="mt-1 text-ink-soft">Tente outro produto ou estabelecimento.</p>
           </div>
         ) : (
           <div className="card mx-auto mt-8 max-w-sm p-8 text-center">
-            <LogoBig className="mx-auto h-16 w-auto" />
+            <LogoBig className="mx-auto h-[125px] w-auto" />
             <p className="mt-4 text-lg font-extrabold text-ink">Nenhuma oferta por aqui</p>
             <p className="mt-1 text-ink-soft">Tente limpar os filtros.</p>
             <button

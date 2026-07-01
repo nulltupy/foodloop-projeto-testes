@@ -107,7 +107,7 @@ export function MeusPedidos() {
       )}
       {pedidosQ.data && pedidos.length === 0 && (
         <div className="card mx-auto mt-10 max-w-sm p-8 text-center">
-          <LogoBig className="mx-auto h-16 w-auto" />
+          <LogoBig className="mx-auto h-[125px] w-auto" />
           <p className="mt-4 text-lg font-extrabold text-ink">Nenhum pedido ainda</p>
           <p className="mt-1 text-ink-soft">Que tal resgatar algo gostoso pertinho de você?</p>
           <Link to="/" className="btn btn-primary mt-5">

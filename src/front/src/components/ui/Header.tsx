@@ -37,7 +37,7 @@ export function Header() {
     <header className="sticky top-0 z-30 border-b border-canvas-line bg-canvas-card/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-3">
         <Link to={inicio} className="flex items-center gap-2" aria-label="FoodLoop — início">
-          <LogoSmall className="h-9 w-9" />
+          <LogoSmall className="h-[70px] w-[70px]" />
           <span className="text-xl font-extrabold text-leaf-dark">
             FoodLoop<span className="text-citrus">.</span>
           </span>

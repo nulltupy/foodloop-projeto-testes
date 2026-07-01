@@ -137,7 +137,7 @@ export function PerfilEstabelecimento() {
 
       <header className="flex flex-col gap-5 border-b border-canvas-line pb-6 sm:flex-row sm:items-center">
         <div className="grid h-24 w-24 shrink-0 place-items-center rounded-2xl border border-canvas-line bg-leaf-50">
-          <LogoSmall className="h-14 w-14 opacity-85" />
+          <LogoSmall className="h-[109px] w-[109px] opacity-85" />
         </div>
 
         <div className="min-w-0 flex-1">

@@ -90,7 +90,7 @@ export function OfertaDetalhe() {
             <img src={produto.imagem} alt={produto.nome} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <LogoSmall className="h-16 w-16" />
+              <LogoSmall className="h-[125px] w-[125px]" />
             </div>
           )}
           {off > 0 && (
