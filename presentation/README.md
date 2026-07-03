@@ -21,7 +21,4 @@
 
 ## Vídeo
 
-<video controls preload="metadata" width="100%">
-  <source src="./pitch-foodloop.mp4" type="video/mp4">
-  Seu navegador não suporta a reprodução de vídeo.
-</video>
+[pitch-foodloop.mp4](pitch-foodloop.mp4)
