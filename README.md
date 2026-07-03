@@ -212,3 +212,4 @@ bash .github/scripts/setup-branch-protection.sh
 # Apresentação
 
 - <a href="presentation/README.md">Apresentação do projeto</a>
+- <a href="presentation/pitch-foodloop.mp4">Vídeo de apresentação do FoodLoop</a>
