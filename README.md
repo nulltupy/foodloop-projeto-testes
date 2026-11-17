@@ -1,5 +1,20 @@
 # FoodLoop
 
+> [!NOTE]
+> **Projeto de Testes — Teste e Manutenção de Software (2026/2)**
+>
+> Este repositório usa o FoodLoop (TI de 2026/1) como base para o Projeto de Testes do grupo de
+> Caio Vieira, Cristiano Tupynambá, Eduardo Antunes, Guilherme de Aguilar Coelho,
+> Gustavo de Aguilar Coelho, Mateus Enrico e Max Augusto.
+>
+> - **Tudo sobre os testes:** [`testes-tms/`](testes-tms) (com o passo a passo para rodar)
+> - **Plano de testes:** [Word](testes-tms/Plano%20de%20Testes%20-%20FoodLoop.docx) ·
+>   [PDF](testes-tms/Plano%20de%20Testes%20-%20FoodLoop.pdf)
+> - **Testes unitários:** [`src/front/src/testes-tms/unitarios.test.ts`](src/front/src/testes-tms/unitarios.test.ts)
+> - **Testes Selenium:** [`testes-tms/selenium/specs/foodloop.spec.js`](testes-tms/selenium/specs/foodloop.spec.js)
+>
+> O restante deste README é o original do TI.
+
 `CURSO: Sistemas de Informação`
 
 `DISCIPLINA: Trabalho Interdisciplinar Aplicações para Sustentabilidade`
