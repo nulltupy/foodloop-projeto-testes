@@ -1,0 +1,30 @@
+// Checkout.tsx (ANTES)
+function moeda(valor: number): string {
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function codigoErro(e: unknown): string | undefined {
+  return (e as { response?: { data?: { error?: { code?: string } } } }).response?.data?.error?.code;
+}
+
+  async function finalizar() {
+    const item = itens[0];
+    if (!item) return;
+    setErro(null);
+    setEnviando(true);
+    try {
+      const pedido = await api.pedidos.criar({
+        itens: [{ id_anuncio: item.id_anuncio, quantidade: item.quantidade }],
+      });
+      limpar();
+      navigate(`/pedidos/${pedido.id}`);
+    } catch (e) {
+      setErro(
+        codigoErro(e) === 'ANUNCIO_ESGOTADO'
+          ? 'Um dos itens não está mais disponível.'
+          : 'Não foi possível concluir a reserva. Tente novamente.',
+      );
+    } finally {
+      setEnviando(false);
+    }
+  }

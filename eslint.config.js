@@ -33,6 +33,12 @@ export default tseslint.config(
     },
   },
 
+  // Testes Selenium do Projeto de Testes (Node + Mocha)
+  {
+    files: ['testes-tms/selenium/**/*.js'],
+    languageOptions: { globals: { ...globals.node, ...globals.mocha } },
+  },
+
   // Front-end (React)
   {
     files: ['src/front/**/*.{ts,tsx}'],

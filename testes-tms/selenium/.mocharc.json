@@ -1,0 +1,6 @@
+{
+  "spec": ["specs/**/*.spec.js"],
+  "timeout": 60000,
+  "reporter": "spec",
+  "slow": 5000
+}

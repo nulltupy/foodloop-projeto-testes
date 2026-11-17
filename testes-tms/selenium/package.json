@@ -1,0 +1,14 @@
+{
+  "name": "foodloop-testes-selenium",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Suíte de testes funcionais automatizados (Selenium) do FoodLoop — Projeto de Testes TMS",
+  "type": "module",
+  "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "^10.8.2",
+    "selenium-webdriver": "^4.27.0"
+  }
+}

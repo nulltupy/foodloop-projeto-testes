@@ -2,15 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@foodloop/lib';
+import { moeda } from '../../../lib/format';
 import { useCarrinho } from '../store';
-
-function moeda(valor: number): string {
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
-function codigoErro(e: unknown): string | undefined {
-  return (e as { response?: { data?: { error?: { code?: string } } } }).response?.data?.error?.code;
-}
+import { mensagemFalhaReserva } from '../mensagens';
 
 export function Checkout() {
   const [params] = useSearchParams();
@@ -52,11 +46,7 @@ export function Checkout() {
       limpar();
       navigate(`/pedidos/${pedido.id}`);
     } catch (e) {
-      setErro(
-        codigoErro(e) === 'ANUNCIO_ESGOTADO'
-          ? 'Um dos itens não está mais disponível.'
-          : 'Não foi possível concluir a reserva. Tente novamente.',
-      );
+      setErro(mensagemFalhaReserva(e));
     } finally {
       setEnviando(false);
     }

@@ -1,0 +1,32 @@
+// src/features/checkout/mensagens.ts (NOVO)
+import { codigoErro } from '../../lib/erros';
+
+export const MSG_ITEM_ESGOTADO = 'Um dos itens não está mais disponível.';
+export const MSG_FALHA_RESERVA = 'Não foi possível concluir a reserva. Tente novamente.';
+
+export function mensagemFalhaReserva(e: unknown): string {
+  return codigoErro(e) === 'ANUNCIO_ESGOTADO' ? MSG_ITEM_ESGOTADO : MSG_FALHA_RESERVA;
+}
+
+// Checkout.tsx (DEPOIS)
+import { moeda } from '../../../lib/format';
+import { useCarrinho } from '../store';
+import { mensagemFalhaReserva } from '../mensagens';
+
+  async function finalizar() {
+    const item = itens[0];
+    if (!item) return;
+    setErro(null);
+    setEnviando(true);
+    try {
+      const pedido = await api.pedidos.criar({
+        itens: [{ id_anuncio: item.id_anuncio, quantidade: item.quantidade }],
+      });
+      limpar();
+      navigate(`/pedidos/${pedido.id}`);
+    } catch (e) {
+      setErro(mensagemFalhaReserva(e));
+    } finally {
+      setEnviando(false);
+    }
+  }

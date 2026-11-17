@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "lint": "eslint src --max-warnings 0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev:e2e": "vite --mode e2e",
+    "test:unit": "vitest run src/testes-tms --reporter=verbose"
   },
   "dependencies": {
     "@foodloop/lib": "*",

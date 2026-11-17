@@ -1,0 +1,21 @@
+
+
+  FoodLoop — testes funcionais automatizados (Selenium)
+    Login
+      ✔ CT11 - Entrar como cliente com e-mail e senha válidos
+      ✔ CT12 - Tentar entrar com a senha errada
+      ✔ CT13 - Tentar entrar com os campos em branco
+    Cadastro de cliente
+      ✔ CT14 - Criar conta de cliente com dados válidos
+      ✔ CT15 - Tentar cadastrar com telefone fora do padrão
+      ✔ CT16 - Tentar cadastrar um e-mail que já existe
+    Ofertas e reserva
+      ✔ CT17 - Buscar uma oferta pelo nome do produto (2791ms)
+      ✔ CT18 - Buscar um produto que não existe (3463ms)
+      ✔ CT19 - Reservar uma oferta disponível e receber o código de retirada
+    Controle de acesso
+      ✔ CT20 - Abrir "Meus pedidos" sem estar logado
+
+
+  10 passing (31s)
+

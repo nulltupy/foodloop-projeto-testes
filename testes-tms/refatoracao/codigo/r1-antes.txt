@@ -1,0 +1,18 @@
+// OfertaDetalhe.tsx (ANTES)
+function moeda(valor: number): string {
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+// Contagem regressiva até o prazo de retirada, atualizada a cada segundo.
+function tempoRestante(prazoIso: string, agora: number): string {
+  const restante = new Date(prazoIso).getTime() - agora;
+  if (restante <= 0) return 'Prazo encerrado';
+  const h = Math.floor(restante / 3_600_000);
+  const m = Math.floor((restante % 3_600_000) / 60_000);
+  const s = Math.floor((restante % 60_000) / 1000);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+  // ... dentro do componente:
+  const encerrando =
+    prazo !== 'Prazo encerrado' && new Date(anuncio.prazo_retirada).getTime() - agora < 2 * 3_600_000;

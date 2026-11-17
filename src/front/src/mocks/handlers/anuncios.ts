@@ -98,6 +98,15 @@ export const anunciosHandlers = [
     if (q.id_estabelecimento !== undefined) {
       itens = itens.filter((li) => li.id_estabelecimento === q.id_estabelecimento);
     }
+    // Busca textual igual à do back (ILIKE em produto OU estabelecimento).
+    // Antes o mock ignorava o parâmetro q (defeito DEF01 do Projeto de Testes).
+    if (q.q) {
+      const termo = q.q.toLowerCase();
+      itens = itens.filter(
+        (li) =>
+          li.produto_nome.toLowerCase().includes(termo) || li.nome_fantasia.toLowerCase().includes(termo),
+      );
+    }
 
     itens.sort((a, b) => a.distancia_km - b.distancia_km);
 

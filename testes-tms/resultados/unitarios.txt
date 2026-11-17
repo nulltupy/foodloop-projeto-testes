@@ -1,0 +1,15 @@
+ RUN  v2.1.9 C:/Users/Cristiano/AppData/Local/Claude-Data/claude_pzs8sxrjxfjjc/scratch-workspaces/c0f03bd5-ba4c-4474-8846-c7ca7616eb5f/3a879876-6d54-4788-8452-c5d63ea124ea/scratch-2026-11-17-d6ca79/fl/src/front
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT01 - Formatar valores em reais
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT02 - Identificar se um pedido ainda está em andamento
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT03 - Escolher a mensagem de erro certa para o usuário
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT04 - Calcular o tempo que falta para retirar a oferta
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > Carrinho > CT05 - Não duplicar a mesma oferta no carrinho e somar o total
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT06 - Exigir CNPJ no cadastro de comerciante
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT07 - Validar o tamanho da senha (mínimo 8 caracteres, máximo 72 bytes)
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT08 - Limitar o pedido a 1 item com até 20 unidades
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT09 - Tratar os filtros da busca de ofertas
+ ✓ src/testes-tms/unitarios.test.ts > Testes unitários — FoodLoop > CT10 - Gerar código de retirada e mensagem de falha na reserva
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  17:59:33
+   Duration  21.38s (transform 606ms, setup 3.13s, collect 243ms, tests 91ms, environment 2.46s, prepare 347ms)

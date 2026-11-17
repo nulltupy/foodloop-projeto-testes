@@ -10,15 +10,25 @@ const qc = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
 
+// Modo e2e (testes Selenium do Projeto de Testes): liga a API simulada do MSW
+// antes de montar a tela. Fora desse modo não faz nada.
+async function prepararMocks(): Promise<void> {
+  if (import.meta.env.VITE_USE_MOCKS !== 'true') return;
+  const { worker } = await import('./mocks/browser');
+  await worker.start({ onUnhandledRequest: 'bypass', quiet: true });
+}
+
 const root = document.getElementById('root');
 if (!root) throw new Error('Elemento #root ausente em index.html');
 
-ReactDOM.createRoot(root).render(
-  <React.StrictMode>
-    <QueryClientProvider client={qc}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
-  </React.StrictMode>,
-);
+void prepararMocks().then(() => {
+  ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+      <QueryClientProvider client={qc}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </React.StrictMode>,
+  );
+});
